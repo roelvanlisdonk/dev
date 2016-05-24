@@ -20,3 +20,19 @@ update	l
 set		l.ApprovedConditions = null
 from	[login] l with (nolock)
 where	l.Id = 1711
+
+-- Toon tweestapsverificatie methode gegevens per login.
+select	* 
+from	LoginTwoFactorAuthenticationType with (nolock)
+where	LoginId = 1711
+
+-- Zet alternatieve tweestapsverificatie methode.
+update	lt
+set		lt.TwoFactorAuthenticationTypeId = 4
+from	LoginTwoFactorAuthenticationType lt with (nolock)
+where	lt.LoginId = 1711
+and		lt.Volgorde = 2
+
+-- Toon tweestapsverificatie methodes.
+select	*
+from	TwoFactorAuthenticationType with (nolock)
