@@ -1,0 +1,26 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>dev</title>
+    <meta name="description" content="dev">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <link rel="stylesheet" href="reset.css">
+
+    <!-- The am.loader is used to load ES6 modules. -->
+    <script src="libraries/am/loader/loader.js"></script>
+
+    <!-- Load root ES6 module and start the application. -->
+    <script>
+        function start(mod) {
+            mod.calendar();
+        }
+        System.import("./calendar/calendar", start);
+    </script>
+</head>
+<body>
+</body>
+</html>

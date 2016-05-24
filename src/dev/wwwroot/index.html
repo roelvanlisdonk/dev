@@ -1,0 +1,42 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>dev</title>
+    <meta name="description" content="dev">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        .item {
+            background-color: rgb(207, 239, 215);
+            margin: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script>
+        //var element = document.getElementById("container");
+        //element.innerText = "Test 4";
+        var t0 = performance.now();
+        
+        var html = '';
+        for (var i = 0, length = 100; i < length; i++) {
+            html += '<div class="item">' + getHtml() + '</div>' + '\n';
+        }
+        document.body.innerHTML = html;
+
+        var t1 = performance.now();
+        console.log("Call took " + (t1 - t0) + " milliseconds.");
+
+        function getHtml() {
+            var html = '';
+            for (var i = 0, length = 100; i < length; i++) {
+                html += '<div class="item">' + i.toString() + '</div>' + '\n';
+            }
+            return html;
+        }
+    </script>
+</body>
+</html>
