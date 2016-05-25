@@ -9,34 +9,80 @@
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         .item {
+            
             background-color: rgb(207, 239, 215);
             margin: 4px;
+        }
+        .bounce {
+            animation: shimmy 3s infinite;
+            animation-direction: alternate;
+        }
+
+        @keyframes shimmy {
+          0% {
+            transform: translate(0, 0);    
+          }
+          100% {
+            transform: translate(20px, 50px);
+          }
         }
     </style>
 </head>
 <body>
-    <div id="container"></div>
     <script>
-        //var element = document.getElementById("container");
-        //element.innerText = "Test 4";
-        var t0 = performance.now();
-        
-        var html = '';
-        for (var i = 0, length = 100; i < length; i++) {
-            html += '<div class="item">' + getHtml() + '</div>' + '\n';
-        }
-        document.body.innerHTML = html;
+        var resources = {
+            execute: "Execute"
+        };
+        var offset = 0;
 
-        var t1 = performance.now();
-        console.log("Call took " + (t1 - t0) + " milliseconds.");
+        document.addEventListener("click", onDocumentClick);
+       
+        render();
+
+        function executeButton() {
+            return '<button id="executeButton" type="button">' + resources.execute + '</button>';
+        }
 
         function getHtml() {
             var html = '';
+
             for (var i = 0, length = 100; i < length; i++) {
-                html += '<div class="item">' + i.toString() + '</div>' + '\n';
+                var cssClass = "item";
+                var text = (i + offset).toString();
+                html += '<div class="' + cssClass + '">' + text + '</div>' + '\n';
             }
             return html;
         }
+
+        function page() {
+            var html = '';
+            html += executeButton();
+            for (var i = 0, length = 100; i < length; i++) {
+                html += '<div class="item">' + getHtml() + '</div>' + '\n';
+            }
+            return html;
+        }
+
+        function render() {
+            var t0 = performance.now();
+
+            document.body.innerHTML = page();
+
+            var t1 = performance.now();
+            console.log("Call took " + (t1 - t0) + " milliseconds.");
+        }
+
+        function onDocumentClick(e) {
+            console.log("clicked");
+            offset += 1;
+            render();
+        }
+
+        /*
+            if (i === 4) {
+                    cssClass += " bounce";
+            }
+        */
     </script>
 </body>
 </html>
