@@ -29,60 +29,69 @@
     </style>
 </head>
 <body>
+    
     <script>
-        var resources = {
-            execute: "Execute"
-        };
-        var offset = 0;
+        (function () {
+            "use strict";
 
-        document.addEventListener("click", onDocumentClick);
-       
-        render();
+            var resources = {
+                execute: "Execute"
+            };
 
-        function executeButton() {
-            return '<button id="executeButton" type="button">' + resources.execute + '</button>';
-        }
+            var offset = 0;
 
-        function getHtml() {
-            var html = '';
+            document.addEventListener("click", onDocumentClick);
 
-            for (var i = 0, length = 100; i < length; i++) {
-                var cssClass = "item";
-                var text = (i + offset).toString();
-                html += '<div class="' + cssClass + '">' + text + '</div>' + '\n';
-            }
-            return html;
-        }
-
-        function page() {
-            var html = '';
-            html += executeButton();
-            for (var i = 0, length = 100; i < length; i++) {
-                html += '<div class="item">' + getHtml() + '</div>' + '\n';
-            }
-            return html;
-        }
-
-        function render() {
-            var t0 = performance.now();
-
-            document.body.innerHTML = page();
-
-            var t1 = performance.now();
-            console.log("Call took " + (t1 - t0) + " milliseconds.");
-        }
-
-        function onDocumentClick(e) {
-            console.log("clicked");
-            offset += 1;
             render();
-        }
 
-        /*
-            if (i === 4) {
-                    cssClass += " bounce";
+
+            function renderExecuteButton() {
+                return '<button id="executeButton" type="button">' + resources.execute + '</button>';
             }
-        */
+
+            function renderTextArea() {
+                return '<textarea></textarea>';
+            }
+
+            function getHtml() {
+                var html = '';
+
+                for (var i = 0, length = 100; i < length; i++) {
+                    var cssClass = "item";
+                    var text = (i + offset).toString();
+                    html += '<div class="' + cssClass + '">' + text + '</div>' + '\n';
+                }
+                return html;
+            }
+
+            function page() {
+                var html = '';
+                html += renderTextArea();
+                html += renderExecuteButton();
+                for (var i = 0, length = 100; i < length; i++) {
+                    html += '<div class="item">' + getHtml() + '</div>' + '\n';
+                }
+                return html;
+            }
+
+            function render() {
+                var t0 = performance.now();
+
+                document.body.innerHTML = page();
+
+                var t1 = performance.now();
+                console.log("Call took " + (t1 - t0) + " milliseconds.");
+            }
+
+            function onDocumentClick(e) {
+                if (e.target.id === "executeButton") {
+                    console.log("clicked");
+                    offset += 1;
+                    render();
+                }
+            }
+        })();
+        
     </script>
 </body>
 </html>
