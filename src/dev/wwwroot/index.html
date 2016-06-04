@@ -38,6 +38,7 @@
                 execute: "Execute"
             };
 
+            var counterDomElements = 0;
             var offset = 0;
 
             document.addEventListener("click", onDocumentClick);
@@ -82,13 +83,98 @@
                 var t1 = performance.now();
                 console.log("Call took " + (t1 - t0) + " milliseconds.");
             }
+            
+
+            function traverseDOM(node) {
+                counterDomElements = counterDomElements + 1;
+
+                if (node.nodeType == 1) {
+
+                    for (var i = 0, length = node.children.length; i < length; i++) {
+                        traverseDOM(node.children[i]);
+                    }
+                    
+
+                    //node = node.firstChild;
+
+                    //while (node) {
+
+                    //    traverseDOM(node);
+                    //    node = node.nextSibling;
+                    //}
+                }
+                //return total;
+            }
+
+            function countArray(arr) {
+                for (var i = 0, length = arr.length; i < length; i++) {
+                    counterDomElements = counterDomElements + 1;
+                }
+            }
+
+            function createLargeArray() {
+                //var arr = [10000];
+
+                //for (var i = 0, length = arr.length; i < length; i++) {
+                //    arr[i] = i;
+                //}
+
+                return new Array(10000).fill(0);
+            }
+
+            //function traverseDOM(node) {
+            //    counterDomElements = counterDomElements + 1;
+
+            //    if (node.nodeType == 1) {
+
+            //        //console.log(node.tagName);
+
+            //        node = node.firstChild;
+
+            //        while (node) {
+                        
+            //            traverseDOM(node);
+            //            node = node.nextSibling;
+            //        }
+            //    }
+            //    //return total;
+            //}
 
             function onDocumentClick(e) {
                 if (e.target.id === "executeButton") {
                     console.log("clicked");
-                    offset += 1;
-                    render();
+
+                    countAllDomElements();
                 }
+            }
+
+            function countAllDomElements() {
+
+                var arr = createLargeArray();
+                
+
+                var t0 = performance.now();
+
+                counterDomElements = 0;
+                countArray(arr);
+                countArray(arr);
+                countArray(arr);
+                countArray(arr);
+                countArray(arr);
+                countArray(arr);
+                countArray(arr);
+                countArray(arr);
+                countArray(arr);
+                
+                console.log(counterDomElements);
+
+                var t1 = performance.now();
+                console.log("Call took " + (t1 - t0) + " milliseconds.");
+            }
+
+            function rerender() {
+                offset += 1;
+                render();
             }
         })();
         

@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <div>
+        <h1>Bundeling</h1>
+        <p>
+            use: http://stackoverflow.com/questions/33268397/how-can-you-compile-angular-templates-with-webpack
+
+            To bundle html templates in the same bundle as de TypeScript output.
+
+            module: {
+            loaders: [
+            { test: /\.js$/, loader: 'babel', include: APP },
+            { test: /\.html$/, loader: 'ng-cache?prefix=[dir]/[dir]' },
+            ]
+            },
+            and example of directive with template:
+
+            import avatarTemplate from './views/avatar.html';
+
+            const avatar = function() {
+            return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+            user: '='
+            },
+            template: avatarTemplate
+            }
+            };
+
+            export default avatar;
+        </p>
+    </div>
+</body>
+</html>
