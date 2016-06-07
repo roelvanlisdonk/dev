@@ -22,8 +22,8 @@
     color: #ffffff;
     cursor: pointer;
     display: inline-block;
-    *display: inline;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#BCCC69', endColorstr='#74AB2A');
+   
+    /*filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#BCCC69', endColorstr='#74AB2A');*/
     font-family: 'DIN-Regular';
     font-size: 14px;
     font-weight: bold;
