@@ -39,7 +39,7 @@ var dev;
             fps: 20,
             zIndex: 2e9,
             className: 'spinner',
-            top: '14px',
+            top: '15px',
             left: '18px',
             shadow: false,
             hwaccel: false,
