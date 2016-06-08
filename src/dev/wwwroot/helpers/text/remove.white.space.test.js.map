@@ -1,0 +1,1 @@
+{"version":3,"file":"remove.white.space.test.js","sourceRoot":"","sources":["remove.white.space.test.ts"],"names":[],"mappings":"AAAA,IAAI,gBAAgB,GAAG,GAAG,CAAC,OAAO,CAAC,IAAI,CAAC,gBAAgB,CAAC;AAEzD,YAAY,CAAC;AAEb,QAAQ,CAAC,mCAAmC,EAAE;IAC1C,EAAE,CAAC,0GAA0G,EAAE;QAC3G,MAAM,CAAC,gBAAgB,CAAC,UAAU,CAAC,CAAC,CAAC,IAAI,CAAC,MAAM,CAAC,CAAC;IACtD,CAAC,CAAC,CAAC;AACP,CAAC,CAAC,CAAC"}
