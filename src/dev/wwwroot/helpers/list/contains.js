@@ -1,11 +1,11 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var list;
         (function (list_1) {
             "use strict";
-            var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+            var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
             /**
              * Returns true, when the given item is found in the list by exact match ("===").
              * @param item
@@ -24,6 +24,6 @@ var zvdz;
             }
             list_1.contains = contains;
         })(list = helpers.list || (helpers.list = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=contains.js.map

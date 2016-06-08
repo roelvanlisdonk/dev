@@ -1,11 +1,11 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var list;
         (function (list_1) {
             "use strict";
-            var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+            var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
             /**
              * Remove item from the list if found.
              * Add item to the list if NOT found.
@@ -27,6 +27,6 @@ var zvdz;
             }
             list_1.removeOrInsert = removeOrInsert;
         })(list = helpers.list || (helpers.list = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=remove.or.insert.js.map

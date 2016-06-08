@@ -1,8 +1,8 @@
-﻿module zvdz.helpers.list {
+﻿module dev.helpers.list {
     "use strict";
 
-    var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
-    var findIndexByItem = zvdz.helpers.list.findIndexByItem;
+    var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
+    var findIndexByItem = dev.helpers.list.findIndexByItem;
     
     /**
      * The number will be the index value of the item plus 1.

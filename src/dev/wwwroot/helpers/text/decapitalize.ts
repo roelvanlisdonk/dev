@@ -1,4 +1,4 @@
-﻿module zvdz.helpers.text {
+﻿module dev.helpers.text {
     "use strict";
 
     /**

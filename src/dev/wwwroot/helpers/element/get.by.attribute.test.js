@@ -1,6 +1,6 @@
-var getByAttribute = zvdz.helpers.element.getByAttribute;
+var getByAttribute = dev.helpers.element.getByAttribute;
 "use strict";
-describe("zvdz.helpers.element.getElementByAttribute", function () {
+describe("dev.helpers.element.getElementByAttribute", function () {
     it("should get the first element (in the given container) containing the given attribute.", function () {
         var container = document.createElement("div");
         container.innerHTML = '<input type="text" test />';

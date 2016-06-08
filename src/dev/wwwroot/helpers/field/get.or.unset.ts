@@ -1,4 +1,4 @@
-﻿module zvdz.helpers.field {
+﻿module dev.helpers.field {
     "use strict";
             
     /**

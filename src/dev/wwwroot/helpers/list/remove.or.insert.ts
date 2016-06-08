@@ -1,7 +1,7 @@
-﻿module zvdz.helpers.list {
+﻿module dev.helpers.list {
     "use strict";
 
-    var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+    var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
         
     /**
      * Remove item from the list if found.

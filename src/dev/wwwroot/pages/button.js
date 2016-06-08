@@ -45,7 +45,9 @@ var dev;
             hwaccel: false,
             position: 'absolute' // Element positioning
         };
-        var template = "<button class=\"button\" type=\"button\">\n                            <div class=\"spinner\"></div>{{options.text}}\n                        </button>";
+        var template = `<button class="button" type="button">
+                            <div class="spinner"></div>{{options.text}}
+                        </button>`;
         function link($scope, $element) {
             $scope.$watch('options.spinnerVisible', watchForSpinnerVisibilityChange);
             function watchForSpinnerVisibilityChange(newValue, oldValue) {

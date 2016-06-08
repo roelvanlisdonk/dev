@@ -1,6 +1,6 @@
-var isFunction = zvdz.helpers.validation.isFunction;
+var isFunction = dev.helpers.validation.isFunction;
 "use strict";
-describe("zvdz.helpers.validation.isFunction", function () {
+describe("dev.helpers.validation.isFunction", function () {
     it("should return true, if value starts with '[function'.", function () {
         expect(isFunction('   function   ')).toBe(true);
     });

@@ -1,6 +1,6 @@
-var removeOrInsert = zvdz.helpers.list.removeOrInsert;
+var removeOrInsert = dev.helpers.list.removeOrInsert;
 "use strict";
-describe("zvdz.helpers.list.removeOrInsert", function () {
+describe("dev.helpers.list.removeOrInsert", function () {
     it("should remove item when found or add when NOT found.", function () {
         var c = { id: 4 };
         var list = [{ id: 1 }, { id: 2 }, { id: 3 }];

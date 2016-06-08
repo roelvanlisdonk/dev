@@ -1,11 +1,11 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var element;
         (function (element_1) {
             "use strict";
-            var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+            var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
             /**
              * Get the first element (in the given container), containing the given attribute.
              * @param container
@@ -20,6 +20,6 @@ var zvdz;
             }
             element_1.getByAttribute = getByAttribute;
         })(element = helpers.element || (helpers.element = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=get.by.attribute.js.map

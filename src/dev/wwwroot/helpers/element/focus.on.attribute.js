@@ -1,12 +1,12 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var element;
         (function (element_1) {
             "use strict";
-            var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
-            var getElementByAttribute = zvdz.helpers.element.getByAttribute;
+            var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
+            var getElementByAttribute = dev.helpers.element.getByAttribute;
             /**
              * Focussus the first element in the container with the given attribute.
              * When the element is a "kendo-drop-down-list" is uses specific logic to set the focus.
@@ -33,6 +33,6 @@ var zvdz;
             }
             element_1.focus = focus;
         })(element = helpers.element || (helpers.element = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=focus.on.attribute.js.map

@@ -1,7 +1,7 @@
-﻿module zvdz.helpers.validation {
+﻿module dev.helpers.validation {
     "use strict";
 
-    var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+    var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
     
     /**
      * Determines if the values of the given property in the object a and b are exactly the same (===).

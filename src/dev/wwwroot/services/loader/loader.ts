@@ -3,7 +3,7 @@
  *  It is based on: https://github.com/caridy/es6-micro-loader/blob/master/dist/system-polyfill.js
  *  Because it is used to load ES6 modules, by definition am.loader can't be a ES6 module.
  */
-module am.loader {
+module dev.services.loader {
     "use strict";
     
     var seen = Object.create(null);
@@ -257,10 +257,28 @@ module am.loader {
     function set(name, values) {
         externalRegistry[name] = values;
     }
+
+    interface ILoadInfo {
+        counter: number;
+        done: (info: ILoadInfo) => void,
+        mod: IModule,
+        normalizedName: string;
+        parentInfo?: ILoadInfo,
+        total: number;
+    }
+
+    interface IModule {
+        deps: Array<string>;
+        dependants: any;
+        execute: () => void;
+        proxy: any;
+        update: (moduleName: any, moduleObj: any) => void;
+        values: any;
+    }  
 }
 
 var System = System || {
     baseURL: "/",
-    import: am.loader.load,
-    register: am.loader.register
+    import: dev.services.loader.load,
+    register: dev.services.loader.register
 };

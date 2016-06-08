@@ -1,7 +1,7 @@
-﻿module zvdz.helpers.list {
+﻿module dev.helpers.list {
     "use strict";
     
-    var findIndexByItem = zvdz.helpers.list.findIndexByItem;
+    var findIndexByItem = dev.helpers.list.findIndexByItem;
 
     /**
      * Get the next item in the list based on the index of the given item.

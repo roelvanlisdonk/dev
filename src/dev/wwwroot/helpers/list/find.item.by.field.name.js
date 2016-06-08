@@ -1,11 +1,11 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var list;
         (function (list_1) {
             "use strict";
-            var findIndexByFieldName = zvdz.helpers.list.findIndexByFieldName;
+            var findIndexByFieldName = dev.helpers.list.findIndexByFieldName;
             /**
              * Find an item in a list with the given field name having the given value.
              * @param list
@@ -23,6 +23,6 @@ var zvdz;
             }
             list_1.findItemByFieldName = findItemByFieldName;
         })(list = helpers.list || (helpers.list = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=find.item.by.field.name.js.map

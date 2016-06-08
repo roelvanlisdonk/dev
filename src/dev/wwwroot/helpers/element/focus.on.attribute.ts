@@ -1,8 +1,8 @@
-﻿module zvdz.helpers.element {
+﻿module dev.helpers.element {
     "use strict";
     
-    var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
-    var getElementByAttribute = zvdz.helpers.element.getByAttribute;
+    var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
+    var getElementByAttribute = dev.helpers.element.getByAttribute;
     
     /**
      * Focussus the first element in the container with the given attribute.

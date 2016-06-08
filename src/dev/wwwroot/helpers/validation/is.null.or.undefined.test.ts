@@ -1,8 +1,8 @@
-﻿var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+﻿var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
 
 "use strict";
 
-describe("zvdz.helpers.validation.isNullOrUndefined", function () {
+describe("dev.helpers.validation.isNullOrUndefined", function () {
     it("should validate if one of the supplied parameters is null or undefined.", function () {
         expect(isNullOrUndefined()).toBe(true);
         expect(isNullOrUndefined(null)).toBe(true);

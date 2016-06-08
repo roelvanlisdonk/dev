@@ -1,5 +1,5 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var validation;
@@ -13,11 +13,7 @@ var zvdz;
              *          true, when one of the supplied parameters is null or undefined.
              *          false, in all other cases.
              */
-            function isNullOrUndefined() {
-                var values = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    values[_i - 0] = arguments[_i];
-                }
+            function isNullOrUndefined(...values) {
                 if (values.length <= 0) {
                     return true;
                 }
@@ -31,6 +27,6 @@ var zvdz;
             }
             validation.isNullOrUndefined = isNullOrUndefined;
         })(validation = helpers.validation || (helpers.validation = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=is.null.or.undefined.js.map

@@ -1,7 +1,7 @@
-﻿module zvdz.helpers.list {
+﻿module dev.helpers.list {
     "use strict";
     
-    var findIndexByFieldName = zvdz.helpers.list.findIndexByFieldName;
+    var findIndexByFieldName = dev.helpers.list.findIndexByFieldName;
     
     /**
      * Find an item in a list with the given field name having the given value. 

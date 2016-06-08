@@ -1,37 +1,38 @@
-System.register([], function(exports_1, context_1) {
-    "use strict";
-    var __moduleName = context_1 && context_1.id;
+﻿module dev.services {
     /**
-     * Fetch can be used to send and receive data over http(s).
-     * Inspired by: https://github.com/ModuleLoader/es6-module-loader/blob/master/src/system-fetch.js
-     *  - without XDomainRequest support.
-     */
-    function fetch(options) {
+ * Fetch can be used to send and receive data over http(s).
+ * Inspired by: https://github.com/ModuleLoader/es6-module-loader/blob/master/src/system-fetch.js
+ *  - without XDomainRequest support.
+ */
+    export function fetch(options: IFetchOptions): void {
         var authorization = options.authorization;
         var onError = options.onError;
         var url = options.url;
         var xhr = new XMLHttpRequest();
+
         function load() {
-            var result = {
+            var result: IFetchSuccessResult = {
                 additionalData: options.additionalData,
                 data: xhr.responseText
             };
             options.onSuccess(result);
         }
+
         function error() {
             var err = new Error('XHR error' + (xhr.status ? ' (' + xhr.status + (xhr.statusText ? ' ' + xhr.statusText : '') + ')' : '') + ' loading ' + url);
-            var errorHandlerSupplied = (typeof onError === "function");
+
+            var errorHandlerSupplied = (typeof onError === "function")
             if (errorHandlerSupplied) {
-                var result = {
+                var result: IFetchErrorResult = {
                     additionalData: options.additionalData,
                     error: err
                 };
                 onError(result);
-            }
-            else {
+            } else {
                 throw err;
             }
         }
+
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 // in Chrome on file:/// URLs, status is 0
@@ -55,6 +56,7 @@ System.register([], function(exports_1, context_1) {
             }
         };
         xhr.open("GET", url, true);
+
         if (xhr.setRequestHeader) {
             xhr.setRequestHeader('Accept', 'application/x-es-module, */*');
             // can set "authorization: true" to enable withCredentials only
@@ -65,12 +67,29 @@ System.register([], function(exports_1, context_1) {
                 xhr.withCredentials = true;
             }
         }
+
         xhr.send(null);
     }
-    exports_1("fetch", fetch);
-    return {
-        setters:[],
-        execute: function() {
-        }
+
+    interface IFetchAndEvalInfo {
+        onFetchAndEvalSuccess: () => void;
     }
-});
+
+    interface IFetchErrorResult {
+        additionalData?: any;
+        error: Error;
+    }
+
+    interface IFetchOptions {
+        additionalData?: any;
+        authorization?: boolean;
+        onError?: (result: IFetchErrorResult) => void; // When not supplied, the error is thrown.
+        onSuccess: (result: IFetchSuccessResult) => void;
+        url: string;
+    }
+
+    interface IFetchSuccessResult {
+        additionalData?: any;
+        data: string;
+    }  
+}

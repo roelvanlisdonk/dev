@@ -1,11 +1,11 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var validation;
         (function (validation) {
             "use strict";
-            var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+            var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
             /**
              * Determines if the values of the given property in the object a and b are exactly the same (===).
              * @param a
@@ -22,6 +22,6 @@ var zvdz;
             }
             validation.propertiesAreEqual = propertiesAreEqual;
         })(validation = helpers.validation || (helpers.validation = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=properties.are.equal.js.map

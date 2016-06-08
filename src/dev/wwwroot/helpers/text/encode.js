@@ -1,5 +1,5 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var text;
@@ -23,6 +23,6 @@ var zvdz;
             }
             text.encode = encode;
         })(text = helpers.text || (helpers.text = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=encode.js.map

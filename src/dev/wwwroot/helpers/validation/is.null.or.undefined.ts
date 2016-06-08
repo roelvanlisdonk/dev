@@ -1,4 +1,4 @@
-﻿module zvdz.helpers.validation {
+﻿module dev.helpers.validation {
     "use strict";
 
     /**

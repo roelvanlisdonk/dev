@@ -1,8 +1,8 @@
-﻿var findIndexByItem = zvdz.helpers.list.findIndexByItem;
+﻿var findIndexByItem = dev.helpers.list.findIndexByItem;
 
 "use strict";
 
-describe("zvdz.helpers.list.findIndexByItem", function () {
+describe("dev.helpers.list.findIndexByItem", function () {
     it("should return the index of the given item by '===' comparison.", function () {
         var c = { id: 3 };
         var list = [{ id: 1 }, { id: 2 }, c, { id: 4 }];

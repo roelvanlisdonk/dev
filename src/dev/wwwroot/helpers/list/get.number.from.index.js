@@ -1,12 +1,12 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var list;
         (function (list_1) {
             "use strict";
-            var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
-            var findIndexByItem = zvdz.helpers.list.findIndexByItem;
+            var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
+            var findIndexByItem = dev.helpers.list.findIndexByItem;
             /**
              * The number will be the index value of the item plus 1.
              * @param list
@@ -21,6 +21,6 @@ var zvdz;
             }
             list_1.getNumberFromIndex = getNumberFromIndex;
         })(list = helpers.list || (helpers.list = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=get.number.from.index.js.map

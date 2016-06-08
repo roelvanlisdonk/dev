@@ -1,7 +1,7 @@
-﻿module zvdz.helpers.list {
+﻿module dev.helpers.list {
     "use strict";
 
-    var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+    var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
     
     /**
      * Calculates the total of a list by executing the given "getValueToAddFn" foreach item in the list.

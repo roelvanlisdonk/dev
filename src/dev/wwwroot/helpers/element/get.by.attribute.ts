@@ -1,7 +1,7 @@
-﻿module zvdz.helpers.element {
+﻿module dev.helpers.element {
     "use strict";
 
-    var isNullOrUndefined = zvdz.helpers.validation.isNullOrUndefined;
+    var isNullOrUndefined = dev.helpers.validation.isNullOrUndefined;
     
     /**
      * Get the first element (in the given container), containing the given attribute.

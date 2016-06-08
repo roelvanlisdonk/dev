@@ -1,5 +1,5 @@
-var zvdz;
-(function (zvdz) {
+var dev;
+(function (dev) {
     var helpers;
     (function (helpers) {
         var validation;
@@ -13,6 +13,6 @@ var zvdz;
             }
             validation.isNumeric = isNumeric;
         })(validation = helpers.validation || (helpers.validation = {}));
-    })(helpers = zvdz.helpers || (zvdz.helpers = {}));
-})(zvdz || (zvdz = {}));
+    })(helpers = dev.helpers || (dev.helpers = {}));
+})(dev || (dev = {}));
 //# sourceMappingURL=is.numeric.js.map

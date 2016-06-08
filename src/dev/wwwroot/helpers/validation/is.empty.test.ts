@@ -1,8 +1,8 @@
-﻿var isEmpty = zvdz.helpers.validation.isEmpty;
+﻿var isEmpty = dev.helpers.validation.isEmpty;
 
 "use strict";
 
-describe("zvdz.helpers.validation.isEmpty", function () {
+describe("dev.helpers.validation.isEmpty", function () {
     it("should validate if given parameter is undefined, null, empty string or empty array.", function () {
         expect(isEmpty()).toBe(true);
         expect(isEmpty(undefined)).toBe(true);
