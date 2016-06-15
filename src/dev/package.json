@@ -2,9 +2,8 @@
   "name": "dev",
   "version": "1.0.0",
   "description": "Dev project",
-  "scripts": {
-  },
-  "keywords": [ ],
+  "scripts": {},
+  "keywords": [],
   "author": "",
   "license": "",
   "dependencies": {
@@ -16,8 +15,11 @@
   },
   "devDependencies": {
     "gulp": ">=3.9.1",
+    "jasmine": ">=2.4.1",
+    "rollup": ">=0.31.2",
     "typings": ">=1.0.4",
-    "jasmine": ">=2.4.1"
+    "gulp-rollup": ">=1.9.0",
+    "gulp-sourcemaps": ">=1.6.0"
   },
-  "repository": { }
+  "repository": {}
 }

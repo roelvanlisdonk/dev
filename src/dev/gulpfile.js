@@ -6,6 +6,8 @@ var gulp = require("gulp");
 var jshint = require("gulp-jshint");
 var plumber = require("gulp-plumber");
 var livereload = require("gulp-livereload");
+var rollup = require('gulp-rollup');
+var sourcemaps = require('gulp-sourcemaps');
 
 /**
  * The default task.
@@ -34,6 +36,19 @@ gulp.task("jshint", function () {
  */
 gulp.task('reload', function () {
     livereload.reload("/");
+});
+
+/**
+ *  Rollup ES6 modules into one bundel.
+ */
+gulp.task('rollup', function () {
+    gulp.src('wwwroot/zvdz/app.js', { read: false })
+    .pipe(rollup({
+        // any option supported by Rollup can be set here, including sourceMap 
+        sourceMap: true
+    }))
+    .pipe(sourcemaps.write(".")) // this only works if the sourceMap option is true 
+    .pipe(gulp.dest('dist'));
 });
 
 /**
