@@ -8,6 +8,7 @@ var plumber = require("gulp-plumber");
 var livereload = require("gulp-livereload");
 var rollup = require('gulp-rollup');
 var sourcemaps = require('gulp-sourcemaps');
+var rename = require("gulp-rename");
 
 /**
  * The default task.
@@ -45,10 +46,15 @@ gulp.task('rollup', function () {
     gulp.src('wwwroot/zvdz/app.js', { read: false })
     .pipe(rollup({
         // any option supported by Rollup can be set here, including sourceMap 
+        format: 'iife',
+        moduleName: 'zvdz',
         sourceMap: true
     }))
-    .pipe(sourcemaps.write(".")) // this only works if the sourceMap option is true 
-    .pipe(gulp.dest('dist'));
+    .pipe(sourcemaps.write("."))    // this only works if the sourceMap option is true.
+    .pipe(rename(function (path) {
+        path.basename = "bundle";   // Set the name of the output bundle by using gulp-rename, because rollup option "dest", doesn't seem to work in gulp-rollup.
+    }))
+    .pipe(gulp.dest("dist"));
 });
 
 /**
