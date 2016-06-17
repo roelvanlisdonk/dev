@@ -6,11 +6,12 @@
     "noImplicitAny": false,
     "noEmitOnError": true,
     "removeComments": false,
-    "module": "es2015", // Output will be es2015 modules, so we can use rollup.
+    "module": "system", // Output will be es2015 modules, so we can use rollup.
     "moduleResolution": "node", // Fixes the error: Cannot find module "@angular/core", because the typescript compiler will now search the "node_modules" folder.
     "sourceMap": true,
     "target": "es2015", // Output will be in es2015.
-    "rootDir": "wwwroot"
+    "rootDir": "wwwroot",
+    "outFile": "wwwroot/rli.bundle.js"
   },
   "exclude": [
     "node_modules" // Exclude "node_modules" folder form compilation by the typescript compiler.

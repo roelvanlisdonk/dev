@@ -7,7 +7,7 @@ import { Component } from "@angular/core";
 export class AppComponent { }
 
 export default function start() {
-    console.log("app starte!!");
+    console.log("app starte!!!");
     toSnakeCase();
 }
 
