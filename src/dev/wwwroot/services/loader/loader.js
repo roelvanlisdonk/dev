@@ -1,8 +1,8 @@
 /**
-*  The am.loader can be used to load ES6 modules.
-*  It is based on: https://github.com/caridy/es6-micro-loader/blob/master/dist/system-polyfill.js
-*  Because it is used to load ES6 modules, by definition am.loader can't be a ES6 module.
-*/
+ *  The am.loader can be used to load ES6 modules.
+ *  It is based on: https://github.com/caridy/es6-micro-loader/blob/master/dist/system-polyfill.js
+ *  Because it is used to load ES6 modules, by definition am.loader can't be a ES6 module.
+ */
 var dev;
 (function (dev) {
     var services;

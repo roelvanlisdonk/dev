@@ -172,6 +172,15 @@
                 console.log("Call took " + (t1 - t0) + " milliseconds.");
             }
 
+            function measure(fn) {
+                const t0 = performance.now();
+
+                fn();
+
+                const t1 = performance.now();
+                console.log("Call took " + (t1 - t0) + " milliseconds.");
+            }
+
             function rerender() {
                 offset += 1;
                 render();
