@@ -1219,7 +1219,9 @@ var dev;
                     anonymousEntry.push.apply(anonymousEntry, arguments);
                     return; // breaking to let the script tag to name it.
                 }
-                var proxy = Object.create(null), values = Object.create(null), mod, meta;
+                var proxy = Object.create(null), values = Object.create(null);
+                var mod;
+                var meta;
                 // creating a new entry in the internal registry
                 internalRegistry[name] = mod = {
                     // live bindings

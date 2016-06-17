@@ -5,11 +5,11 @@
  */
 module dev.services.loader {
     "use strict";
-    
+
     var seen = Object.create(null);
     var internalRegistry = Object.create(null);
     var externalRegistry = Object.create(null);
-    var anonymousEntry;
+    var anonymousEntry: any;
 
     var headEl = document.getElementsByTagName('head')[0],
         ie = /MSIE/.test(navigator.userAgent);
@@ -41,7 +41,7 @@ module dev.services.loader {
         headEl.appendChild(node);
     }
 
-    function ensuredExecute(name) {
+    function ensuredExecute(name: string) {
         var mod = internalRegistry[name];
         if (mod && !seen[name]) {
             seen[name] = true;
@@ -51,14 +51,14 @@ module dev.services.loader {
         return mod && mod.proxy;
     }
 
-    function get(name) {
+    function get(name: string) {
         return externalRegistry[name] || ensuredExecute(name);
     }
 
-    function has(name) {
+    function has(name: string) {
         return !!externalRegistry[name] || !!internalRegistry[name];
     }
-    
+
     export function load(name: string, onSuccess: (mod: any) => void) {
         var endTreeLoading = onSuccess;
         var normalizedName = normalizeName(name, []);
@@ -67,7 +67,7 @@ module dev.services.loader {
         if (moduleAsCode && endTreeLoading) {
             endTreeLoading(moduleAsCode);
         } else {
-            
+
             // To determine, "if all dependencies are loaded", this "rootInfo" object will be passed to and updated during the load process. 
             var rootInfo: ILoadInfo = {
                 counter: 0,
@@ -86,7 +86,7 @@ module dev.services.loader {
         var url = (System.baseURL || '/') + info.normalizedName + '.js';
         createScriptNode(url, onScriptLoad, info);
     }
-        
+
     function getModuleFromInternalRegistry(name: string): any {
         var mod = internalRegistry[name];
         if (!mod) {
@@ -95,13 +95,13 @@ module dev.services.loader {
         return mod;
     }
 
-    function onScriptLoad(info: ILoadInfo) {      
+    function onScriptLoad(info: ILoadInfo) {
         if (anonymousEntry) {
             // Register as an named module.
             System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
             anonymousEntry = undefined;
         }
-        
+
         var mod: IModule = getModuleFromInternalRegistry(info.normalizedName);
         info.mod = mod;
         info.total = mod.deps.length;
@@ -119,7 +119,7 @@ module dev.services.loader {
             var moduleAsCode = get(info.normalizedName);
             if (info.done) {
                 info.done(moduleAsCode);
-            }      
+            }
         }
 
         if (!isRootModule && !hasDepedencies) {
@@ -175,7 +175,7 @@ module dev.services.loader {
         }
     }
 
-    function normalizeName(child, parentBase) {
+    function normalizeName(child: string, parentBase: Array<any>) {
         if (child.charAt(0) === '/') {
             child = child.slice(1);
         }
@@ -191,14 +191,16 @@ module dev.services.loader {
         return parentBase.concat(parts).join('/');
     }
 
-    export function register(name, deps, wrapper) {
+    export function register(name: string, deps: any, wrapper: any) {
         if (Array.isArray(name)) {
             // anounymous module
             anonymousEntry = [];
             anonymousEntry.push.apply(anonymousEntry, arguments);
             return; // breaking to let the script tag to name it.
         }
-        var proxy = Object.create(null), values = Object.create(null), mod, meta;
+        var proxy = Object.create(null), values = Object.create(null);
+        var mod: any;
+        var meta: any;
         // creating a new entry in the internal registry
         internalRegistry[name] = mod = {
             // live bindings
@@ -206,17 +208,17 @@ module dev.services.loader {
             // exported values
             values: values,
             // normalized deps
-            deps: deps.map(function (dep) {
+            deps: deps.map(function (dep: string) {
                 return normalizeName(dep, name.split('/').slice(0, -1));
             }),
             // other modules that depends on this so we can push updates into those modules
             dependants: [],
             // method used to push updates of deps into the module body
-            update: function (moduleName, moduleObj) {
+            update: function (moduleName: string, moduleObj: any) {
                 meta.setters[mod.deps.indexOf(moduleName)](moduleObj);
             },
             execute: function () {
-                mod.deps.map(function (dep) {
+                mod.deps.map(function (dep: any) {
                     var imports = externalRegistry[dep];
                     if (imports) {
                         mod.update(dep, imports);
@@ -233,10 +235,10 @@ module dev.services.loader {
             }
         };
         // collecting execute() and setters[]
-        meta = wrapper(function (identifier, value) {
+        meta = wrapper(function (identifier: any, value: any) {
             values[identifier] = value;
             mod.lock = true; // locking down the updates on the module to avoid infinite loop
-            mod.dependants.forEach(function (moduleName) {
+            mod.dependants.forEach(function (moduleName: string) {
                 if (internalRegistry[moduleName] && !internalRegistry[moduleName].lock) {
                     internalRegistry[moduleName].update(name, values);
                 }
@@ -254,7 +256,7 @@ module dev.services.loader {
         });
     }
 
-    function set(name, values) {
+    function set(name: string, values: any) {
         externalRegistry[name] = values;
     }
 
@@ -274,10 +276,10 @@ module dev.services.loader {
         proxy: any;
         update: (moduleName: any, moduleObj: any) => void;
         values: any;
-    }  
+    }
 }
 
-var System = System || {
+var System: any = System || {
     baseURL: "/",
     import: dev.services.loader.load,
     register: dev.services.loader.register
