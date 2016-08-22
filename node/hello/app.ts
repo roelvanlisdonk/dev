@@ -1,5 +1,5 @@
 
-const helpers = require('./helpers');
+import helpers = require('./helpers');
 
 class Startup {
     public static main(): number {
