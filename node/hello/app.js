@@ -1,1 +1,13 @@
-console.log("Hello");
+var helpers = require('./helpers');
+
+var Startup = (function () {
+    function Startup() {
+    }
+    Startup.main = function () {
+        console.log('Hello World');
+        return 0;
+    };
+    return Startup;
+}());
+Startup.main();
+//# sourceMappingURL=app.js.map
