@@ -1,5 +1,36 @@
 module <%= module %>.<%= feature %> {
     'use strict';
 
+    'use strict';
     
+    const stubData = {
+        
+    };
+
+    export class VoorbladDirective implements ng.IDirective {
+        public link;
+        public restrict = 'EA';
+        public templateUrl = '/App/Formulieren/Wizard/voorblad.html';
+        public scope = {
+            options: '='
+        };
+
+        constructor() {
+            const self: VoorbladDirective = this;
+            
+            self.link = self.unboundLink.bind(self);
+        }
+
+        unboundLink($scope: IVoorbladScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) {
+            const self: VoorbladDirective = this;
+            
+            $scope.resources = new zvdz.resources.FormulierenResources();
+        }
+    }
+
+    export interface IVoorbladScope extends ng.IScope {
+        resources: zvdz.resources.FormulierenResources;
+    }
+    
+    angular.module('zvdz').directive('voorblad', [() => new VoorbladDirective()]);
 }

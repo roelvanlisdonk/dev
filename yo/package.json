@@ -1,14 +1,9 @@
 {
   "version": "1.0.0",
   "name": "yo-rli",
-  "private": false,
   "devDependencies": {
-    
+    "typescript": ">=2.1.0-dev.20160908"
   },
-  "dependencies": {
-    
-  },
-  "scripts": {
-    
-  }
+  "dependencies": {},
+  "scripts": {}
 }
