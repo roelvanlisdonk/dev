@@ -1,0 +1,18 @@
+{
+  "name": "ng1",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "livereload": "livereload ./"
+  },
+  "main": "app.js",
+  "private": true,
+  "dependencies": {
+    "angular": "latest",
+    "@types/angular": "latest"
+  },
+  "devDependencies": {
+      "livereload": "latest",
+      "typescript": "latest"
+  }
+}
