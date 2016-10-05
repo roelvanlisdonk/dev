@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs",
+    "module": "system",
     "declaration": false,
     "removeComments": true,
     "noLib": false,
@@ -11,13 +11,18 @@
     "pretty": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
+    "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".vscode"
   ],
   "compileOnSave": true
 }

@@ -1,7 +1,4 @@
 
-
-const a: string = "a";
-
-export class HttpService {
+export function fetch() {
 
 }

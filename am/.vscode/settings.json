@@ -1,0 +1,5 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    // Use TypeScript compiler from the node_modules folder instead of the default visual studio code TypeScript compiler. 
+    "typescript.tsdk": "node_modules/typescript/lib"
+}

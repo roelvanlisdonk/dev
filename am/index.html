@@ -5,37 +5,8 @@
     <title>Research</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     
-    <!-- <link type="text/css" href="index.css"> -->
-    <!-- <script type="text/javascript" src="index.js"></script>-->
-    <style>
-        .red {
-            color: rgb(255, 0, 0);
-        };
-    </style>
-    <script type="text/javascript">
-        let counter = 1;
-        function onChangeClick() {
-            renderTable(counter);
-            counter++;
-        }
-
-        function renderTable(offset) {
-            offset = offset || 0;
-            let researchHtml = '<p><button type="button" onclick="onChangeClick()">Change</button></p>';
-            researchHtml += '<table>';
-            researchHtml += `<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>\n`
-            const length = 100 + offset;
-            for(let i=offset; i < length; i++) {
-                researchHtml += `<tr><td id="${i}_1">${i} - 1</td><td id="${i}_2">${i} - 2</td><td id="${i}_3">${i} - 3</td><td id="${i}_4">${i} - 4</td><td id="${i}_5">${i} - 5</td><td id="${i}_6">${i} - 6</td><td id="${i}_7">${i} - 7</td><td id="${i}_8">${i} - 8</td><td id="${i}_9">${i} - 9</td><td id="${i}_10">${i} - 10</td></tr>\n`
-            }
-            researchHtml += '</table>'
-            
-            document.body = document.createElement("body");
-            document.body.innerHTML = researchHtml;
-        }
-
-        renderTable();
-        
-    </script>
+    <script type="text/javascript" src="am.system.js" data-main="main.js"></script>
 </head>
+<body>
+</body>
 </html>

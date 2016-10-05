@@ -1,9 +1,13 @@
-"use strict";
-var a = "a";
-var HttpService = (function () {
-    function HttpService() {
+System.register([], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
+    function fetch() {
     }
-    return HttpService;
-}());
-exports.HttpService = HttpService;
+    exports_1("fetch", fetch);
+    return {
+        setters:[],
+        execute: function() {
+        }
+    }
+});
 //# sourceMappingURL=http.js.map

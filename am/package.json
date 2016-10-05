@@ -10,6 +10,7 @@
     
   },
   "devDependencies": {
-      "livereload": "latest"
+      "livereload": "latest",
+      "typescript": "latest"
   }
 }
