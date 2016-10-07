@@ -16,65 +16,74 @@ namespace poc {
         public restrict = 'E';
         public template = `
 <style>
+    html, body {
+        height: 100%;
+    }
+
+    animation button {
+        margin-right: 20px;
+    }
+
     /*
-        The overflow property is set to hidden, so when a page is made visible,
-        it appears if it scrolls from the bottom to the top.
+        The overflow property is set to hidden, so pages can be made hidden, by moving them outside of the list at the top or bottom.
     */
-    .animation .list {
+    animation .list {
         border: 1px solid rgb(50, 50, 50);
+        height: 500px;
         margin-top: 20px;
         overflow: hidden; /* When the ng-hide class is removed from the page elementThis is used to hide, the hidden pages that have the ng-hide class */
+        position: relative;
     }
 
     /* 
         This is the default styling of a visible page.
+        
         The "transition" property states, that whenever the value of the "transform" property changes,
-        apply the new value linear, with a duration of 0.5s to transition from the orignal value to the new value.
+        apply the new value linear, with a duration of 0.5s to transition from the orignal value to the 
+        new value.
+
+        The pages are stacked on top of each other, by using absolute positioning.
     */
-    .animation .list .page {
-        height: 500px;
+    animation .list .page {
+        bottom: 0;
+        left: 0;
         padding: 10px;
+        position: absolute;
+        right: 0;
+        top: 0;
         -webkit-transition: transform 0.5s linear 0s;
         -moz-transition: transform 0.5s linear 0s;
         -o-transition: transform 0.5s linear 0s;
         transition: transform 0.5s linear 0s;
-        opacity:1;
+    }
+    
+    /*
+        Move previous pages outside of the list (invisible for the user), on the top side of the list.
+    */
+    animation .list .page.previous {        
+        transform: translateY(-500px);
     }
 
     /*
-        Each hidden page is positioned at the bottom of the list, by applying a translateY(500px).
-        When a page is made visible by removing the ng-hide class, 
-        the hidden page immediately gets its normal styling, but it is not yet visible because the list has 
-        an overflow set to hidden.
-        The transition is only applied on the transform, so the hidden page is moved from the bottom of the list
-        to the top of the list, at its normal position.
-
-        The properties height, opacity, padding and margin, are set to 0, to immediately hide the current page, when navigating.
-        Because the current page is immediately hidden, you don't see it move to the bottom of the list.
-        We only want to see the next page scroll from the bottom to the top of the list.
+        Move next pages outside of the list (invisible for the user), on the bottom side of the list.
     */
-    .animation .list .page.ng-hide {
+    animation .list .page.next {
         transform: translateY(500px);
-        height: 0;
-        opacity: 0;
-        padding: 0;
-        margin: 0;
     }
     
 </style>
-<div class="animation">
+    <button type="button" ng-click="setCurrentPageIndex(currentPageIndex - 1);">Previous page</button>
     <button type="button" ng-click="setCurrentPageIndex(currentPageIndex + 1);">Next page</button>
     <div id="list" class="list">
         <div 
             id="page-{{$index}}" 
             class="page"
-            ng-hide="!isCurrentPageIndex($index)"
+            ng-class="{ previous: $index < currentPageIndex, next: $index > currentPageIndex }"
             ng-repeat="page in pages"
             style="background-color: {{page.color}}">
             {{page}}
         </div>
-    </div>
-</div>`;
+    </div>`;
 
         constructor() {
             const self: AnimationDirective = this;
@@ -90,6 +99,9 @@ namespace poc {
             }
 
             function setCurrentPageIndex(index: number) {
+                index = index < 0 ? 0 : index;
+                index = index >= maxPages ? maxPages - 1 : index;
+
                 $scope.currentPageIndex = index;
             }
 
