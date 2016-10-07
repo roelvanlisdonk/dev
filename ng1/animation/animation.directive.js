@@ -13,7 +13,7 @@ var poc;
     var AnimationDirective = (function () {
         function AnimationDirective() {
             this.restrict = 'E';
-            this.template = "\n<style>\n    html, body {\n        height: 100%;\n    }\n\n    animation button {\n        margin-right: 20px;\n    }\n\n    /*\n        The overflow property is set to hidden, so pages can be made hidden, by moving them outside of the list at the top or bottom.\n    */\n    animation .list {\n        border: 1px solid rgb(50, 50, 50);\n        height: 500px;\n        margin-top: 20px;\n        overflow: hidden; /* When the ng-hide class is removed from the page elementThis is used to hide, the hidden pages that have the ng-hide class */\n        position: relative;\n    }\n\n    /* \n        This is the default styling of a visible page.\n        \n        The \"transition\" property states, that whenever the value of the \"transform\" property changes,\n        apply the new value linear, with a duration of 0.5s to transition from the orignal value to the \n        new value.\n\n        The pages are stacked on top of each other, by using absolute positioning.\n    */\n    animation .list .page {\n        bottom: 0;\n        left: 0;\n        padding: 10px;\n        position: absolute;\n        right: 0;\n        top: 0;\n        -webkit-transition: transform 0.5s linear 0s;\n        -moz-transition: transform 0.5s linear 0s;\n        -o-transition: transform 0.5s linear 0s;\n        transition: transform 0.5s linear 0s;\n    }\n    \n    /*\n        Move previous pages outside of the list (invisible for the user), on the top side of the list.\n    */\n    animation .list .page.previous {        \n        transform: translateY(-500px);\n    }\n\n    /*\n        Move next pages outside of the list (invisible for the user), on the bottom side of the list.\n    */\n    animation .list .page.next {\n        transform: translateY(500px);\n    }\n    \n</style>\n    <button type=\"button\" ng-click=\"setCurrentPageIndex(currentPageIndex - 1);\">Previous page</button>\n    <button type=\"button\" ng-click=\"setCurrentPageIndex(currentPageIndex + 1);\">Next page</button>\n    <div id=\"list\" class=\"list\">\n        <div \n            id=\"page-{{$index}}\" \n            class=\"page\"\n            ng-class=\"{ previous: $index < currentPageIndex, next: $index > currentPageIndex }\"\n            ng-repeat=\"page in pages\"\n            style=\"background-color: {{page.color}}\">\n            {{page}}\n        </div>\n    </div>";
+            this.template = "\n\n    <button type=\"button\" ng-click=\"setCurrentPageIndex(currentPageIndex - 1);\">Previous page</button>\n    <button type=\"button\" ng-click=\"setCurrentPageIndex(currentPageIndex + 1);\">Next page</button>\n    <div id=\"list\" class=\"list\">\n        <div \n            id=\"page-{{$index}}\" \n            class=\"page\"\n            ng-class=\"{ previous: $index < currentPageIndex, next: $index > currentPageIndex }\"\n            ng-repeat=\"page in pages\"\n            ng-style=\"page.style\">\n            {{page}}\n        </div>\n    </div>\n    \n    ";
             var self = this;
             self.link = self.unboundLink.bind(self);
         }
@@ -31,9 +31,11 @@ var poc;
             $scope.setCurrentPageIndex = setCurrentPageIndex;
             $scope.pages = [];
             for (var i = 0; i < maxPages; i++) {
+                var color = getRandomColor();
                 $scope.pages.push({
-                    color: getRandomColor(),
-                    name: "Page " + i.toString()
+                    color: color,
+                    name: "Page " + i.toString(),
+                    style: { 'background-color': color }
                 });
             }
             $scope.currentPageIndex = 0;

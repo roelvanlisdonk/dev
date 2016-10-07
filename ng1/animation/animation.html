@@ -1,0 +1,12 @@
+<button type="button" ng-click="setCurrentPageIndex(currentPageIndex - 1);">Previous page</button>
+<button type="button" ng-click="setCurrentPageIndex(currentPageIndex + 1);">Next page</button>
+<div id="list" class="list">
+    <div 
+        id="page-{{$index}}" 
+        class="page"
+        ng-class="{ previous: $index < currentPageIndex, next: $index > currentPageIndex }"
+        ng-repeat="page in pages"
+        ng-style="page.style">
+        {{page}}
+    </div>
+</div>
