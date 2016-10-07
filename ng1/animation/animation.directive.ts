@@ -16,12 +16,33 @@ namespace poc {
         public restrict = 'E';
         public template = `
 <style>
+    animation, body, button, div, html {
+        border: 0;
+        border-image-width: 0;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        margin: 0;
+        outline: 0;
+        padding: 0;
+    }
+    
     html, body {
         height: 100%;
     }
 
+    body {
+        padding: 40px;
+    }
+
     animation button {
+        cursor: pointer;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
         margin-right: 20px;
+        padding: 10px;
     }
 
     /*
@@ -70,7 +91,6 @@ namespace poc {
     animation .list .page.next {
         transform: translateY(500px);
     }
-    
 </style>
     <button type="button" ng-click="setCurrentPageIndex(currentPageIndex - 1);">Previous page</button>
     <button type="button" ng-click="setCurrentPageIndex(currentPageIndex + 1);">Next page</button>
