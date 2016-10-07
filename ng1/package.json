@@ -8,8 +8,10 @@
   "main": "app.js",
   "private": true,
   "dependencies": {
+    "@types/angular": "latest",
     "angular": "latest",
-    "@types/angular": "latest"
+    "angular-animate": "latest",
+    "jquery": "latest"
   },
   "devDependencies": {
       "livereload": "latest",
