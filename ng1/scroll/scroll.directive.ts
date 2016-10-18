@@ -22,23 +22,29 @@ namespace poc {
         
     }
 
+    .scroll .hidden {
+        visibility: hidden;
+    }
+
     .scroll .list {
         border: 1px solid rgb(50, 50, 50);
         height: 500px;
         margin-top: 20px;
-        overflow-y: auto;
+        overflow-y: hidden;
     }
 
     .scroll .list .item {
-        height: 50px;
+        height: 100px;
         padding: 10px;
     }
 </style>
 <div class="scroll">
+    <input type="number" ng-model="currentItemIndex" />
     <button type="button" ng-click="onScrollToItem()">Scroll to item</button>
+    <button type="button" ng-click="onMakeItemVisible()">Make item visible</button>
     <div id="list" class="list">
-        <div id="item-{{$index}}" ng-repeat="item in items" class="item">
-            {{item}}
+        <div id="item-{{$index}}" ng-class="{'hidden': !item.visible}" ng-repeat="item in items" class="item">
+            {{item.name}}
         </div>
     </div>
 </div>`;
@@ -51,21 +57,37 @@ namespace poc {
 
         unboundLink($scope: IScrollScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) {
             const self: ScrollDirective = this;
-            
+            const specialItemIndex = 15;
             $scope.items = [];
             for(let i = 0; i< 40; i++) {
-                $scope.items.push(`Item ${i.toString()}`);
+                const item = {
+                    name: `Item ${i.toString()}`,
+                    visible: false
+                };
+                $scope.items.push(item);
             }
 
+            $scope.onMakeItemVisible = function() {
+                $scope.items[specialItemIndex].visible = true;
+            };
+
             $scope.onScrollToItem = function() {
-                scrollToItem(document.getElementById('list'), document.getElementById('item-26'), 50);
+                $scope.items[$scope.currentItemIndex].visible = true;
+                scrollToItem(document.getElementById('list'), document.getElementById(`item-${$scope.currentItemIndex.toString()}`), 50);
             };
         }
     }
 
     interface IScrollScope extends ng.IScope {
-        items: Array<string>;
+        currentItemIndex: number;
+        items: Array<IItem>;
+        onMakeItemVisible: () => void;
         onScrollToItem: () => void;
+    }
+
+    interface IItem {
+        name: string;
+        visible: boolean;
     }
 
     angular.module('poc').directive('scroll', [() => new ScrollDirective()]);
