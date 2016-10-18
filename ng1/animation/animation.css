@@ -58,6 +58,7 @@ animation .list .page {
     -moz-transition: transform 0.5s linear 0s;
     -o-transition: transform 0.5s linear 0s;
     transition: transform 0.5s linear 0s;
+    z-index: 0;
 }
 
 /*
@@ -65,6 +66,7 @@ animation .list .page {
 */
 animation .list .page.previous {
     transform: translateY(-100%);
+    z-index: -10;
 }
 
 /*
@@ -72,4 +74,5 @@ animation .list .page.previous {
 */
 animation .list .page.next {
     transform: translateY(100%);
+    z-index: -10;
 }
