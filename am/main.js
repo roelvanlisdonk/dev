@@ -1,9 +1,10 @@
 System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var _vd;
+    var _vd, body, element, html;
     function convertDomToVirtualDomInternal(node) {
         var vdNode = {
+            changed: false,
             childNodes: [],
             nodeName: node.nodeName
         };
@@ -22,6 +23,12 @@ System.register([], function(exports_1, context_1) {
             _vd = null;
             convertDomToVirtualDom(document);
             console.log(_vd);
+            body = document.createElement('body');
+            element = document.createElement('div');
+            element.appendChild(document.createTextNode('Test !!!!'));
+            body.appendChild(element);
+            html = document.childNodes[1];
+            html.appendChild(body);
         }
     }
 });

@@ -244,8 +244,6 @@ namespace am {
             console.log(err);
         });
     }
-    
 
     start();
-    
 }
