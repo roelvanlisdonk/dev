@@ -10,7 +10,9 @@
     
   },
   "devDependencies": {
-      "livereload": "latest",
-      "typescript": "latest"
+    "@types/es6-promise": "latest",
+    "@types/system": "latest",
+    "livereload": "latest",
+    "typescript": "latest"
   }
 }
