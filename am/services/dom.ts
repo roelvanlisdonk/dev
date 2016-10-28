@@ -4,6 +4,7 @@ export function render(element: HTMLElement, vdNode: IVirtualDomNode) {
     // TODO: must be done in the one and only, 'am request animation frame'.
     element.innerHTML = convertToHtml(vdNode);
 }
+
 function convertToHtml(node: IVirtualDomNode): string {
     let html = `<${node.nodeName}`;
 

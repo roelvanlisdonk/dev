@@ -151,7 +151,7 @@ var am;
     };
     var amWindow = window;
     amWindow.System = System;
-    function start() {
+    function loadMain() {
         var scriptTag = document.querySelector("script[data-main]");
         var moduleName = scriptTag.getAttribute("data-main");
         console.log("Loading module " + moduleName);
@@ -161,7 +161,7 @@ var am;
             console.log(err);
         });
     }
-    am.start = start;
-    start();
+    am.loadMain = loadMain;
+    loadMain();
 })(am || (am = {}));
 //# sourceMappingURL=system.js.map

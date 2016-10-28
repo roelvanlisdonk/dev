@@ -232,7 +232,7 @@ namespace am {
         onreadystatechange: any;
     }
 
-    export function start() {
+    export function loadMain() {
         const scriptTag = document.querySelector("script[data-main]");
         const moduleName = scriptTag.getAttribute("data-main");
 
@@ -245,5 +245,5 @@ namespace am {
         });
     }
 
-    start();
+    loadMain();
 }
