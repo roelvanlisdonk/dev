@@ -1,6 +1,16 @@
 
 const objectIndex: any = {}; // Array<IStoreObject>
-const typeIndex: any = {}; // Array<IStoreType>
+
+// The typeId of a IStoreType is used as key.
+// The values will be of type IStoreTypeIndexItem.
+const typeIndex: any = {};
+
+interface IStoreTypeIndexItem {
+    // The fielId of a IStoreField is used as key.
+    // The values will be of type IStoreField. 
+    fieldIndex: any;
+    value: IStoreType;
+}
 
 // To support renaming of types and fields, we expect objects in the store to be of type IStoreObject
 // Fields of a IStoreObject can only be of type IStoreField (except for the readonly fields "id" and "typeId".
@@ -30,45 +40,53 @@ function cloneSimpleType(obj: any): any {
 }
 
 export function get<T>(id: string): T {
-    const obj: any = objectIndex[id];
+    const obj: any = objectIndex[id];   
 
-    let copy: any; 
-
-    // Handle Object
-    if (obj instanceof Object) {
-        copy = {
+    // Only handle "typed" objects.
+    if (obj instanceof Object && obj.id && obj.typeId) {
+        const copy: any = {
             id: obj.id,
             typeId: obj.typeId
         };
 
+        const storeTypeIndexItem: IStoreTypeIndexItem = typeIndex[obj.typeId];
+        const storeType = storeTypeIndexItem.value;
+
         for (let propName in obj) {
             if (obj.hasOwnProperty(propName)) {
-                const propValue = obj[propName];
+                const field: IStoreField = obj[propName];
 
                 // Only handle IStoreField.
-                if("object" === typeof propValue && propValue.fieldId) {
-                    // TODO: lookup correct field.
-                    const fieldCopy = {
-
+                if("object" === typeof field && field.fieldId) {
+                    
+                    const fieldCopy: IStoreField = {
+                        fieldId: field.fieldId,
+                        value: null
                     };
 
-                    // Handle IStoreField.value is of type 'Array'.
-                    if (propValue.value instanceof Array) {
-                        let guids: Array<string> = [];
-                        for (let i = 0, len = propValue.length; i < len; i++) {
-                            guids[i] = cloneSimpleType(propValue[i]); // Array items should be of simple types!.
-                        }
+                    // // TODO: Determine correct fieldName.
+                    const fieldName = '';
 
-                        // TODO: lookup correct field.
-                        copy[propName] = guids;
+                    // Handle IStoreField.value is of type 'Array'.
+                    if (field.value instanceof Array) {
+                        const sourceArray = field.value;
+                        let destArray: Array<string> = [];
+                        for (let i = 0, len = sourceArray.length; i < len; i++) {
+                            destArray[i] = cloneSimpleType(sourceArray[i]); // Array items should be of simple types!.
+                        }
+                        fieldCopy.value = destArray;
+                    } else {
+                        fieldCopy.value = cloneSimpleType(field.value);
                     }
+
+                    copy[fieldName] = fieldCopy;
                 }
             }
         }
         return copy;
     }
 
-    throw new Error("Unable to copy obj! Its type isn't supported.");
+    throw new Error(`Unable to get store object ${id}! Its type isn't supported.`);
 }
 
 
