@@ -15,7 +15,7 @@ interface IStoreTypeIndexItem {
 // To support renaming of types and fields, we expect objects in the store to be of type IStoreObject
 // Fields of a IStoreObject can only be of type IStoreField (except for the readonly fields "id" and "typeId".
 
-// This function converts the given type, so fields can be accessed fast.
+
 export function addType() {
     
 }

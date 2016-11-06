@@ -6,6 +6,10 @@ import { IStoreBooleanField, IStoreNumberField, IStoreObject, IStoreStringField 
 
 // const bodyVirtualDom = getVirtualDom(body);
 
+
+
+
+
 class Topic implements IStoreObject {
     id: string;
     readonly typeId: string = StoreTypes.Topic.toString();
