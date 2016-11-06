@@ -17,9 +17,8 @@ interface IStoreTypeIndexItem {
 
 // This function converts the given type, so fields can be accessed fast.
 export function addType() {
- 
+    
 }
-
 
 function cloneSimpleType(obj: any): any {
     let copy: any;
@@ -89,18 +88,16 @@ export function get<T>(id: string): T {
     throw new Error(`Unable to get store object ${id}! Its type isn't supported.`);
 }
 
-
-
 export interface IStoreType {
-    readonly typeId: string; // GUID
+    readonly typeId: string; // Application wide unique id.
 }
 
 export interface IStoreObject extends IStoreType {
-    readonly id: string; // GUID
+    readonly id: string; // Application wide unique id.
 }
 
 export interface IStoreField {
-    readonly fieldId: string; // GUID
+    readonly fieldId: string; // Application wide unique id.
     value: boolean | Date | number | string | Array<boolean | Date | number | string>;
 }
 
