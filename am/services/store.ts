@@ -1,29 +1,20 @@
 
-const objectIndex: any = {}; // Array<IStoreObject>
+const index: any = {}; // Array<IStoreObject>
 
-// The typeId of a IStoreType is used as key.
-// The values will be of type IStoreTypeIndexItem.
-const typeIndex: any = {};
-
-interface IStoreTypeIndexItem {
-    // The fielId of a IStoreField is used as key.
-    // The values will be of type IStoreField. 
-    fieldIndex: any;
-    value: IStoreType;
-}
 
 // To support renaming of types and fields, we expect objects in the store to be of type IStoreObject
 // Fields of a IStoreObject can only be of type IStoreField (except for the readonly fields "id" and "typeId".
 
-
-export function addType() {
-    
+// Change the data stored localy to match the new type schema.
+export function fixDataBasedOnSchemaChanges(types: Array<IStoreType>) {
+    throw new Error('Not implemented exception.');
 }
 
 function cloneSimpleType(obj: any): any {
     let copy: any;
 
     // Handle boolean, number, string, null and undefined.
+    // TODO: NaN.
     if (null == obj || "object" != typeof obj) { 
         return copy;
     };
@@ -35,11 +26,11 @@ function cloneSimpleType(obj: any): any {
         return copy;
     }
 
-    throw new Error("Unable to clone simple type.");
+    throw new Error(`Unable to clone simple type. This is most likely cast by IStoreField.value containing In the curren version of the store, arrays can only have types (boolean, Date, number, string) and `);
 }
 
 export function get<T>(id: string): T {
-    const obj: any = objectIndex[id];   
+    const obj: any = index[id];   
 
     // Only handle "typed" objects.
     if (obj instanceof Object && obj.id && obj.typeId) {
@@ -47,9 +38,6 @@ export function get<T>(id: string): T {
             id: obj.id,
             typeId: obj.typeId
         };
-
-        const storeTypeIndexItem: IStoreTypeIndexItem = typeIndex[obj.typeId];
-        const storeType = storeTypeIndexItem.value;
 
         for (let propName in obj) {
             if (obj.hasOwnProperty(propName)) {
@@ -63,22 +51,20 @@ export function get<T>(id: string): T {
                         value: null
                     };
 
-                    // // TODO: Determine correct fieldName.
-                    const fieldName = '';
-
-                    // Handle IStoreField.value is of type 'Array'.
+                    // Handle arrays.
                     if (field.value instanceof Array) {
                         const sourceArray = field.value;
                         let destArray: Array<string> = [];
                         for (let i = 0, len = sourceArray.length; i < len; i++) {
-                            destArray[i] = cloneSimpleType(sourceArray[i]); // Array items should be of simple types!.
+                            // Array items should be of simple types!.
+                            destArray[i] = cloneSimpleType(sourceArray[i]); 
                         }
                         fieldCopy.value = destArray;
                     } else {
                         fieldCopy.value = cloneSimpleType(field.value);
                     }
 
-                    copy[fieldName] = fieldCopy;
+                    copy[propName] = fieldCopy;
                 }
             }
         }
