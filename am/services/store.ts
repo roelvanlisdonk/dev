@@ -7,7 +7,7 @@ const index: any = {}; // Array<IStoreObject>
 
 // Change the data stored localy to match the new type schema.
 export function fixDataBasedOnSchemaChanges(types: Array<IStoreType>) {
-    throw new Error('Not implemented exception.');
+    throw new Error("Not implemented exception.");
 }
 
 function cloneSimpleType(obj: any): any {
@@ -74,6 +74,55 @@ export function get<T>(id: string): T {
     throw new Error(`Unable to get store object ${id}! Its type isn't supported.`);
 }
 
+export function save(storeObject: IStoreObject) {
+    if(storeObject && storeObject.id) {
+        
+        //TODO: save change to changeLog.
+
+        const current = index[storeObject.id];
+        if(!current) {
+            index[storeObject.id] = storeObject;
+        }
+
+        for (let fieldName in storeObject) {
+            saveField(storeObject, current, fieldName)
+        }
+        
+        return;
+    }
+
+    throw new Error("Given parameter is not an IStoreObject.");
+}
+
+function saveField(storeObject: IStoreObject, current: IStoreObject, fieldName: string) {
+    const storeObjectAsAny = storeObject as any;
+    const currentAsAny = current as any;
+    //TODO: save change to changeLog.
+    if (storeObject.hasOwnProperty(fieldName)) {
+        const field = storeObjectAsAny[fieldName];
+        const fieldIsAStoreField = ("undefined" !== field.id && "undefined" !== field.value);
+
+        // Only handle IStoreFields
+        if(fieldIsAStoreField) {
+            const valueIsAnStoreObject = (field.value.id);
+            if(valueIsAnStoreObject) {
+                save(field.value);
+                return;
+            }
+
+            const valueIsAnArray = field.value instanceof Array;
+            if(valueIsAnArray) {
+                // TODO: notify dependencies
+                // TODO: store array items.
+                return;
+            }
+
+            // TODO: notify dependencies
+            currentAsAny[fieldName] = storeObjectAsAny[fieldName];
+        }
+    }
+}
+
 export interface IStoreType {
     readonly typeId: string; // Application wide unique id.
 }
@@ -84,7 +133,7 @@ export interface IStoreObject extends IStoreType {
 
 export interface IStoreField {
     readonly fieldId: string; // Application wide unique id.
-    value: boolean | Date | number | string | Array<boolean | Date | number | string>;
+    value: Array<boolean | Date | number | string> | boolean | Date| IStoreObject | number | string;
 }
 
 export interface IStoreBooleanField extends IStoreField {
@@ -119,32 +168,6 @@ export interface IStoreStringArrayField extends IStoreField {
     value: Array<string>;
 }
 
+function fillStoreWithStubData() {
 
-
-// export interface IStoreArray extends IStoreObject {
-//     id: string;
-//     [position: number]: IStoreObject;
-// }
-
-// export interface IStoreDepenendcy {
-//     deps: Array<IStoreDepenendcy>;
-// }
-
-// export interface IStoreField extends IStoreObject {
-// 	fieldTypeId: string;
-//     id: string;
-// 	recordId: string;
-//     value: boolean | Date | number | string;
-// }
-
-// export interface IStoreFnDepenendcy extends IStoreDepenendcy {
-//     deps: Array<IStoreDepenendcy>;
-//     fn: (...deps: Array<IStoreDepenendcy>) => any;
-// }
-
-
-
-// export interface IStoreRecord extends IStoreObject {
-//     id: string;
-// 	recordTypeId: string;
-// }
+}

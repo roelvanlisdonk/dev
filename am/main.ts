@@ -1,12 +1,12 @@
 import { div, getVirtualDom, IVirtualDomNode, span } from './services/virtual.dom'
 import { render } from './services/dom'
-import { IStoreBooleanField, IStoreNumberField, IStoreObject, IStoreStringField } from './services/store'
+import { get, IStoreBooleanField, IStoreNumberField, IStoreObject, IStoreStringField } from './services/store'
 
 // const body = document.querySelector('body');
 
 // const bodyVirtualDom = getVirtualDom(body);
 
-
+const user = get<User>('test@test.com');
 
 
 
