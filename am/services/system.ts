@@ -1,39 +1,39 @@
 /**
- * The system loader is a adjusted version of the https://github.com/caridy/es6-micro-loader
+ * The system loader is an adjusted version of the https://github.com/caridy/es6-micro-loader
  */
-namespace am {
-    'use strict';
+namespace am.systemUsingPromises {
+    "use strict";
 
-    var headEl = document.getElementsByTagName('head')[0],
+    const headEl = document.getElementsByTagName("head")[0],
         ie = /MSIE/.test(navigator.userAgent);
 
-    /*
-    normalizeName() is inspired by Ember's loader:
-    https://github.com/emberjs/ember.js/blob/0591740685ee2c444f2cfdbcebad0bebd89d1303/packages/loader/lib/main.js#L39-L53
-    */
+    /**
+     *  normalizeName() is inspired by Ember's loader:
+     *  https://github.com/emberjs/ember.js/blob/0591740685ee2c444f2cfdbcebad0bebd89d1303/packages/loader/lib/main.js#L39-L53
+     */
     function normalizeName(child: string, parentBase: Array<string>) {
-        if (child.charAt(0) === '/') {
+        if (child.charAt(0) === "/") {
             child = child.slice(1);
         }
-        if (child.charAt(0) !== '.') {
+        if (child.charAt(0) !== ".") {
             return child;
         }
-        var parts = child.split('/');
-        while (parts[0] === '.' || parts[0] === '..') {
-            if (parts.shift() === '..') {
+        const parts = child.split("/");
+        while (parts[0] === "." || parts[0] === "..") {
+            if (parts.shift() === "..") {
                 parentBase.pop();
             }
         }
-        return parentBase.concat(parts).join('/');
+        return parentBase.concat(parts).join("/");
     }
 
-    var seen = Object.create(null);
-    var internalRegistry = Object.create(null);
-    var externalRegistry = Object.create(null);
-    var anonymousEntry: any;
+    const seen = Object.create(null);
+    const internalRegistry = Object.create(null);
+    const externalRegistry = Object.create(null);
+    let anonymousEntry: any;
 
     function ensuredExecute(name: string): boolean {
-        var mod = internalRegistry[name];
+        const mod = internalRegistry[name];
         if (mod && !seen[name]) {
             seen[name] = true;
             // one time operation to execute the module body
@@ -55,7 +55,7 @@ namespace am {
     }
 
     function createScriptNode(src: string, callback: any) {
-        var node = document.createElement('script');
+        const node = document.createElement("script");
         // use async=false for ordered async?
         // parallel-load-serial-execute http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
         if (node.async) {
@@ -72,20 +72,20 @@ namespace am {
         } else {
             node.onload = node.onerror = callback;
         }
-        node.setAttribute('src', src);
+        node.setAttribute("src", src);
         headEl.appendChild(node);
     }
 
     function load(name: string) {
         return new Promise(function(resolve, reject) {
-            createScriptNode((System.baseURL || '/') + name + '.js', function() {
+            createScriptNode((System.baseURL || "/") + name + ".js", function() {
                 if (anonymousEntry) {
                     System.register(name, anonymousEntry[0], anonymousEntry[1]);
                     anonymousEntry = undefined;
                 }
-                var mod = internalRegistry[name];
+                const mod = internalRegistry[name];
                 if (!mod) {
-                    reject(new Error('Error loading module ' + name));
+                    reject(new Error("Error loading module " + name));
                     return;
                 }
                 Promise.all(mod.deps.map(function (dep: string) {
@@ -99,14 +99,14 @@ namespace am {
     }
 
     const System: ISystem = {
-        baseURL: '',
+        baseURL: "",
         set: set,
         get: get,
         has: has,
         import: function(name: string): Promise<any> {
             return new Promise(function(resolve, reject) {
-                var normalizedName = normalizeName(name, []);
-                var mod = get(normalizedName);
+                const normalizedName = normalizeName(name, []);
+                const mod = get(normalizedName);
                 return mod ? resolve(mod) : load(name).then(function () {
                     const modObject = get(normalizedName);
                      resolve(modObject);
@@ -134,7 +134,7 @@ namespace am {
                 values: values,
                 // normalized deps
                 deps: deps.map(function(dep: string) {
-                    return normalizeName(dep, name.split('/').slice(0, -1));
+                    return normalizeName(dep, name.split("/").slice(0, -1));
                 }),
                 // other modules that depends on this so we can push updates into those modules
                 dependants: [],
@@ -144,7 +144,7 @@ namespace am {
                 },
                 execute: function() {
                     mod.deps.map(function(dep: string) {
-                        var imports = externalRegistry[dep];
+                        let imports = externalRegistry[dep];
                         if (imports) {
                             mod.update(dep, imports);
                         } else {
@@ -162,11 +162,12 @@ namespace am {
             meta = wrapper(function(identifier: any, value: any) {
                 values[identifier] = value;
                 mod.lock = true; // locking down the updates on the module to avoid infinite loop
-                mod.dependants.forEach(function(moduleName: string) {
+                for(let i = 0, length = mod.dependants.length; i < length; i++) {
+                    const moduleName: string = mod.dependants[i];
                     if (internalRegistry[moduleName] && !internalRegistry[moduleName].lock) {
                         internalRegistry[moduleName].update(name, values);
                     }
-                });
+                }
                 mod.lock = false;
                 if (!Object.getOwnPropertyDescriptor(proxy, identifier)) {
                     Object.defineProperty(proxy, identifier, {

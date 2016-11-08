@@ -1,167 +1,171 @@
 var am;
 (function (am) {
-    'use strict';
-    var headEl = document.getElementsByTagName('head')[0], ie = /MSIE/.test(navigator.userAgent);
-    function normalizeName(child, parentBase) {
-        if (child.charAt(0) === '/') {
-            child = child.slice(1);
-        }
-        if (child.charAt(0) !== '.') {
-            return child;
-        }
-        var parts = child.split('/');
-        while (parts[0] === '.' || parts[0] === '..') {
-            if (parts.shift() === '..') {
-                parentBase.pop();
+    var systemUsingPromises;
+    (function (systemUsingPromises) {
+        "use strict";
+        var headEl = document.getElementsByTagName("head")[0], ie = /MSIE/.test(navigator.userAgent);
+        function normalizeName(child, parentBase) {
+            if (child.charAt(0) === "/") {
+                child = child.slice(1);
             }
-        }
-        return parentBase.concat(parts).join('/');
-    }
-    var seen = Object.create(null);
-    var internalRegistry = Object.create(null);
-    var externalRegistry = Object.create(null);
-    var anonymousEntry;
-    function ensuredExecute(name) {
-        var mod = internalRegistry[name];
-        if (mod && !seen[name]) {
-            seen[name] = true;
-            mod.execute();
-        }
-        return mod && mod.proxy;
-    }
-    function set(name, values) {
-        externalRegistry[name] = values;
-    }
-    function get(name) {
-        return externalRegistry[name] || ensuredExecute(name);
-    }
-    function has(name) {
-        return !!externalRegistry[name] || !!internalRegistry[name];
-    }
-    function createScriptNode(src, callback) {
-        var node = document.createElement('script');
-        if (node.async) {
-            node.async = false;
-        }
-        if (ie) {
-            var ieNode = node;
-            ieNode.onreadystatechange = function () {
-                if (/loaded|complete/.test(this.readyState)) {
-                    this.onreadystatechange = null;
-                    callback();
+            if (child.charAt(0) !== ".") {
+                return child;
+            }
+            var parts = child.split("/");
+            while (parts[0] === "." || parts[0] === "..") {
+                if (parts.shift() === "..") {
+                    parentBase.pop();
                 }
-            };
+            }
+            return parentBase.concat(parts).join("/");
         }
-        else {
-            node.onload = node.onerror = callback;
+        var seen = Object.create(null);
+        var internalRegistry = Object.create(null);
+        var externalRegistry = Object.create(null);
+        var anonymousEntry;
+        function ensuredExecute(name) {
+            var mod = internalRegistry[name];
+            if (mod && !seen[name]) {
+                seen[name] = true;
+                mod.execute();
+            }
+            return mod && mod.proxy;
         }
-        node.setAttribute('src', src);
-        headEl.appendChild(node);
-    }
-    function load(name) {
-        return new Promise(function (resolve, reject) {
-            createScriptNode((System.baseURL || '/') + name + '.js', function () {
-                if (anonymousEntry) {
-                    System.register(name, anonymousEntry[0], anonymousEntry[1]);
-                    anonymousEntry = undefined;
-                }
-                var mod = internalRegistry[name];
-                if (!mod) {
-                    reject(new Error('Error loading module ' + name));
+        function set(name, values) {
+            externalRegistry[name] = values;
+        }
+        function get(name) {
+            return externalRegistry[name] || ensuredExecute(name);
+        }
+        function has(name) {
+            return !!externalRegistry[name] || !!internalRegistry[name];
+        }
+        function createScriptNode(src, callback) {
+            var node = document.createElement("script");
+            if (node.async) {
+                node.async = false;
+            }
+            if (ie) {
+                var ieNode = node;
+                ieNode.onreadystatechange = function () {
+                    if (/loaded|complete/.test(this.readyState)) {
+                        this.onreadystatechange = null;
+                        callback();
+                    }
+                };
+            }
+            else {
+                node.onload = node.onerror = callback;
+            }
+            node.setAttribute("src", src);
+            headEl.appendChild(node);
+        }
+        function load(name) {
+            return new Promise(function (resolve, reject) {
+                createScriptNode((System.baseURL || "/") + name + ".js", function () {
+                    if (anonymousEntry) {
+                        System.register(name, anonymousEntry[0], anonymousEntry[1]);
+                        anonymousEntry = undefined;
+                    }
+                    var mod = internalRegistry[name];
+                    if (!mod) {
+                        reject(new Error("Error loading module " + name));
+                        return;
+                    }
+                    Promise.all(mod.deps.map(function (dep) {
+                        if (externalRegistry[dep] || internalRegistry[dep]) {
+                            return Promise.resolve();
+                        }
+                        return load(dep);
+                    })).then(resolve, reject);
+                });
+            });
+        }
+        var System = {
+            baseURL: "",
+            set: set,
+            get: get,
+            has: has,
+            import: function (name) {
+                return new Promise(function (resolve, reject) {
+                    var normalizedName = normalizeName(name, []);
+                    var mod = get(normalizedName);
+                    return mod ? resolve(mod) : load(name).then(function () {
+                        var modObject = get(normalizedName);
+                        resolve(modObject);
+                    });
+                });
+            },
+            register: function (name, deps, wrapper) {
+                if (Array.isArray(name)) {
+                    anonymousEntry = [];
+                    anonymousEntry.push.apply(anonymousEntry, arguments);
                     return;
                 }
-                Promise.all(mod.deps.map(function (dep) {
-                    if (externalRegistry[dep] || internalRegistry[dep]) {
-                        return Promise.resolve();
-                    }
-                    return load(dep);
-                })).then(resolve, reject);
-            });
-        });
-    }
-    var System = {
-        baseURL: '',
-        set: set,
-        get: get,
-        has: has,
-        import: function (name) {
-            return new Promise(function (resolve, reject) {
-                var normalizedName = normalizeName(name, []);
-                var mod = get(normalizedName);
-                return mod ? resolve(mod) : load(name).then(function () {
-                    var modObject = get(normalizedName);
-                    resolve(modObject);
-                });
-            });
-        },
-        register: function (name, deps, wrapper) {
-            if (Array.isArray(name)) {
-                anonymousEntry = [];
-                anonymousEntry.push.apply(anonymousEntry, arguments);
-                return;
-            }
-            var proxy = Object.create(null), values = Object.create(null), mod, meta;
-            internalRegistry[name] = mod = {
-                proxy: proxy,
-                values: values,
-                deps: deps.map(function (dep) {
-                    return normalizeName(dep, name.split('/').slice(0, -1));
-                }),
-                dependants: [],
-                update: function (moduleName, moduleObj) {
-                    meta.setters[mod.deps.indexOf(moduleName)](moduleObj);
-                },
-                execute: function () {
-                    mod.deps.map(function (dep) {
-                        var imports = externalRegistry[dep];
-                        if (imports) {
-                            mod.update(dep, imports);
-                        }
-                        else {
-                            imports = get(dep) && internalRegistry[dep].values;
+                var proxy = Object.create(null), values = Object.create(null), mod, meta;
+                internalRegistry[name] = mod = {
+                    proxy: proxy,
+                    values: values,
+                    deps: deps.map(function (dep) {
+                        return normalizeName(dep, name.split("/").slice(0, -1));
+                    }),
+                    dependants: [],
+                    update: function (moduleName, moduleObj) {
+                        meta.setters[mod.deps.indexOf(moduleName)](moduleObj);
+                    },
+                    execute: function () {
+                        mod.deps.map(function (dep) {
+                            var imports = externalRegistry[dep];
                             if (imports) {
-                                internalRegistry[dep].dependants.push(name);
                                 mod.update(dep, imports);
                             }
-                        }
-                    });
-                    meta.execute();
-                }
-            };
-            meta = wrapper(function (identifier, value) {
-                values[identifier] = value;
-                mod.lock = true;
-                mod.dependants.forEach(function (moduleName) {
-                    if (internalRegistry[moduleName] && !internalRegistry[moduleName].lock) {
-                        internalRegistry[moduleName].update(name, values);
+                            else {
+                                imports = get(dep) && internalRegistry[dep].values;
+                                if (imports) {
+                                    internalRegistry[dep].dependants.push(name);
+                                    mod.update(dep, imports);
+                                }
+                            }
+                        });
+                        meta.execute();
                     }
-                });
-                mod.lock = false;
-                if (!Object.getOwnPropertyDescriptor(proxy, identifier)) {
-                    Object.defineProperty(proxy, identifier, {
-                        enumerable: true,
-                        get: function () {
-                            return values[identifier];
+                };
+                meta = wrapper(function (identifier, value) {
+                    values[identifier] = value;
+                    mod.lock = true;
+                    for (var i = 0, length_1 = mod.dependants.length; i < length_1; i++) {
+                        var moduleName = mod.dependants[i];
+                        if (internalRegistry[moduleName] && !internalRegistry[moduleName].lock) {
+                            internalRegistry[moduleName].update(name, values);
                         }
-                    });
-                }
-                return value;
+                    }
+                    mod.lock = false;
+                    if (!Object.getOwnPropertyDescriptor(proxy, identifier)) {
+                        Object.defineProperty(proxy, identifier, {
+                            enumerable: true,
+                            get: function () {
+                                return values[identifier];
+                            }
+                        });
+                    }
+                    return value;
+                });
+            }
+        };
+        var amWindow = window;
+        amWindow.System = System;
+        function loadMain() {
+            var scriptTag = document.querySelector("script[data-main]");
+            var moduleName = scriptTag.getAttribute("data-main");
+            console.log("Loading module " + moduleName);
+            System.import(moduleName).then(function (mod) {
+                console.log("Loaded module " + moduleName);
+            }).catch(function (err) {
+                console.log(err);
             });
         }
-    };
-    var amWindow = window;
-    amWindow.System = System;
-    function loadMain() {
-        var scriptTag = document.querySelector("script[data-main]");
-        var moduleName = scriptTag.getAttribute("data-main");
-        console.log("Loading module " + moduleName);
-        System.import(moduleName).then(function (mod) {
-            console.log("Loaded module " + moduleName);
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
-    am.loadMain = loadMain;
-    loadMain();
+        systemUsingPromises.loadMain = loadMain;
+        loadMain();
+    })(systemUsingPromises = am.systemUsingPromises || (am.systemUsingPromises = {}));
 })(am || (am = {}));
 //# sourceMappingURL=system.js.map

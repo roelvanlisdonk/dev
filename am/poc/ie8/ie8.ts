@@ -13,7 +13,7 @@ const css = {
 
 const square = document.createElement("div");
 square.id = "square"
-square.classList.add(css.square);
+square.className = css.square;
 document.body.appendChild(square);
 
 function animate(tick: (domHighResTimeStamp?: any)=> void): any {

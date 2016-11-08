@@ -43,10 +43,10 @@ System.register(['../../services/stylesheet'], function(exports_1, context_1) {
             };
             square = document.createElement("div");
             square.id = "square";
-            square.classList.add(css.square);
+            square.className = css.square;
             document.body.appendChild(square);
             scrollLeft();
         }
     }
 });
-//# sourceMappingURL=animation.js.map
+//# sourceMappingURL=ie8.js.map
