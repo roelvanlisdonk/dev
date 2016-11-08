@@ -165,13 +165,15 @@ var am;
             }
             var proxy = Object.create(null);
             var values = Object.create(null);
+            var depsAsArray = deps;
             var mod;
             var meta;
-            internalRegistry[name] = mod = {
+            var nameAsString = name;
+            internalRegistry[nameAsString] = mod = {
                 proxy: proxy,
                 values: values,
-                deps: deps.map(function (dep) {
-                    return normalizeName(dep, name.split("/").slice(0, -1));
+                deps: depsAsArray.map(function (dep) {
+                    return normalizeName(dep, nameAsString.split("/").slice(0, -1));
                 }),
                 dependants: [],
                 update: function (moduleName, moduleObj) {
@@ -204,13 +206,8 @@ var am;
                     }
                 }
                 mod.lock = false;
-                if (!Object.getOwnPropertyDescriptor(proxy, identifier)) {
-                    Object.defineProperty(proxy, identifier, {
-                        enumerable: true,
-                        get: function () {
-                            return values[identifier];
-                        }
-                    });
+                if (!proxy[identifier]) {
+                    proxy[identifier] = values[identifier];
                 }
                 return value;
             });
@@ -219,20 +216,36 @@ var am;
             externalRegistry[name] = values;
         }
         var System = {
-            baseURL: "",
-            set: set,
-            get: get,
-            has: has,
-            import: load,
-            register: register
+            "baseURL": "",
+            "set": set,
+            "get": get,
+            "has": has,
+            "import": load,
+            "register": register
         };
         var amWindow = window;
         amWindow.System = System;
+        function getMainModuleName() {
+            if (document.querySelector) {
+                var scriptTag = document.querySelector("script[data-main]");
+                return scriptTag.getAttribute("data-main");
+            }
+            else {
+                var scripts = document.getElementsByTagName('script');
+                for (var i = 0, length_2 = scripts.length; i < length_2; i++) {
+                    var script = scripts[i];
+                    var moduleName = script.getAttribute("data-main");
+                    if (moduleName) {
+                        return moduleName;
+                    }
+                }
+            }
+            throw new Error("Could not find script tag in head with attribute data-main.");
+        }
         function loadMain() {
-            var scriptTag = document.querySelector("script[data-main]");
-            var moduleName = scriptTag.getAttribute("data-main");
+            var moduleName = getMainModuleName();
             console.log("Loading module " + moduleName);
-            System.import(moduleName, function onSuccess(mod) {
+            System["import"](moduleName, function onSuccess(mod) {
                 console.log("Loaded module " + moduleName);
             });
         }

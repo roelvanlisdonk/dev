@@ -116,16 +116,18 @@ namespace am.systemUsingPromises {
                 });
             });
         },
-        register: function(name: string, deps: Array<string>, wrapper: Function) {
+        register: function(name: string| Array<string>, deps: Array<string> | Function, wrapper?: Function) {
             if (Array.isArray(name)) {
                 // anounymous module
                 anonymousEntry = [];
                 anonymousEntry.push.apply(anonymousEntry, arguments);
                 return; // breaking to let the script tag to name it.
             }
-            let proxy = Object.create(null),
-                values = Object.create(null),
-                mod: any, meta: any;
+            const proxy = Object.create(null);
+            const values = Object.create(null);
+            const depsAsArray = deps as Array<string>;
+            let mod: any;
+            let meta: any;
             // creating a new entry in the internal registry
             internalRegistry[name] = mod = {
                 // live bindings
@@ -133,7 +135,7 @@ namespace am.systemUsingPromises {
                 // exported values
                 values: values,
                 // normalized deps
-                deps: deps.map(function(dep: string) {
+                deps: depsAsArray.map(function(dep: string) {
                     return normalizeName(dep, name.split("/").slice(0, -1));
                 }),
                 // other modules that depends on this so we can push updates into those modules
@@ -210,9 +212,7 @@ namespace am.systemUsingPromises {
          * Declaration function for defining modules of the System.register polyfill module format.
          */
         register(name: string, deps: Array<string>, wrapper: Function): void;
-
-        // TODO:
-        // register(deps: Array<string>, wrapper: Function): void;
+        register(deps: Array<string>, wrapper: Function): void;
 
         /**
          * Sets a module into the registry directly and synchronously.

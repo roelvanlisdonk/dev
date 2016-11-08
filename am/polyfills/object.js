@@ -3,9 +3,7 @@ if (typeof Object.create != 'function') {
         if (arguments.length > 1) {
             throw new Error('This polyfill for Object.create, only accepts one parameter.');
         }
-        if (o === null) {
-            throw new Error('This polyfill for Object.create, does not support null as parameter.');
-        }
+        o = o || {};
         function F() { }
         F.prototype = o;
         var FasAny = F;

@@ -14,16 +14,24 @@ export function addClass(name: string, rules: Array<string>): string {
 
 function create(id: string): CSSStyleSheet {
     // Create the <style> tag
-	const style = document.createElement("style");
+	const head = document.head ||  document.getElementsByTagName('head')[0];
+	const style = document.createElement("style") as any;
     style.id = id;
+	style.type = "text/css";
 
-	// WebKit hack
-	style.appendChild(document.createTextNode(""));
+	if (style.styleSheet){
+		// IE8
+		style.styleSheet.cssText = "";
+	} else {
+		// WebKit hack
+		style.appendChild(document.createTextNode(""));
+	}
 
 	// Add the <style> element to the page
-	document.head.appendChild(style);
-
-	return style.sheet as CSSStyleSheet;
+	head.appendChild(style);
+	
+	// IE8 support (style.styleSheet)
+	return style.sheet || style.styleSheet as CSSStyleSheet;
 }
 
 const styleSheet = create("am");

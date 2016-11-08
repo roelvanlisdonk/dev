@@ -2,14 +2,9 @@ System.register(['../../services/stylesheet'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var stylesheet_1;
-    var css, square;
+    var w, css, square;
     function animate(tick) {
-        if (window["requestAnimationFrame"]) {
-            return window.requestAnimationFrame(tick);
-        }
-        else {
-            return setInterval(tick, 16);
-        }
+        return window.requestAnimationFrame(tick);
     }
     function scrollLeft() {
         console.log("Animation poc started.");
@@ -31,6 +26,15 @@ System.register(['../../services/stylesheet'], function(exports_1, context_1) {
                 stylesheet_1 = stylesheet_1_1;
             }],
         execute: function() {
+            w = window;
+            w.requestAnimationFrame = w.requestAnimationFrame
+                || w.mozRequestAnimationFrame
+                || w.webkitRequestAnimationFrame
+                || w.msRequestAnimationFrame
+                || function (f) { return setTimeout(f, 1000 / 60); };
+            w.cancelAnimationFrame = w.cancelAnimationFrame
+                || w.mozCancelAnimationFrame
+                || function (requestID) { clearTimeout(requestID); };
             css = {
                 square: stylesheet_1.addClass("square-a", [
                     "background-color: rgb(50, 50, 50);",

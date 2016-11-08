@@ -2,7 +2,7 @@ System.register(['../../services/stylesheet'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var stylesheet_1;
-    var css, square;
+    var css, w, square;
     function animate(tick) {
         if (window["requestAnimationFrame"]) {
             return window.requestAnimationFrame(tick);
@@ -41,6 +41,15 @@ System.register(['../../services/stylesheet'], function(exports_1, context_1) {
                     "width: 200px;"
                 ])
             };
+            w = window;
+            w.requestAnimationFrame = w.requestAnimationFrame
+                || w.mozRequestAnimationFrame
+                || w.webkitRequestAnimationFrame
+                || w.msRequestAnimationFrame
+                || function (f) { return setTimeout(f, 1000 / 60); };
+            w.cancelAnimationFrame = w.cancelAnimationFrame
+                || w.mozCancelAnimationFrame
+                || function (requestID) { clearTimeout(requestID); };
             square = document.createElement("div");
             square.id = "square";
             square.classList.add(css.square);

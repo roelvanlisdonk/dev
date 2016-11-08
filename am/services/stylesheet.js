@@ -14,11 +14,18 @@ System.register([], function(exports_1, context_1) {
     }
     exports_1("addClass", addClass);
     function create(id) {
+        var head = document.head || document.getElementsByTagName('head')[0];
         var style = document.createElement("style");
         style.id = id;
-        style.appendChild(document.createTextNode(""));
-        document.head.appendChild(style);
-        return style.sheet;
+        style.type = "text/css";
+        if (style.styleSheet) {
+            style.styleSheet.cssText = "";
+        }
+        else {
+            style.appendChild(document.createTextNode(""));
+        }
+        head.appendChild(style);
+        return style.sheet || style.styleSheet;
     }
     return {
         setters:[],

@@ -102,11 +102,15 @@ var am;
                     anonymousEntry.push.apply(anonymousEntry, arguments);
                     return;
                 }
-                var proxy = Object.create(null), values = Object.create(null), mod, meta;
+                var proxy = Object.create(null);
+                var values = Object.create(null);
+                var depsAsArray = deps;
+                var mod;
+                var meta;
                 internalRegistry[name] = mod = {
                     proxy: proxy,
                     values: values,
-                    deps: deps.map(function (dep) {
+                    deps: depsAsArray.map(function (dep) {
                         return normalizeName(dep, name.split("/").slice(0, -1));
                     }),
                     dependants: [],

@@ -191,7 +191,7 @@ namespace am.systemUsingCallbacks {
         return parentBase.concat(parts).join("/");
     }
 
-    function register(name: string, deps: Array<string>, wrapper: Function) {
+    function register(name: string| Array<string>, deps: Array<string> | Function, wrapper?: Function) {
         if (Array.isArray(name)) {
             // anounymous module
             anonymousEntry = [];
@@ -200,17 +200,19 @@ namespace am.systemUsingCallbacks {
         }
         const proxy = Object.create(null);
         const values = Object.create(null);
+        const depsAsArray = deps as Array<string>;
         let mod: any;
         let meta: any;
+        const nameAsString = name as string;
         // creating a new entry in the internal registry
-        internalRegistry[name] = mod = {
+        internalRegistry[nameAsString] = mod = {
             // live bindings
             proxy: proxy,
             // exported values
             values: values,
             // normalized deps
-            deps: deps.map(function (dep) {
-                return normalizeName(dep, name.split("/").slice(0, -1));
+            deps: depsAsArray.map(function (dep) {
+                return normalizeName(dep, nameAsString.split("/").slice(0, -1));
             }),
             // other modules that depends on this so we can push updates into those modules
             dependants: [],
@@ -246,14 +248,12 @@ namespace am.systemUsingCallbacks {
                 }
             }
             mod.lock = false;
-            if (!Object.getOwnPropertyDescriptor(proxy, identifier)) {
-                Object.defineProperty(proxy, identifier, {
-                    enumerable: true,
-                    get: function () {
-                        return values[identifier];
-                    }
-                });
+
+            // To support IE8 we can't use "getOwnPropertyDescriptor" and "defineProperty" here.
+            if(!proxy[identifier]) {
+                proxy[identifier] = values[identifier];
             }
+            
             return value;
         });
     }
@@ -263,12 +263,12 @@ namespace am.systemUsingCallbacks {
     }
 
     const System: ISystem = {
-        baseURL: "",
-        set: set,
-        get: get,
-        has: has,
-        import: load,
-        register: register
+        "baseURL": "",
+        "set": set,
+        "get": get,
+        "has": has,
+        "import": load,
+        "register": register
     };
 
     interface ILoadInfo {
@@ -311,6 +311,7 @@ namespace am.systemUsingCallbacks {
          * Declaration function for defining modules of the System.register polyfill module format.
          */
         register(name: string, deps: Array<string>, wrapper: Function): void;
+        register(deps: Array<string>, wrapper: Function): void;
 
         /**
          * Sets a module into the registry directly and synchronously.
@@ -331,13 +332,33 @@ namespace am.systemUsingCallbacks {
         onreadystatechange: any;
     }
 
+    function getMainModuleName(): string {
+        if(document.querySelector) {
+            const scriptTag = document.querySelector("script[data-main]");
+            return scriptTag.getAttribute("data-main");
+        } else {
+            // Support < IE8
+            const scripts = document.getElementsByTagName('script');
+            for(let i = 0, length = scripts.length; i < length; i++) {
+                const script = scripts[i];
+                const moduleName = script.getAttribute("data-main");
+                if(moduleName) {
+                    return moduleName;
+                }
+            }
+        }
+        throw new Error("Could not find script tag in head with attribute data-main.");
+    }
+
     export function loadMain() {
-        const scriptTag = document.querySelector("script[data-main]");
-        const moduleName = scriptTag.getAttribute("data-main");
+        
+        const moduleName = getMainModuleName();
 
         // Load "main" module.
         console.log(`Loading module ${moduleName}`);
-        System.import(moduleName, function onSuccess(mod){
+
+        // IE8 reserverd keyword "import".
+        System["import"](moduleName, function onSuccess(mod){
             console.log(`Loaded module ${moduleName}`);
         });
     }
