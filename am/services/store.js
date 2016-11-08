@@ -1,10 +1,11 @@
 System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var objectIndex, typeIndex;
-    function addType() {
+    var index;
+    function fixDataBasedOnSchemaChanges(types) {
+        throw new Error("Not implemented exception.");
     }
-    exports_1("addType", addType);
+    exports_1("fixDataBasedOnSchemaChanges", fixDataBasedOnSchemaChanges);
     function cloneSimpleType(obj) {
         var copy;
         if (null == obj || "object" != typeof obj) {
@@ -16,17 +17,15 @@ System.register([], function(exports_1, context_1) {
             copy.setTime(obj.getTime());
             return copy;
         }
-        throw new Error("Unable to clone simple type.");
+        throw new Error("Unable to clone simple type. This is most likely cast by IStoreField.value containing In the curren version of the store, arrays can only have types (boolean, Date, number, string) and ");
     }
     function get(id) {
-        var obj = objectIndex[id];
+        var obj = index[id];
         if (obj instanceof Object && obj.id && obj.typeId) {
             var copy = {
                 id: obj.id,
                 typeId: obj.typeId
             };
-            var storeTypeIndexItem = typeIndex[obj.typeId];
-            var storeType = storeTypeIndexItem.value;
             for (var propName in obj) {
                 if (obj.hasOwnProperty(propName)) {
                     var field = obj[propName];
@@ -35,7 +34,6 @@ System.register([], function(exports_1, context_1) {
                             fieldId: field.fieldId,
                             value: null
                         };
-                        var fieldName = '';
                         if (field.value instanceof Array) {
                             var sourceArray = field.value;
                             var destArray = [];
@@ -47,7 +45,7 @@ System.register([], function(exports_1, context_1) {
                         else {
                             fieldCopy.value = cloneSimpleType(field.value);
                         }
-                        copy[fieldName] = fieldCopy;
+                        copy[propName] = fieldCopy;
                     }
                 }
             }
@@ -56,11 +54,46 @@ System.register([], function(exports_1, context_1) {
         throw new Error("Unable to get store object " + id + "! Its type isn't supported.");
     }
     exports_1("get", get);
+    function save(storeObject) {
+        if (storeObject && storeObject.id) {
+            var current = index[storeObject.id];
+            if (!current) {
+                index[storeObject.id] = storeObject;
+            }
+            for (var fieldName in storeObject) {
+                saveField(storeObject, current, fieldName);
+            }
+            return;
+        }
+        throw new Error("Given parameter is not an IStoreObject.");
+    }
+    exports_1("save", save);
+    function saveField(storeObject, current, fieldName) {
+        var storeObjectAsAny = storeObject;
+        var currentAsAny = current;
+        if (storeObject.hasOwnProperty(fieldName)) {
+            var field = storeObjectAsAny[fieldName];
+            var fieldIsAStoreField = ("undefined" !== field.id && "undefined" !== field.value);
+            if (fieldIsAStoreField) {
+                var valueIsAnStoreObject = (field.value.id);
+                if (valueIsAnStoreObject) {
+                    save(field.value);
+                    return;
+                }
+                var valueIsAnArray = field.value instanceof Array;
+                if (valueIsAnArray) {
+                    return;
+                }
+                currentAsAny[fieldName] = storeObjectAsAny[fieldName];
+            }
+        }
+    }
+    function fillStoreWithStubData() {
+    }
     return {
         setters:[],
         execute: function() {
-            objectIndex = {};
-            typeIndex = {};
+            index = {};
         }
     }
 });
