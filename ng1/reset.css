@@ -15,9 +15,9 @@ body {
     padding: 40px;
 }
 
-button {
-    cursor: pointer;
-    padding: 10px;
+button,
+button i {
+    cursor: pointer; 
     -moz-user-select: none;
     -ms-user-select: none;
     -webkit-user-select: none;

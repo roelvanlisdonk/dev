@@ -1,5 +1,6 @@
 
 .carousel {
+    border: 1px solid rgb(60, 60, 60);
     height: 100px;
     position: relative;
 }
@@ -9,11 +10,11 @@
 }
 
 .carousel button.previous {
-    left: 0;
+    left: 20px;
 }
 
 .carousel button.next {
-    right: 0;
+    right: 20px;
 }
 
 .carousel button.previous,
@@ -31,7 +32,13 @@
     text-align: center;
 }
 
-.carousel .pager button.dot i {
+.carousel .pager button.item {
+    border: 1px solid rgb(60, 60, 60);
+    margin-right: 10px;
+    padding: 4px;
+}
+
+.carousel .pager button.item i {
     font-size: 20px;
     font-style: normal;  
 }
