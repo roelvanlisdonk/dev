@@ -1,0 +1,37 @@
+
+.carousel {
+    height: 100px;
+    position: relative;
+}
+
+.carousel button {
+    background-color: transparent;
+}
+
+.carousel button.previous {
+    left: 0;
+}
+
+.carousel button.next {
+    right: 0;
+}
+
+.carousel button.previous,
+.carousel button.next {
+    bottom: 0;
+    position: absolute;
+    top: 0;
+}
+
+.carousel .pager {
+    bottom: 20px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+}
+
+.carousel .pager button.dot i {
+    font-size: 20px;
+    font-style: normal;  
+}

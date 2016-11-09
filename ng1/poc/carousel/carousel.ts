@@ -2,19 +2,24 @@ namespace poc {
     'use strict';  
     
     class CarouselDirective implements ng.IDirective {
-        public link: ($scope: IScrollScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) => void;
+        public link: ($scope: ICarouselScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) => void;
         public restrict = 'EA';
+        public scope = {
+            options: '=?carousel'
+        };
         public template = `
 <div class="carousel">
-    <button type="button">
+    <button type="button" class="previous">
         <i>&lt;</i>
     </button>
     <div class="slide"></div>
-    <button type="button">
+    <div class="pager">
+        <button type="button" class="dot" title="item.title" ng-repeat="item in options.items">
+            <i>.</i>
+        </button>
+    </div>
+    <button type="button" class="next">
         <i>&gt;</i>
-    </button>
-    <button type="button" class="dot">
-        <i>.</i>
     </button>
 </div>`;
 
@@ -24,20 +29,39 @@ namespace poc {
             self.link = self.unboundLink.bind(self);
         }
 
-        unboundLink($scope: IScrollScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) {
+        unboundLink($scope: ICarouselScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) {
             const self: CarouselDirective = this;
-            
+
+            if(!$scope.options) {
+                $scope.options = getStubOptions();
+            }    
         }
     }
 
-    interface IScrollScope extends ng.IScope {
+    interface ICarouselScope extends ng.IScope {
+        options: ICarouselOptions;
+        
+    }
+
+    interface ICarouselOptions {
         currentItemIndex: number;
         items: Array<IItem>;
     }
 
     interface IItem {
-        name: string;
-        visible: boolean;
+        title: string;
+    }
+
+    function getStubOptions(): ICarouselOptions {
+        const options: ICarouselOptions = {
+            currentItemIndex: 0,
+            items: [
+                { title: 'title 1' },
+                { title: 'title 2' },
+                { title: 'title 3' }
+            ]
+        }
+        return options;
     }
 
     angular.module('poc').directive('carousel', [() => new CarouselDirective()]);

@@ -11,6 +11,7 @@
     "@types/angular": "latest",
     "angular": "latest",
     "angular-animate": "latest",
+    "font-awesome": "latest",
     "jquery": "latest"
   },
   "devDependencies": {
