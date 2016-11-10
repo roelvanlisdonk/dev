@@ -1,60 +1,61 @@
-System.register(['../../services/stylesheet'], function(exports_1, context_1) {
+System.register(['../../services/stylesheet', '../../services/animate'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var stylesheet_1;
-    var css, w, square;
-    function animate(tick) {
-        if (window["requestAnimationFrame"]) {
-            return window.requestAnimationFrame(tick);
-        }
-        else {
-            return setInterval(tick, 16);
-        }
-    }
+    var stylesheet_1, animate_1;
+    var css, square;
     function scrollLeft() {
         console.log("Animation poc started.");
         var left = 0;
         var element = document.getElementById("square");
         function step() {
             element.style.left = left + "px";
-            left += 10;
+            left += 20;
             if (left < 800) {
-                animate(step);
+                animate_1.animate(step);
             }
         }
-        animate(step);
+        animate_1.animate(step);
     }
     exports_1("scrollLeft", scrollLeft);
+    function adjustWidth() {
+        console.log("Animation poc started.");
+        var left = 0;
+        var element = document.getElementById("square");
+        element.style.width = "0";
+        function step() {
+            element.style.width = left + "px";
+            left += 40;
+            if (left < 1000) {
+                animate_1.animate(step);
+            }
+        }
+        animate_1.animate(step);
+    }
+    exports_1("adjustWidth", adjustWidth);
     return {
         setters:[
             function (stylesheet_1_1) {
                 stylesheet_1 = stylesheet_1_1;
+            },
+            function (animate_1_1) {
+                animate_1 = animate_1_1;
             }],
         execute: function() {
             css = {
                 square: stylesheet_1.addClass("square-a", [
                     "background-color: rgb(50, 50, 50);",
                     "height: 100px;",
-                    "left: 0;",
+                    "left: 60px;",
                     "position: absolute;",
                     "top: 100px;",
                     "width: 200px;"
                 ])
             };
-            w = window;
-            w.requestAnimationFrame = w.requestAnimationFrame
-                || w.mozRequestAnimationFrame
-                || w.webkitRequestAnimationFrame
-                || w.msRequestAnimationFrame
-                || function (f) { return setTimeout(f, 1000 / 60); };
-            w.cancelAnimationFrame = w.cancelAnimationFrame
-                || w.mozCancelAnimationFrame
-                || function (requestID) { clearTimeout(requestID); };
             square = document.createElement("div");
             square.id = "square";
             square.classList.add(css.square);
             document.body.appendChild(square);
-            scrollLeft();
+            adjustWidth();
         }
     }
 });
