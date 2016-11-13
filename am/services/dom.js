@@ -1,6 +1,15 @@
 System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
+    function addEventListener(element, type, listener) {
+        if (element.addEventListener) {
+            element.addEventListener(type, listener, false);
+            return;
+        }
+        var el = element;
+        el["attachEvent"]("on" + type, listener);
+    }
+    exports_1("addEventListener", addEventListener);
     function render(element, vdNode) {
         element.innerHTML = convertToHtml(vdNode);
     }

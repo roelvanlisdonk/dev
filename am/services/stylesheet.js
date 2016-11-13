@@ -1,15 +1,20 @@
 System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var styleSheet;
+    var _rules, styleSheet;
     function addClass(name, rules) {
-        var rulesAsString = rules.join("");
+        var rule = _rules[name];
+        if (rule) {
+            return name;
+        }
+        var rulesAsString = rules.join(";");
         if ("insertRule" in styleSheet) {
             styleSheet.insertRule("." + name + " { " + rulesAsString + " }", 0);
         }
         else if ("addRule" in styleSheet) {
             styleSheet.addRule("." + name, rulesAsString, 0);
         }
+        _rules[name] = rulesAsString;
         return name;
     }
     exports_1("addClass", addClass);
@@ -30,6 +35,7 @@ System.register([], function(exports_1, context_1) {
     return {
         setters:[],
         execute: function() {
+            _rules = {};
             styleSheet = create("am");
         }
     }

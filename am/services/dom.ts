@@ -1,5 +1,15 @@
 import {IVirtualDomNode} from './virtual.dom'
 
+export function addEventListener(element: HTMLElement, type: string, listener: EventListenerOrEventListenerObject) {
+    if (element.addEventListener) {
+        element.addEventListener(type, listener, false);
+        return;
+    } 
+    
+    const el = element as any;
+    el["attachEvent"](`on${type}`, listener);
+}
+
 export function render(element: HTMLElement, vdNode: IVirtualDomNode) {
     // TODO: must be done in the one and only, 'am request animation frame'.
     element.innerHTML = convertToHtml(vdNode);

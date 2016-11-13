@@ -1,14 +1,19 @@
 
-// ...objects: NestedCSSProperties[]
+// ...objects: NestedCSSProperties[].
+const _rules: any = {};
 
 export function addClass(name: string, rules: Array<string>): string {
-	const rulesAsString = rules.join("");
+	const rule: string = _rules[name] as any;
+	if(rule) { return name; }
+
+	const rulesAsString = rules.join(";");
 	if("insertRule" in styleSheet) {
 		styleSheet.insertRule(`.${name} { ${rulesAsString} }`, 0);
 	}
 	else if("addRule" in styleSheet) {
 		styleSheet.addRule(`.${name}`, rulesAsString, 0);
 	}
+	_rules[name] = rulesAsString;
 	return name;
 }
 
