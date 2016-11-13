@@ -132,5 +132,4 @@ function slide(evt: Event) {
         currentOffset = 0;
     }
     container.style.transform = `translateX(-${currentOffset}px)`;
-    //$("#slide1_images").css("transform","translateX("+$(this).index() * -450+"px)");
 }
