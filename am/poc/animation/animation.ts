@@ -1,37 +1,137 @@
-import { addClass } from '../../services/stylesheet'
 import { addEventListener } from '../../services/dom'
 import { animate } from '../../services/animate'
-
+import { addClass } from '../../services/stylesheet'
 
 // http://css3.bradshawenterprises.com/sliding/
 
-
-const carousel = getCarousel();
-document.body.appendChild(carousel);
-
-const pager = getPager();
-document.body.appendChild(pager);
-
 let currentOffset = 0;
 
+const carouselElement = createCarousel();
+document.body.appendChild(carouselElement);
+document.body.appendChild(
+    createPager(
+        [
+            createActionButton("transform", slide),
+            createActionButton("position left", scrollLeft)
+        ]
+    )
+);
+
+function createActionButton(text: string, click: (evt: Event) => void): HTMLElement {
+    const className =  addClass("am-action-button", [
+            "cursor: pointer",
+            "user-select: none"
+        ]);
+    const button = document.createElement("button");
+    button.className = className;
+    button.type = "button";
+    button.textContent = text;
+    addEventListener(button, "click", click);
+
+    return button;
+}
+
+function createCarousel(): HTMLElement {
+    const element = document.createElement("carousel");
+    element.className = addClass("am-carousel", [
+            "display: block",
+            "height: 410px",
+            "margin: 50px auto 50px auto",
+            "overflow: hidden",
+            "position: relative",
+            "width: 1000px"
+        ]);
+    element.appendChild(createSlidesContainer());
+    return element;
+}
+
+function createPager(buttons: Array<HTMLElement>): HTMLElement {  
+    const element = document.createElement("div");
+    element.className = addClass("am-carousel-pager", [
+        "display: block",
+        "margin: 50px auto 50px auto",
+        "user-select: none",
+        "width: 1000px"
+    ]);
+
+    for(let i = 0, length = buttons.length; i < length; i++) {
+        element.appendChild(buttons[i]);    
+    }
+    
+    return element;
+}
+
+function createSlide(nr: number): HTMLElement { 
+    const element = document.createElement("slide");
+    element.className = addClass("am-carousel-slide", [
+            "float: left",
+            "height: 410px",
+            "margin: 0",
+            "padding: 0",
+            "width: 1000px"
+        ]);
+    element.style.background = `url(img${nr}.png)`;
+    return element;
+}
+
+function createSlidesContainer(): HTMLElement {
+    const element = document.createElement("container");
+    element.style.transform = "translateX(0px)";
+    element.style.transition = "all 1.0s ease-in-out";
+    element.style.position = "static";
+
+    element.className = addClass("am-carousel-slides-container", [
+            "display: block",
+            "height: 410px",
+            "margin: 0",
+            "padding: 0",
+            "-webkit-transition:all 1.0s ease-in-out",
+            "-moz-transition:all 1.0s ease-in-out",
+            "-o-transition:all 1.0s ease-in-out",
+            "transition:all 1.0s ease-in-out",
+            "width: 3000px"
+        ]);;
+    element.appendChild(createSlide(1));
+    element.appendChild(createSlide(2));
+    element.appendChild(createSlide(3));
+    return element;
+}
 
 
-// export function scrollLeft() {
-//     console.log("Animation poc started.");
+function slide(evt: Event) {
+    const container = carouselElement.childNodes[0] as HTMLElement;
+    currentOffset += 1000;
+    if(currentOffset >= 3000) {
+        currentOffset = 0;
+    }
+    container.style.transform = `translateX(-${currentOffset}px)`;
+}
 
-//     let left: number = 0;
-//     const element = document.getElementById("square");
+export function scrollLeft() {
+    console.log("Animation poc started.");
+    
+    const container = carouselElement.childNodes[0] as HTMLElement;
+    container.style.transform = "none";
+    container.style.transition = "all 0s ease-in-out";
+    container.style.position = "absolute";
+    container.style.left = "0";
+    container.style.top = "0";
+    container.style.bottom = "0";
 
-//     function step() {
-//         element.style.left = `${left}px`;
-//         left += 20;
-//         if (left < 800) {
-//             animate(step);
-//         }
-//     }
 
-//     animate(step);
-// }
+    let left: number = 0;
+    
+
+    function step() {
+        container.style.left = `-${left}px`;
+        left += 20;
+        if (left < 1020) {
+            animate(step);
+        }
+    }
+
+    animate(step);
+}
 
 // export function adjustWidth() {
 //     console.log("Animation poc started.");
@@ -49,87 +149,3 @@ let currentOffset = 0;
 
 //     animate(step);
 // }
-
-
-function getActionButtion(click: (evt: Event) => void): HTMLElement {
-    const className =  addClass("am-action-button", [
-            "cursor: pointer",
-            "user-select: none"
-        ]);
-    const button = document.createElement("button");
-    button.className = className;
-    button.type = "button";
-    button.textContent = "Execute";
-    addEventListener(button, "click", click);
-
-    return button;
-}
-
-function getCarousel(): HTMLElement {
-    const carousel = document.createElement("carousel");
-    carousel.className = addClass("am-carousel", [
-            "display: block",
-            "height: 410px",
-            "margin: 50px auto 50px auto",
-            "overflow: hidden",
-            "width: 1000px"
-        ]);
-    carousel.appendChild(getSlidesContainer());
-    return carousel;
-}
-
-function getSlide(nr: number): HTMLElement {
-    const className =  addClass("am-carousel-slide", [
-            "float: left",
-            "height: 410px",
-            "margin: 0",
-            "padding: 0",
-            "width: 1000px"
-        ]);
-    const slide = document.createElement("slide");
-    slide.className = className;
-    slide.style.background = `url(img${nr}.png)`;
-    return slide;
-}
-
-function getSlidesContainer(): HTMLElement {
-    const container = document.createElement("container");
-    container.className = addClass("am-carousel-slides-container", [
-            "display: block",
-            "height: 410px",
-            "margin: 0",
-            "padding: 0",
-            "width: 3000px",
-            "-webkit-transition:all 1.0s ease-in-out",
-            "-moz-transition:all 1.0s ease-in-out",
-            "-o-transition:all 1.0s ease-in-out",
-            "transition:all 1.0s ease-in-out"
-        ]);;
-    container.appendChild(getSlide(1));
-    container.appendChild(getSlide(2));
-    container.appendChild(getSlide(3));
-    return container;
-}
-
-
-function getPager(): HTMLElement {
-    const className =  addClass("am-carousel-pager", [
-            "display: block",
-            "margin: 50px auto 50px auto",
-            "user-select: none",
-            "width: 1000px"
-        ]);
-    const pager = document.createElement("div");
-    pager.className = className;
-    pager.appendChild(getActionButtion(slide));
-    return pager;
-}
-
-function slide(evt: Event) {
-    const container = carousel.childNodes[0] as HTMLElement;
-    currentOffset += 1000;
-    if(currentOffset >= 3000) {
-        currentOffset = 0;
-    }
-    container.style.transform = `translateX(-${currentOffset}px)`;
-}
