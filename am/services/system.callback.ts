@@ -1,30 +1,33 @@
 /**
  * The system loader is an adjusted version of the https://github.com/caridy/es6-micro-loader that uses callbacks instead of promises.
- * Primarily used to support IE9, IE10 and IE11.
- * For IE8 support we need polyfills for Object.create and Array.map.
+ * Primarily used to support older browsers like, IE8, IE9, IE10 and IE11.
  */
 namespace am.systemUsingCallbacks {
     "use strict";
 
-    const seen = Object.create(null);
-    const internalRegistry = Object.create(null);
-    const externalRegistry = Object.create(null);
+    console.log("system.callback.js loaded.");
+
+    const seen: any = {};
+    const internalRegistry: any = {};
+    const externalRegistry: any = {};
     let anonymousEntry: any;
 
-    const headEl = document.getElementsByTagName("head")[0],
-        ie = /MSIE/.test(navigator.userAgent);
+    const headEl = document.getElementsByTagName("head")[0];
+    const ie = /MSIE/.test(navigator.userAgent);
 
     /**
      * A script tag is used to fetch and eval sources,
      * because fetching the data directly will not allow developers to see / debug the sources in the browser.
      */
     function createScriptNode(src: string, callback: (info: ILoadInfo) => void, info: ILoadInfo) {
+        console.log(`createScriptNode - ${src}`);
         const node = document.createElement("script") as any;
         // use async=false for ordered async?
         // parallel-load-serial-execute http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
         if (node.async) {
             node.async = false;
         }
+
         if (ie) {
             node["onreadystatechange"] = function () {
                 if (/loaded|complete/.test(this.readyState)) {
@@ -41,25 +44,36 @@ namespace am.systemUsingCallbacks {
         headEl.appendChild(node);
     }
 
+    function isArray(obj: any): boolean {
+        return obj && obj.constructor === Array;
+    }
+
     function ensuredExecute(name: string): boolean {
+        console.log(`ensuredExecute - ${name}`);
         const mod = internalRegistry[name];
         if (mod && !seen[name]) {
             seen[name] = true;
             // one time operation to execute the module body
             mod.execute();
         }
+        else {
+            const stop = "";
+        }
         return mod && mod.proxy;
     }
 
     function get(name: string): any {
+        console.log(`get - ${name}`);
         return externalRegistry[name] || ensuredExecute(name);
     }
 
     function has(name: string): boolean {
+        console.log(`has - ${name}`);
         return !!externalRegistry[name] || !!internalRegistry[name];
     }
 
     export function load(name: string, onSuccess: (mod: any) => void) {
+        console.log(`load - ${name}`);
         const endTreeLoading = onSuccess;
         const normalizedName = normalizeName(name, []);
 
@@ -83,11 +97,13 @@ namespace am.systemUsingCallbacks {
     }
 
     function fetchAndEval(info: ILoadInfo) {
+        console.log(`fetchAndEval - ${info.normalizedName}`);
         const url = (System.baseURL || "/") + info.normalizedName + ".js";
         createScriptNode(url, onScriptLoad, info);
     }
 
     function getModuleFromInternalRegistry(name: string): any {
+        console.log(`getModuleFromInternalRegistry - ${name}`);
         const mod = internalRegistry[name];
         if (!mod) {
             throw new Error("Error loading module " + name);
@@ -95,20 +111,8 @@ namespace am.systemUsingCallbacks {
         return mod;
     }
 
-    function onScriptLoad(info: ILoadInfo) {
-        if (anonymousEntry) {
-            // Register as an named module.
-            System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
-            anonymousEntry = undefined;
-        }
-
-        const mod: IModule = getModuleFromInternalRegistry(info.normalizedName);
-        info.mod = mod;
-        info.total = mod.deps.length;
-        handleLoadedModule(info);
-    }
-
     function handleLoadedModule(info: ILoadInfo) {
+        console.log(`handleLoadedModule - ${info.normalizedName}`);
         const mod = info.mod;
         const isRootModule = (info.parentInfo === null);
         const hasDepedencies = (mod.deps.length > 0);
@@ -132,6 +136,7 @@ namespace am.systemUsingCallbacks {
     }
 
     function loadDependencies(deps: Array<string>, parentInfo: ILoadInfo) {
+        console.log(`loadDependencies - ${parentInfo.normalizedName}`);
         for (let i = 0; i < deps.length; i++) {
             const dep: string = deps[i];
             loadDependency(dep, parentInfo);
@@ -139,6 +144,7 @@ namespace am.systemUsingCallbacks {
     }
 
     function loadDependency(name: string, parentInfo: ILoadInfo) {
+        console.log(`loadDependency - ${name}`);
         const normalizedName = normalizeName(name, []);
 
         const childInfo: ILoadInfo = {
@@ -158,24 +164,12 @@ namespace am.systemUsingCallbacks {
             fetchAndEval(childInfo);
         }
     }
-
-    function updateParentInfo(info: ILoadInfo) {
-        const parentInfo = info.parentInfo;
-        if (parentInfo) {
-            parentInfo.counter += 1;
-            if (parentInfo.counter === parentInfo.total) {
-                const moduleAsCode = get(parentInfo.normalizedName);
-                if (parentInfo.done) {
-                    parentInfo.done(moduleAsCode);
-                }
-                if (parentInfo.parentInfo) {
-                    updateParentInfo(parentInfo);
-                }
-            }
-        }
-    }
-
+    
+    /**
+     * Convert given "relative path" to "absolute path".
+     */
     function normalizeName(child: string, parentBase: Array<string>) {
+        console.log(`normalizeName - ${child}`);
         if (child.charAt(0) === "/") {
             child = child.slice(1);
         }
@@ -191,19 +185,39 @@ namespace am.systemUsingCallbacks {
         return parentBase.concat(parts).join("/");
     }
 
+    function onScriptLoad(info: ILoadInfo) {
+        console.log(`onScriptLoad - ${info.normalizedName}`);
+        if (anonymousEntry) {
+            // Register as an named module.
+            System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
+            anonymousEntry = undefined;
+        }
+
+        const mod: IModule = getModuleFromInternalRegistry(info.normalizedName);
+        info.mod = mod;
+        info.total = mod.deps.length;
+        handleLoadedModule(info);
+    }
+    
     function register(name: string| Array<string>, deps: Array<string> | Function, wrapper?: Function) {
-        if (Array.isArray(name)) {
-            // anounymous module
+        const nameAsString = name.toString() || "module has no dependencies.";
+        console.log(`register - ${nameAsString}`);
+
+        if (isArray(name)) {
+            // Anounymous module (Note: TypeScript modules are generated as anonymous modules).
             anonymousEntry = [];
             anonymousEntry.push.apply(anonymousEntry, arguments);
-            return; // breaking to let the script tag to name it.
+
+            // Breaking to let the script tag to name it (the module will be registered on its "url / path on the filesystem").
+            return;
         }
-        const proxy = Object.create(null);
-        const values = Object.create(null);
+
+        const proxy: any = {};
+        const values: any = {};
         const depsAsArray = deps as Array<string>;
         let mod: any;
         let meta: any;
-        const nameAsString = name as string;
+        
         // creating a new entry in the internal registry
         internalRegistry[nameAsString] = mod = {
             // live bindings
@@ -212,16 +226,20 @@ namespace am.systemUsingCallbacks {
             values: values,
             // normalized deps
             deps: depsAsArray.map(function (dep) {
+                console.log(`deps - ${dep}`);
                 return normalizeName(dep, nameAsString.split("/").slice(0, -1));
             }),
             // other modules that depends on this so we can push updates into those modules
             dependants: [],
             // method used to push updates of deps into the module body
             update: function (moduleName: string, moduleObj: any) {
+                console.log(`update - ${moduleName}`);
                 meta.setters[mod.deps.indexOf(moduleName)](moduleObj);
             },
             execute: function () {
+                console.log(`execute`);
                 mod.deps.map(function (dep: string) {
+                    console.log(`map - ${dep}`);
                     let imports = externalRegistry[dep];
                     if (imports) {
                         mod.update(dep, imports);
@@ -239,6 +257,7 @@ namespace am.systemUsingCallbacks {
         };
         // collecting execute() and setters[]
         meta = wrapper(function (identifier: any, value: any) {
+            console.log(`wrapper - ${identifier}`);
             values[identifier] = value;
             mod.lock = true; // locking down the updates on the module to avoid infinite loop
             for(let i = 0, length = mod.dependants.length; i < length; i++) {
@@ -259,8 +278,29 @@ namespace am.systemUsingCallbacks {
     }
 
     function set(name: string, values: any): void {
+        console.log(`set - ${name}`);
         externalRegistry[name] = values;
     }
+
+    function updateParentInfo(info: ILoadInfo) {
+        console.log(`updateParentInfo - ${info.normalizedName}`);
+        const parentInfo = info.parentInfo;
+        if (parentInfo) {
+            parentInfo.counter += 1;
+            if (parentInfo.counter === parentInfo.total) {
+                const moduleAsCode = get(parentInfo.normalizedName);
+                if (parentInfo.done) {
+                    parentInfo.done(moduleAsCode);
+                }
+                if (parentInfo.parentInfo) {
+                    updateParentInfo(parentInfo);
+                }
+            }
+        }
+    }
+
+
+    
 
     const System: ISystem = {
         "baseURL": "",
@@ -333,6 +373,8 @@ namespace am.systemUsingCallbacks {
     }
 
     function getMainModuleName(): string {
+        console.log("getMainModuleName");
+
         if(document.querySelector) {
             const scriptTag = document.querySelector("script[data-main]");
             return scriptTag.getAttribute("data-main");
@@ -351,7 +393,8 @@ namespace am.systemUsingCallbacks {
     }
 
     export function loadMain() {
-        
+        console.log("loadMain");
+
         const moduleName = getMainModuleName();
 
         // Load "main" module.

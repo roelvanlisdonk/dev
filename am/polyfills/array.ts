@@ -1,9 +1,4 @@
 
-if (!Array.isArray) {
-  Array.isArray = function(arg: any): arg is any[] {
-    return arg.constructor === Array;
-  };
-}
 
 // Production steps of ECMA-262, Edition 5, 15.4.4.14
 // Reference: http://es5.github.io/#x15.4.4.14

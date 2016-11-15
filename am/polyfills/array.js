@@ -1,8 +1,3 @@
-if (!Array.isArray) {
-    Array.isArray = function (arg) {
-        return arg.constructor === Array;
-    };
-}
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (searchElement, fromIndex) {
         var k;
