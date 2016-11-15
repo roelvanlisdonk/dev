@@ -30,6 +30,8 @@ namespace am.systemUsingCallbacks {
 
         if (ie) {
             node["onreadystatechange"] = function () {
+                
+                console.log(`onreadystatechange - ${this.readyState} - src - ${src}`);
                 if (/loaded|complete/.test(this.readyState)) {
                     this.onreadystatechange = null;
                     callback(info);
@@ -186,7 +188,7 @@ namespace am.systemUsingCallbacks {
     }
 
     function onScriptLoad(info: ILoadInfo) {
-        console.log(`onScriptLoad - ${info.normalizedName}`);
+        console.log(`onScriptLoad - ${info.normalizedName} - anonymousEntry - ${anonymousEntry}`);
         if (anonymousEntry) {
             // Register as an named module.
             System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
@@ -204,7 +206,8 @@ namespace am.systemUsingCallbacks {
         console.log(`register - ${nameAsString}`);
 
         if (isArray(name)) {
-            // Anounymous module (Note: TypeScript modules are generated as anonymous modules).
+            console.log(`register - deps - ${deps}.`);
+            console.log("Anounymous module (Note: TypeScript modules are generated as anonymous modules).");
             anonymousEntry = [];
             anonymousEntry.push.apply(anonymousEntry, arguments);
 
@@ -298,9 +301,6 @@ namespace am.systemUsingCallbacks {
             }
         }
     }
-
-
-    
 
     const System: ISystem = {
         "baseURL": "",

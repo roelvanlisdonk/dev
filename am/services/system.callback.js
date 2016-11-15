@@ -18,6 +18,7 @@ var am;
             }
             if (ie) {
                 node["onreadystatechange"] = function () {
+                    console.log("onreadystatechange - " + this.readyState + " - src - " + src);
                     if (/loaded|complete/.test(this.readyState)) {
                         this.onreadystatechange = null;
                         callback(info);
@@ -152,7 +153,7 @@ var am;
             return parentBase.concat(parts).join("/");
         }
         function onScriptLoad(info) {
-            console.log("onScriptLoad - " + info.normalizedName);
+            console.log("onScriptLoad - " + info.normalizedName + " - anonymousEntry - " + anonymousEntry);
             if (anonymousEntry) {
                 System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
                 anonymousEntry = undefined;
@@ -166,6 +167,8 @@ var am;
             var nameAsString = name.toString() || "module has no dependencies.";
             console.log("register - " + nameAsString);
             if (isArray(name)) {
+                console.log("register - deps - " + deps + ".");
+                console.log("Anounymous module (Note: TypeScript modules are generated as anonymous modules).");
                 anonymousEntry = [];
                 anonymousEntry.push.apply(anonymousEntry, arguments);
                 return;
