@@ -3,10 +3,11 @@
         <i class="fa-angle-left"></i>
     </button>
     <div class="slides"
+        ng-class="{ 'transition': transitionEnabled, 'no-transition': !transitionEnabled }"
          ng-style="{'transform': transform, '-webkit-transform': transform, '-ms-transform': transform, width: slidesWidth }">
         <div class="slide"
-             ng-repeat="item in options.items"
-             ng-style="{ background: item.background }"></div>
+             ng-repeat="slide in slides track by $index"
+             ng-style="{ background: slide.background }"></div>
     </div>
     <div class="pager">
         <button type="button"
@@ -14,7 +15,7 @@
                 title="item.title"
                 ng-click="onPagerItemClick($index)"
                 ng-repeat="item in options.items">
-            <i ng-class="{'fa-circle': $index === options.currentItemIndex, 'fa-circle-o': $index !== options.currentItemIndex}"></i>
+            <i ng-class="{'fa-circle': $index === currentPagerItemIndex, 'fa-circle-o': $index !== currentPagerItemIndex}"></i>
         </button>
     </div>
     <button type="button" class="next" ng-click="onNextClick()">
