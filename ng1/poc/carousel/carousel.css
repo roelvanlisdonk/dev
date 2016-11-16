@@ -1,14 +1,17 @@
 
 .carousel {
-    border: 1px solid rgb(60, 60, 60);
+    background-color: rgb(50, 50 , 50);
     color: rgb(255, 255, 255);
-    height: 410px;
+    height: 100px;
+    margin: 50px auto 50px auto;
+    overflow: hidden;
     position: relative;
     width: 1000px;
 }
 
 .carousel button {
     background-color: transparent;
+    z-index: 1;
 }
 
 .carousel button.previous {
@@ -58,5 +61,21 @@
 }
 
 .carousel .slide {
+    float: left;
     height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 1000px;
+}
+
+.carousel .slides {
+    clear: both;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    -webkit-transition: all 1.0s ease-in-out;
+    -moz-transition: all 1.0s ease-in-out;
+    -o-transition: all 1.0s ease-in-out;
+    transition: all 1.0s ease-in-out;
 }
