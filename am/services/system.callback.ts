@@ -1,3 +1,10 @@
+// TODO: I think the solution to the <= IE 10 problem can be solved by NOT using a global anonymousEntry, 
+//       but keep track of the dependencies chain, the "System.register" call inside a script will be called first
+//       then the "System.register" calls inside the scripts it depends on, in order that the dependencies are given.
+//       The first script will always load first, then the dependent scripts will be loaded, thats, where the problem starts.
+
+
+
 /**
  * The system loader is an adjusted version of the https://github.com/caridy/es6-micro-loader that uses callbacks instead of promises.
  * Primarily used to support older browsers like, IE8, IE9, IE10 and IE11.
