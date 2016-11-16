@@ -1,0 +1,23 @@
+<div class="carousel">
+    <button type="button" class="previous" ng-click="onPreviousClick()">
+        <i class="fa-angle-left"></i>
+    </button>
+    <div class="slides"
+         ng-style="{'transform': transform, '-webkit-transform': transform, '-ms-transform': transform, width: slidesWidth }">
+        <div class="slide"
+             ng-repeat="item in options.items"
+             ng-style="{ background: item.background }"></div>
+    </div>
+    <div class="pager">
+        <button type="button"
+                class="item"
+                title="item.title"
+                ng-click="onPagerItemClick($index)"
+                ng-repeat="item in options.items">
+            <i ng-class="{'fa-circle': $index === options.currentItemIndex, 'fa-circle-o': $index !== options.currentItemIndex}"></i>
+        </button>
+    </div>
+    <button type="button" class="next" ng-click="onNextClick()">
+        <i class="fa-angle-right"></i>
+    </button>
+</div>
