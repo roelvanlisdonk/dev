@@ -2,9 +2,10 @@ var poc;
 (function (poc) {
     'use strict';
     var _slideWidth = 1000;
-    angular.module('poc').directive('carousel', ['$timeout', function ($timeout) { return new CarouselDirective($timeout); }]);
+    angular.module('poc').directive('carousel', ['$animate', '$timeout', function ($animate, $timeout) { return new CarouselDirective($animate, $timeout); }]);
     var CarouselDirective = (function () {
-        function CarouselDirective($timeout) {
+        function CarouselDirective($animate, $timeout) {
+            this.$animate = $animate;
             this.$timeout = $timeout;
             this.restrict = 'EA';
             this.scope = {
@@ -16,6 +17,7 @@ var poc;
         }
         CarouselDirective.prototype.unboundLink = function ($scope, $element, attrs) {
             var self = this;
+            var slidesJqueryElement = $element.find('.slides').first();
             $scope.onNextClick = onNextClick;
             $scope.onPagerItemClick = onPagerItemClick;
             $scope.onPreviousClick = onPreviousClick;
@@ -35,6 +37,7 @@ var poc;
             $scope.currentSlideIndex = 1;
             setTransform(0 - ($scope.currentSlideIndex * _slideWidth));
             setSlidesWidth();
+            self.$animate.addClass(slidesJqueryElement, 'transition');
             function setSlidesWidth() {
                 $scope.slidesWidth = $scope.slides.length * _slideWidth + "px";
             }
@@ -64,17 +67,25 @@ var poc;
                 }
                 var current = $scope.currentSlideIndex;
                 if (current === 0) {
-                    $scope.transitionEnabled = false;
-                    var offset = 0 - ((total - 2) * _slideWidth);
-                    $scope.transform = "translateX(" + offset + "px)";
-                    self.$timeout(function () {
-                        $scope.transitionEnabled = true;
-                        self.$timeout(function () {
-                            setTransform(0 - ((total - 3) * _slideWidth));
-                            $scope.currentSlideIndex = total - 3;
-                            $scope.currentPagerItemIndex = total - 4;
-                        }, 100);
-                    }, 0);
+                    self.$animate.removeClass(slidesJqueryElement, 'transition')
+                        .then(function () {
+                        return self.$animate.addClass(slidesJqueryElement, 'no-transition');
+                    })
+                        .then(function () {
+                        var offset = 0 - ((total - 2) * _slideWidth);
+                        $scope.transform = "translateX(" + offset + "px)";
+                        slidesJqueryElement.removeClass('no-transition');
+                    })
+                        .then(function () {
+                        return self.$animate.addClass(slidesJqueryElement, 'transition');
+                    })
+                        .then(function () {
+                        setTransform(0 - ((total - 3) * _slideWidth));
+                        $scope.currentSlideIndex = total - 3;
+                        $scope.currentPagerItemIndex = total - 4;
+                        $scope.currentSlideIndex = total - 3;
+                        $scope.currentPagerItemIndex = total - 4;
+                    });
                 }
                 else {
                     var previous = current - 1;
@@ -87,7 +98,6 @@ var poc;
                 }
             }
             function setTransform(offSet) {
-                $scope.transitionEnabled = true;
                 $scope.transform = "translateX(" + offSet + "px)";
             }
         };

@@ -2,7 +2,7 @@ namespace poc {
     'use strict';  
     const _slideWidth = 1000;
 
-    angular.module('poc').directive('carousel', ['$timeout', ($timeout) => new CarouselDirective($timeout)]);
+    angular.module('poc').directive('carousel', ['$animate', '$timeout', ($animate, $timeout) => new CarouselDirective($animate, $timeout)]);
 
     class CarouselDirective implements ng.IDirective {
         public link: ($scope: ICarouselScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) => void;
@@ -12,7 +12,7 @@ namespace poc {
         };
         public templateUrl = '/ng1/poc/carousel/carousel.html';
 
-        constructor(public $timeout: ng.ITimeoutService) {
+        constructor(public $animate: ng.animate.IAnimateService, public $timeout: ng.ITimeoutService) {
             const self: CarouselDirective = this;
 
             self.link = self.unboundLink.bind(self);
@@ -20,6 +20,7 @@ namespace poc {
 
         unboundLink($scope: ICarouselScope, $element: ng.IAugmentedJQuery, attrs: ng.IAttributes) {
             const self: CarouselDirective = this;
+            const slidesJqueryElement = $element.find('.slides').first();
 
             $scope.onNextClick = onNextClick;
             $scope.onPagerItemClick = onPagerItemClick;
@@ -41,6 +42,7 @@ namespace poc {
 
             setTransform(0 - ($scope.currentSlideIndex * _slideWidth));
             setSlidesWidth();
+            self.$animate.addClass(slidesJqueryElement, 'transition');           
 
             function setSlidesWidth() {
                 $scope.slidesWidth = `${$scope.slides.length * _slideWidth}px`;
@@ -72,21 +74,27 @@ namespace poc {
                 if (total === 0) { return; }
                 const current = $scope.currentSlideIndex;
                 if(current === 0) {
-                    
-                    $scope.transitionEnabled = false;
-                    const offset = 0 - ((total - 2)  * _slideWidth);
-                    $scope.transform = `translateX(${offset}px)`;
 
-                    self.$timeout(()=>{
-                        $scope.transitionEnabled = true;
-                         self.$timeout(()=>{
-                            setTransform(0 - ((total - 3)  * _slideWidth));
-                            $scope.currentSlideIndex = total - 3;
-                            $scope.currentPagerItemIndex = total - 4;
-                         }, 100);
-                    }, 0);
-                    
-                   
+                    self.$animate.removeClass(slidesJqueryElement, 'transition')
+                    .then(() => {
+                        return self.$animate.addClass(slidesJqueryElement, 'no-transition'); 
+                    })           
+                    .then(() => {
+                        const offset = 0 - ((total - 2)  * _slideWidth);
+                        $scope.transform = `translateX(${offset}px)`;
+                        slidesJqueryElement.removeClass('no-transition');
+                        //return self.$animate.removeClass(slidesJqueryElement, 'no-transition');
+                    })                    
+                    .then(() => {
+                        return self.$animate.addClass(slidesJqueryElement, 'transition');
+                    })
+                    .then(() => {
+                        setTransform(0 - ((total - 3)  * _slideWidth));
+                        $scope.currentSlideIndex = total - 3;
+                        $scope.currentPagerItemIndex = total - 4;
+                        $scope.currentSlideIndex = total - 3;
+                        $scope.currentPagerItemIndex = total - 4;
+                    });
                 } else {
                     let previous = current - 1;
                     if (previous < 0) {
@@ -97,12 +105,9 @@ namespace poc {
 
                     setTransform(0 - ($scope.currentSlideIndex * _slideWidth));
                 }
-
-                
             }
 
             function setTransform(offSet: number) {
-                $scope.transitionEnabled = true;
                 $scope.transform = `translateX(${offSet}px)`;
             }
         }
@@ -118,7 +123,7 @@ namespace poc {
         slides: Array<ICarouselItem>;
         slidesWidth: string;
         transform: string;
-        transitionEnabled: boolean;
+        transitionEnabled: boolean; // TODO: remove this.
     }
 
     interface ICarouselOptions {

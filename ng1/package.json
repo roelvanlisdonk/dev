@@ -9,6 +9,7 @@
   "private": true,
   "dependencies": {
     "@types/angular": "latest",
+    "@types/angular-animate": "latest",
     "angular": "latest",
     "angular-animate": "latest",
     "font-awesome": "latest",

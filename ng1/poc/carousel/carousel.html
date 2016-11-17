@@ -3,7 +3,6 @@
         <i class="fa-angle-left"></i>
     </button>
     <div class="slides"
-        ng-class="{ 'transition': transitionEnabled, 'no-transition': !transitionEnabled }"
          ng-style="{'transform': transform, '-webkit-transform': transform, '-ms-transform': transform, width: slidesWidth }">
         <div class="slide"
              ng-repeat="slide in slides track by $index"

@@ -77,15 +77,22 @@
 }
 
 .carousel .slides.no-transition {
-    -webkit-transition: none;
-    -moz-transition: none;
-    -o-transition: none;
-    transition: none;
+    -webkit-transition: transform 0s ease-in-out;
+    -moz-transition: transform 0s ease-in-out;
+    -o-transition: transform 0s ease-in-out;
+    transition: transform 0s ease-in-out;
 }
 
 .carousel .slides.transition {
-    -webkit-transition: all 1.0s ease-in-out;
-    -moz-transition: all 1.0s ease-in-out;
-    -o-transition: all 1.0s ease-in-out;
-    transition: all 1.0s ease-in-out;
+    -webkit-transition: transform 1.0s ease-in-out;
+    -moz-transition: transform 1.0s ease-in-out;
+    -o-transition: transform 1.0s ease-in-out;
+    transition: transform 1.0s ease-in-out;
+}
+
+.carousel .slides.fast-transition {
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
