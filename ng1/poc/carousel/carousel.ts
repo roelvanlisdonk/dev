@@ -42,7 +42,7 @@ namespace poc {
 
             setTransform(0 - ($scope.currentSlideIndex * _slideWidth));
             setSlidesWidth();
-            self.$animate.addClass(slidesJqueryElement, 'transition');           
+            slidesJqueryElement.addClass('slidetran');           
 
             function setSlidesWidth() {
                 $scope.slidesWidth = `${$scope.slides.length * _slideWidth}px`;
@@ -74,27 +74,20 @@ namespace poc {
                 if (total === 0) { return; }
                 const current = $scope.currentSlideIndex;
                 if(current === 0) {
+                    slidesJqueryElement.removeClass('slidetran');
+                    const offset = 0 - ((total - 2)  * _slideWidth);
+                    $scope.transform = `translateX(${offset}px)`;
 
-                    self.$animate.removeClass(slidesJqueryElement, 'transition')
-                    .then(() => {
-                        return self.$animate.addClass(slidesJqueryElement, 'no-transition'); 
-                    })           
-                    .then(() => {
-                        const offset = 0 - ((total - 2)  * _slideWidth);
-                        $scope.transform = `translateX(${offset}px)`;
-                        slidesJqueryElement.removeClass('no-transition');
-                        //return self.$animate.removeClass(slidesJqueryElement, 'no-transition');
-                    })                    
-                    .then(() => {
-                        return self.$animate.addClass(slidesJqueryElement, 'transition');
-                    })
-                    .then(() => {
-                        setTransform(0 - ((total - 3)  * _slideWidth));
-                        $scope.currentSlideIndex = total - 3;
-                        $scope.currentPagerItemIndex = total - 4;
-                        $scope.currentSlideIndex = total - 3;
-                        $scope.currentPagerItemIndex = total - 4;
-                    });
+                    self.$timeout(() => {
+                        slidesJqueryElement.addClass('slidetran');
+                        self.$timeout(() => {
+                            setTransform(0 - ((total - 3)  * _slideWidth));
+                            $scope.currentSlideIndex = total - 3;
+                            $scope.currentPagerItemIndex = total - 4;
+                            $scope.currentSlideIndex = total - 3;
+                            $scope.currentPagerItemIndex = total - 4;
+                        }, 0);
+                    }, 0);
                 } else {
                     let previous = current - 1;
                     if (previous < 0) {
@@ -142,13 +135,9 @@ namespace poc {
                 { title: 'title 3', background: 'url(/ng1/poc/carousel/img3_small.png)' }
             ];
 
-        
-        
         const options: ICarouselOptions = {
             items: items
         }
         return options;
-    }
-
-    
+    } 
 }

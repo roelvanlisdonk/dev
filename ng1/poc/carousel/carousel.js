@@ -37,7 +37,7 @@ var poc;
             $scope.currentSlideIndex = 1;
             setTransform(0 - ($scope.currentSlideIndex * _slideWidth));
             setSlidesWidth();
-            self.$animate.addClass(slidesJqueryElement, 'transition');
+            slidesJqueryElement.addClass('slidetran');
             function setSlidesWidth() {
                 $scope.slidesWidth = $scope.slides.length * _slideWidth + "px";
             }
@@ -67,25 +67,19 @@ var poc;
                 }
                 var current = $scope.currentSlideIndex;
                 if (current === 0) {
-                    self.$animate.removeClass(slidesJqueryElement, 'transition')
-                        .then(function () {
-                        return self.$animate.addClass(slidesJqueryElement, 'no-transition');
-                    })
-                        .then(function () {
-                        var offset = 0 - ((total - 2) * _slideWidth);
-                        $scope.transform = "translateX(" + offset + "px)";
-                        slidesJqueryElement.removeClass('no-transition');
-                    })
-                        .then(function () {
-                        return self.$animate.addClass(slidesJqueryElement, 'transition');
-                    })
-                        .then(function () {
-                        setTransform(0 - ((total - 3) * _slideWidth));
-                        $scope.currentSlideIndex = total - 3;
-                        $scope.currentPagerItemIndex = total - 4;
-                        $scope.currentSlideIndex = total - 3;
-                        $scope.currentPagerItemIndex = total - 4;
-                    });
+                    slidesJqueryElement.removeClass('slidetran');
+                    var offset = 0 - ((total - 2) * _slideWidth);
+                    $scope.transform = "translateX(" + offset + "px)";
+                    self.$timeout(function () {
+                        slidesJqueryElement.addClass('slidetran');
+                        self.$timeout(function () {
+                            setTransform(0 - ((total - 3) * _slideWidth));
+                            $scope.currentSlideIndex = total - 3;
+                            $scope.currentPagerItemIndex = total - 4;
+                            $scope.currentSlideIndex = total - 3;
+                            $scope.currentPagerItemIndex = total - 4;
+                        }, 0);
+                    }, 0);
                 }
                 else {
                     var previous = current - 1;
