@@ -69,16 +69,20 @@
 }
 
 .carousel .slides {
+    bottom: 0;
     clear: both;
     height: 100%;
     margin: 0;
     overflow: hidden;
     padding: 0;
+    position: absolute;
+    top: 0;
 }
 
+/*
 .carousel .slides.slidetran {
     -webkit-transition: transform 1.0s ease-in-out 0s;
     -moz-transition: transform 1.0s ease-in-out 0s;
     -o-transition: transform 1.0s ease-in-out 0s;
     transition: transform 1.0s ease-in-out 0s;
-}
+}*/
