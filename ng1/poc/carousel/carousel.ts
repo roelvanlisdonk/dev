@@ -38,49 +38,25 @@ namespace poc {
                 const slides: Array<ICarouselItem> = [];
                 const totalItemCount = items.length;
 
-                // Create a clone of the last slide and use it, as first slide, to prevent flikkering, when cycling the carousel. 
+                // Create a "clone"" of the last slide and use it, as first slide, to prevent flikkering, when cycling the carousel. 
                 slides.unshift(items[totalItemCount - 1]);
                 for(let i = 0, length = totalItemCount; i < length; i++) {
                     slides.push(items[i]);
                 }
-                // Create a clone of the first slide and use it, as last slide, to prevent flikkering, when cycling the carousel.
+                // Create a "clone" of the first slide and use it, as last slide, to prevent flikkering, when cycling the carousel.
                 slides.push(items[0]);
                 $scope.slidesWidth = `${slides.length * _slideWidth}px`;
                 $scope.slides = slides;
             }
 
-            function onNextClick() {
+            function move(direction: Direction) {
                 const total = $scope.slides.length;
-                if (total === 0) { return; }
+                const first = (direction === Direction.forward) ? 0 : total - 1;
+                const last = (direction === Direction.forward) ? total - 1 : 0;
+                const incrementor = (direction === Direction.forward) ? 1 : -1;
 
-                const current = $scope.currentSlideIndex;
-                if(current === total - 1) {
-                    moveToSecondSlide(false);
-                    moveToThirdSlide(true);
-                    
-                } else {
-                    moveToNextSlide();
-                }
-            }
-
-            function onPagerItemClick(index: number) {
-                $scope.currentPagerItemIndex = index;
-                $scope.currentSlideIndex = index + 1;
-                moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
-            }
-
-            function onPreviousClick() {
-                const total = $scope.slides.length;
-                if (total === 0) { return; }
-
-                const current = $scope.currentSlideIndex;
-                if(current === 0) {
-                    moveToSecondLastSlide(false);
-                    moveToThirdLastSlide(true);
-                    
-                } else {
-                    moveToPreviousSlide();
-                }
+                setPagerItemIndex(first, last, incrementor);
+                setSlideIndexAndMove(first, last, incrementor);
             }
 
             function moveSlide(offset: number, duration?: number, cb?: Function) {
@@ -90,62 +66,10 @@ namespace poc {
 
                 if(useAnimation) {
                     $scope.slideAnimationInProgress = true;
-                    slidesJqueryElement.animate({
-                        left: `${offset}px`
-                    }, duration,'swing', cb);
-                    
+                    slidesJqueryElement.animate({ left: `${offset}px` }, duration,'swing', cb);
                 } else {
                     slidesJqueryElement.css("left", `${offset}px`);
                 }
-            }
-
-            function moveToFirstSlide(useAnimation: boolean) {
-                const duration = useAnimation ? _defaultAnimiationDuration : 0;
-                const offset = 0 - ($scope.currentSlideIndex * _slideWidth);
-                moveSlide(offset, 0);
-                $scope.currentPagerItemIndex = 0;
-                $scope.currentSlideIndex = 1;
-            }
-
-            function moveToSecondLastSlide(useAnimation: boolean) {
-                const duration = useAnimation ? _defaultAnimiationDuration : 0;
-                const total = $scope.slides.length;
-                const offset = 0 - ((total - 2)  * _slideWidth);
-                moveSlide(offset, duration);
-                $scope.currentPagerItemIndex = 0;
-                $scope.currentSlideIndex = 1;
-            }
-
-            function moveToNextSlide() {
-                const current = $scope.currentSlideIndex;
-                const total = $scope.slides.length;
-
-                let next = current + 1;
-                $scope.currentSlideIndex = next;
-
-                if (next === total - 1) {
-                    $scope.currentPagerItemIndex = 0;
-                } else {
-                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex + 1;
-                }
-
-                moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
-            }
-
-            function moveToPreviousSlide() {
-                const current = $scope.currentSlideIndex;
-                const total = $scope.slides.length;
-
-                let previous = current - 1;
-                $scope.currentSlideIndex = previous;
-
-                if (previous === 0) {
-                    $scope.currentPagerItemIndex = total - 3;
-                } else {
-                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex - 1;
-                }
-
-                moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
             }
 
             function moveToSecondSlide(useAnimation: boolean) {
@@ -155,29 +79,53 @@ namespace poc {
                 $scope.currentPagerItemIndex = 0;
                 $scope.currentSlideIndex = 1;
             }
-
-            function moveToThirdSlide(useAnimation: boolean) {
-                const duration = useAnimation ? _defaultAnimiationDuration : 0;
-                const total = $scope.slides.length;
-                moveSlide(0 - (2  * _slideWidth), duration);
-                $scope.currentPagerItemIndex = 1;
-                $scope.currentSlideIndex = 2;
-            }
-
-            function moveToThirdLastSlide(useAnimation: boolean) {
-                const duration = useAnimation ? _defaultAnimiationDuration : 0;
-                const total = $scope.slides.length;
-                moveSlide(0 - ((total - 3)  * _slideWidth), duration);
-                $scope.currentPagerItemIndex = total - 4;
-                $scope.currentSlideIndex = total - 3;
-            }
             
+            function onNextClick() {
+                move(Direction.forward);
+            }
+
+            function onPagerItemClick(index: number) {
+                $scope.currentPagerItemIndex = index;
+                $scope.currentSlideIndex = index + 1;
+                moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
+            }
+
+            function onPreviousClick() {
+                move(Direction.backward);
+            }
+
             function onSlideAnimationEnd() {
                 $scope.slideAnimationInProgress = false;
+            }
+            
+            function setPagerItemIndex(first: number, last: number, incrementor: number) {
+                if($scope.currentSlideIndex === last) {
+                     $scope.currentPagerItemIndex = first + incrementor;
+                } else if($scope.currentSlideIndex === (last - incrementor)){
+                    $scope.currentPagerItemIndex = first;
+                } else {
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex + incrementor;
+                }
+            }
+
+            function setSlideIndexAndMove(first: number, last: number, incrementor: number) {
+                if($scope.currentSlideIndex === last) {
+                    $scope.currentSlideIndex = first + incrementor;
+                    moveSlide(0 - ($scope.currentSlideIndex * _slideWidth), 0);
+                    $scope.currentSlideIndex = $scope.currentSlideIndex  + incrementor;
+                    moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
+                } else {
+                    $scope.currentSlideIndex = $scope.currentSlideIndex + incrementor;
+                    moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
+                }
             }
         }
     }
 
+    enum Direction {
+        backward = 0,
+        forward = 1
+    }
     interface ICarouselScope extends ng.IScope {
         currentPagerItemIndex: number;
         currentSlideIndex: number;
