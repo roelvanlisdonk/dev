@@ -52,10 +52,11 @@ namespace poc {
             function move(direction: Direction) {
                 const total = $scope.slides.length;
                 const first = (direction === Direction.forward) ? 0 : total - 1;
+                const pagerFirst = (direction === Direction.forward) ? 0 : total - 2;
                 const last = (direction === Direction.forward) ? total - 1 : 0;
                 const incrementor = (direction === Direction.forward) ? 1 : -1;
 
-                setPagerItemIndex(first, last, incrementor);
+                setPagerItemIndex(pagerFirst, last, incrementor);
                 setSlideIndexAndMove(first, last, incrementor);
             }
 

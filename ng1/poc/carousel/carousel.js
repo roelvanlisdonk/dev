@@ -42,9 +42,10 @@ var poc;
             function move(direction) {
                 var total = $scope.slides.length;
                 var first = (direction === Direction.forward) ? 0 : total - 1;
+                var pagerFirst = (direction === Direction.forward) ? 0 : total - 2;
                 var last = (direction === Direction.forward) ? total - 1 : 0;
                 var incrementor = (direction === Direction.forward) ? 1 : -1;
-                setPagerItemIndex(first, last, incrementor);
+                setPagerItemIndex(pagerFirst, last, incrementor);
                 setSlideIndexAndMove(first, last, incrementor);
             }
             function moveSlide(offset, duration, cb) {
