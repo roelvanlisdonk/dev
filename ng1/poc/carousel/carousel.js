@@ -2,6 +2,7 @@ var poc;
 (function (poc) {
     'use strict';
     var _slideWidth = 1000;
+    var _defaultAnimiationDuration = 1000;
     angular.module('poc').directive('carousel', ['$animate', '$timeout', function ($animate, $timeout) { return new CarouselDirective($animate, $timeout); }]);
     var CarouselDirective = (function () {
         function CarouselDirective($animate, $timeout) {
@@ -25,7 +26,7 @@ var poc;
                 $scope.options = getStubOptions();
             }
             createSlides();
-            moveToFirstSlide();
+            moveToSecondSlide(false);
             function createSlides() {
                 var items = $scope.options.items;
                 var slides = [];
@@ -44,13 +45,13 @@ var poc;
                     return;
                 }
                 var current = $scope.currentSlideIndex;
-                var next = current + 1;
-                if (next === total) {
-                    next = 0;
+                if (current === total - 1) {
+                    moveToSecondSlide(false);
+                    moveToThirdSlide(true);
                 }
-                $scope.currentSlideIndex = next;
-                $scope.currentPagerItemIndex = next + 1;
-                moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
+                else {
+                    moveToNextSlide();
+                }
             }
             function onPagerItemClick(index) {
                 $scope.currentPagerItemIndex = index;
@@ -64,8 +65,8 @@ var poc;
                 }
                 var current = $scope.currentSlideIndex;
                 if (current === 0) {
-                    moveToLastSlideWithoutUsingAnimation();
-                    moveToSecondLastSlide();
+                    moveToSecondLastSlide(false);
+                    moveToThirdLastSlide(true);
                 }
                 else {
                     moveToPreviousSlide();
@@ -73,7 +74,7 @@ var poc;
             }
             function moveSlide(offset, duration, cb) {
                 var useAnimation = duration !== 0;
-                duration = duration || 1000;
+                duration = duration || _defaultAnimiationDuration;
                 cb = cb || onSlideAnimationEnd;
                 if (useAnimation) {
                     $scope.slideAnimationInProgress = true;
@@ -85,15 +86,33 @@ var poc;
                     slidesJqueryElement.css("left", offset + "px");
                 }
             }
-            function moveToFirstSlide() {
+            function moveToFirstSlide(useAnimation) {
+                var duration = useAnimation ? _defaultAnimiationDuration : 0;
+                var offset = 0 - ($scope.currentSlideIndex * _slideWidth);
+                moveSlide(offset, 0);
                 $scope.currentPagerItemIndex = 0;
                 $scope.currentSlideIndex = 1;
-                moveSlide(0 - ($scope.currentSlideIndex * _slideWidth), 0);
             }
-            function moveToLastSlideWithoutUsingAnimation() {
+            function moveToSecondLastSlide(useAnimation) {
+                var duration = useAnimation ? _defaultAnimiationDuration : 0;
                 var total = $scope.slides.length;
                 var offset = 0 - ((total - 2) * _slideWidth);
-                moveSlide(offset, 0);
+                moveSlide(offset, duration);
+                $scope.currentPagerItemIndex = 0;
+                $scope.currentSlideIndex = 1;
+            }
+            function moveToNextSlide() {
+                var current = $scope.currentSlideIndex;
+                var total = $scope.slides.length;
+                var next = current + 1;
+                $scope.currentSlideIndex = next;
+                if (next === total - 1) {
+                    $scope.currentPagerItemIndex = 0;
+                }
+                else {
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex + 1;
+                }
+                moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
             }
             function moveToPreviousSlide() {
                 var current = $scope.currentSlideIndex;
@@ -104,15 +123,30 @@ var poc;
                     $scope.currentPagerItemIndex = total - 3;
                 }
                 else {
-                    $scope.currentPagerItemIndex = previous - 1;
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex - 1;
                 }
                 moveSlide(0 - ($scope.currentSlideIndex * _slideWidth));
             }
-            function moveToSecondLastSlide() {
+            function moveToSecondSlide(useAnimation) {
+                var duration = useAnimation ? _defaultAnimiationDuration : 0;
                 var total = $scope.slides.length;
-                moveSlide(0 - ((total - 3) * _slideWidth));
-                $scope.currentSlideIndex = total - 3;
+                moveSlide(0 - (1 * _slideWidth), duration);
+                $scope.currentPagerItemIndex = 0;
+                $scope.currentSlideIndex = 1;
+            }
+            function moveToThirdSlide(useAnimation) {
+                var duration = useAnimation ? _defaultAnimiationDuration : 0;
+                var total = $scope.slides.length;
+                moveSlide(0 - (2 * _slideWidth), duration);
+                $scope.currentPagerItemIndex = 1;
+                $scope.currentSlideIndex = 2;
+            }
+            function moveToThirdLastSlide(useAnimation) {
+                var duration = useAnimation ? _defaultAnimiationDuration : 0;
+                var total = $scope.slides.length;
+                moveSlide(0 - ((total - 3) * _slideWidth), duration);
                 $scope.currentPagerItemIndex = total - 4;
+                $scope.currentSlideIndex = total - 3;
             }
             function onSlideAnimationEnd() {
                 $scope.slideAnimationInProgress = false;
