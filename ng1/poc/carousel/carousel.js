@@ -42,10 +42,9 @@ var poc;
             function move(direction) {
                 var total = $scope.slides.length;
                 var first = (direction === Direction.forward) ? 0 : total - 1;
-                var pagerFirst = (direction === Direction.forward) ? 0 : total - 2;
                 var last = (direction === Direction.forward) ? total - 1 : 0;
                 var incrementor = (direction === Direction.forward) ? 1 : -1;
-                setPagerItemIndex(pagerFirst, last, incrementor);
+                setPagerItemIndex(first, last, incrementor, direction);
                 setSlideIndexAndMove(first, last, incrementor);
             }
             function moveSlide(offset, duration, cb) {
@@ -81,15 +80,30 @@ var poc;
             function onSlideAnimationEnd() {
                 $scope.slideAnimationInProgress = false;
             }
-            function setPagerItemIndex(first, last, incrementor) {
-                if ($scope.currentSlideIndex === last) {
-                    $scope.currentPagerItemIndex = first + incrementor;
+            function setPagerItemIndex(first, last, incrementor, direction) {
+                if (direction === Direction.backward) {
+                    if ($scope.currentSlideIndex === first) {
+                        $scope.currentPagerItemIndex = first;
+                        return;
+                    }
+                    if ($scope.currentSlideIndex === last) {
+                        $scope.currentPagerItemIndex = last - incrementor - incrementor;
+                        return;
+                    }
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex - incrementor;
+                    return;
                 }
-                else if ($scope.currentSlideIndex === (last - incrementor)) {
-                    $scope.currentPagerItemIndex = first;
-                }
-                else {
-                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex + incrementor;
+                if (direction === Direction.forward) {
+                    if ($scope.currentSlideIndex === first) {
+                        $scope.currentPagerItemIndex = first;
+                        return;
+                    }
+                    if ($scope.currentSlideIndex === last) {
+                        $scope.currentPagerItemIndex = first + incrementor;
+                        return;
+                    }
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex - incrementor;
+                    return;
                 }
             }
             function setSlideIndexAndMove(first, last, incrementor) {

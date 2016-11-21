@@ -52,11 +52,10 @@ namespace poc {
             function move(direction: Direction) {
                 const total = $scope.slides.length;
                 const first = (direction === Direction.forward) ? 0 : total - 1;
-                const pagerFirst = (direction === Direction.forward) ? 0 : total - 2;
                 const last = (direction === Direction.forward) ? total - 1 : 0;
                 const incrementor = (direction === Direction.forward) ? 1 : -1;
 
-                setPagerItemIndex(pagerFirst, last, incrementor);
+                setPagerItemIndex(first, last, incrementor, direction);
                 setSlideIndexAndMove(first, last, incrementor);
             }
 
@@ -99,14 +98,47 @@ namespace poc {
                 $scope.slideAnimationInProgress = false;
             }
             
-            function setPagerItemIndex(first: number, last: number, incrementor: number) {
-                if($scope.currentSlideIndex === last) {
-                     $scope.currentPagerItemIndex = first + incrementor;
-                } else if($scope.currentSlideIndex === (last - incrementor)){
-                    $scope.currentPagerItemIndex = first;
-                } else {
-                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex + incrementor;
+            function setPagerItemIndex(first: number, last: number, incrementor: number, direction: Direction) {
+                if(direction === Direction.backward) {
+                    if($scope.currentSlideIndex === first) {
+                        $scope.currentPagerItemIndex = first;
+                        return;
+                    }
+
+                    if($scope.currentSlideIndex === last) {
+                        $scope.currentPagerItemIndex = last - incrementor - incrementor;
+                        return;
+                    }
+
+                    // Normaal
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex - incrementor;
+                    return;
                 }
+
+
+                if(direction === Direction.forward) {
+                    if($scope.currentSlideIndex === first) {
+                        $scope.currentPagerItemIndex = first;
+                        return;
+                    }
+
+                    if($scope.currentSlideIndex === last) {
+                        $scope.currentPagerItemIndex = first + incrementor;
+                        return;
+                    }
+
+                    // Normaal
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex - incrementor;
+                    return;
+                }
+
+                // if($scope.currentSlideIndex === last) {
+                //      $scope.currentPagerItemIndex = (direction === Direction.backward) ? first - 2: first + incrementor;
+                // } else if($scope.currentSlideIndex === (last - incrementor)){
+                //     $scope.currentPagerItemIndex = (direction === Direction.backward) ? first - 1: first;
+                // } else {
+                //     $scope.currentPagerItemIndex = $scope.currentPagerItemIndex + incrementor;
+                // }
             }
 
             function setSlideIndexAndMove(first: number, last: number, incrementor: number) {
