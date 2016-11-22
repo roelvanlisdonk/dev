@@ -11,7 +11,31 @@ namespace poc {
         public scope = {
             options: '=?carousel'
         };
-        public templateUrl = '/ng1/poc/carousel/carousel.html';
+        public template = `
+<div class="carousel">
+    <button type="button" class="previous" ng-click="slideAnimationInProgress || onPreviousClick()">
+        <i class="fa-angle-left"></i>
+    </button>
+    <div class="slides"
+         ng-style="{ width: slidesWidth }">
+        <div class="slide"
+             ng-repeat="slide in slides track by $index"
+             ng-style="{ background: slide.background }"></div>
+    </div>
+    <div class="pager">
+        <button type="button"
+                class="item"
+                title="item.title"
+                ng-click="slideAnimationInProgress || onPagerItemClick($index)"
+                ng-repeat="item in options.items">
+            <i ng-class="{'fa-circle': $index === currentPagerItemIndex, 'fa-circle-o': $index !== currentPagerItemIndex}"></i>
+        </button>
+    </div>
+    <button type="button" class="next" ng-click="slideAnimationInProgress || onNextClick()">
+        <i class="fa-angle-right"></i>
+    </button>
+</div>
+        `;
 
         constructor(public $animate: ng.animate.IAnimateService, public $timeout: ng.ITimeoutService) {
             const self: CarouselDirective = this;
@@ -127,7 +151,7 @@ namespace poc {
         backward = 0,
         forward = 1
     }
-    
+
     interface ICarouselScope extends ng.IScope {
         currentPagerItemIndex: number;
         currentSlideIndex: number;

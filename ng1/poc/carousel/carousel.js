@@ -1,8 +1,8 @@
 var poc;
 (function (poc) {
     'use strict';
-    var _slideWidth = 1000;
     var _defaultAnimiationDuration = 1000;
+    var _slideWidth = 1000;
     angular.module('poc').directive('carousel', ['$animate', '$timeout', function ($animate, $timeout) { return new CarouselDirective($animate, $timeout); }]);
     var CarouselDirective = (function () {
         function CarouselDirective($animate, $timeout) {
@@ -12,7 +12,7 @@ var poc;
             this.scope = {
                 options: '=?carousel'
             };
-            this.templateUrl = '/ng1/poc/carousel/carousel.html';
+            this.template = "\n<div class=\"carousel\">\n    <button type=\"button\" class=\"previous\" ng-click=\"slideAnimationInProgress || onPreviousClick()\">\n        <i class=\"fa-angle-left\"></i>\n    </button>\n    <div class=\"slides\"\n         ng-style=\"{ width: slidesWidth }\">\n        <div class=\"slide\"\n             ng-repeat=\"slide in slides track by $index\"\n             ng-style=\"{ background: slide.background }\"></div>\n    </div>\n    <div class=\"pager\">\n        <button type=\"button\"\n                class=\"item\"\n                title=\"item.title\"\n                ng-click=\"slideAnimationInProgress || onPagerItemClick($index)\"\n                ng-repeat=\"item in options.items\">\n            <i ng-class=\"{'fa-circle': $index === currentPagerItemIndex, 'fa-circle-o': $index !== currentPagerItemIndex}\"></i>\n        </button>\n    </div>\n    <button type=\"button\" class=\"next\" ng-click=\"slideAnimationInProgress || onNextClick()\">\n        <i class=\"fa-angle-right\"></i>\n    </button>\n</div>\n        ";
             var self = this;
             self.link = self.unboundLink.bind(self);
         }
