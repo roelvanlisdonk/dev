@@ -1,7 +1,7 @@
 namespace poc {
     'use strict';  
-    const _slideWidth = 1000;
     const _defaultAnimiationDuration = 1000;
+    const _slideWidth = 1000;
 
     angular.module('poc').directive('carousel', ['$animate', '$timeout', ($animate, $timeout) => new CarouselDirective($animate, $timeout)]);
 
@@ -127,6 +127,7 @@ namespace poc {
         backward = 0,
         forward = 1
     }
+    
     interface ICarouselScope extends ng.IScope {
         currentPagerItemIndex: number;
         currentSlideIndex: number;
