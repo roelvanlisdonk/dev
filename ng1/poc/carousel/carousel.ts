@@ -51,12 +51,15 @@ namespace poc {
 
             function move(direction: Direction) {
                 const total = $scope.slides.length;
-                const first = (direction === Direction.forward) ? 0 : total - 1;
-                const last = (direction === Direction.forward) ? total - 1 : 0;
                 const incrementor = (direction === Direction.forward) ? 1 : -1;
 
-                $scope.currentPagerItemIndex = getPagerItemIndex(0, total - 1, direction);
-                setSlideIndexAndMove(first, last, incrementor);
+                const firstPagerItemIndex = (direction === Direction.forward) ? 0 : total - 3;
+                const lastPagerItemIndex = (direction === Direction.forward) ? total - 3 : 0;
+                setPagerItemIndex(firstPagerItemIndex, lastPagerItemIndex, incrementor);
+
+                const firstSlideIndex = (direction === Direction.forward) ? 0 : total - 1;
+                const lastSlideIndex = (direction === Direction.forward) ? total - 1 : 0;
+                setSlideIndexAndMove(firstSlideIndex, lastSlideIndex, incrementor);
             }
 
             function moveSlide(offset: number, duration?: number, cb?: Function) {
@@ -98,33 +101,12 @@ namespace poc {
                 $scope.slideAnimationInProgress = false;
             }
             
-            function getPagerItemIndex(first: number, last: number, direction: Direction): number {
-                if(direction === Direction.backward) {
-                    if($scope.currentSlideIndex === first) {
-                        return first;
-                    }
-
-                    if($scope.currentSlideIndex === first + 1) {
-                        return first + 1;
-                    }
-
-                    return $scope.currentSlideIndex - 2;
+            function setPagerItemIndex(first: number, last: number, incrementor: number) {
+                if($scope.currentPagerItemIndex === last) {
+                    $scope.currentPagerItemIndex = first;
+                } else {
+                    $scope.currentPagerItemIndex = $scope.currentPagerItemIndex + incrementor;
                 }
-
-
-                if(direction === Direction.forward) {
-                    if($scope.currentSlideIndex === last) {
-                        return first + 1;
-                    }
-
-                    if($scope.currentSlideIndex === last - 1) {
-                        return first;
-                    }
-
-                    return $scope.currentSlideIndex;
-                }
-
-                throw new Error("Unknown direction.");
             }
 
             function setSlideIndexAndMove(first: number, last: number, incrementor: number) {
