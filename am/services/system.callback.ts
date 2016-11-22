@@ -71,44 +71,15 @@ namespace am.systemUsingCallbacks {
         return mod && mod.proxy;
     }
 
-    function get(name: string): any {
-        console.log(`get - ${name}`);
-        return externalRegistry[name] || ensuredExecute(name);
-    }
-
-    function has(name: string): boolean {
-        console.log(`has - ${name}`);
-        return !!externalRegistry[name] || !!internalRegistry[name];
-    }
-
-    export function load(name: string, onSuccess: (mod: any) => void) {
-        console.log(`load - ${name}`);
-        const endTreeLoading = onSuccess;
-        const normalizedName = normalizeName(name, []);
-
-        const moduleAsCode = get(normalizedName);
-        if (moduleAsCode && endTreeLoading) {
-            endTreeLoading(moduleAsCode);
-        } else {
-
-            // To determine, "if all dependencies are loaded", this "rootInfo" object will be passed to and updated during the load process. 
-            const rootInfo: ILoadInfo = {
-                counter: 0,
-                done: endTreeLoading,
-                mod: null,
-                normalizedName: normalizedName,
-                parentInfo: null,
-                total: 0
-            };
-
-            fetchAndEval(rootInfo);
-        }
-    }
-
     function fetchAndEval(info: ILoadInfo) {
         console.log(`fetchAndEval - ${info.normalizedName}`);
         const url = (System.baseURL || "/") + info.normalizedName + ".js";
         createScriptNode(url, onScriptLoad, info);
+    }
+
+    function get(name: string): any {
+        console.log(`get - ${name}`);
+        return externalRegistry[name] || ensuredExecute(name);
     }
 
     function getModuleFromInternalRegistry(name: string): any {
@@ -141,6 +112,35 @@ namespace am.systemUsingCallbacks {
 
         if (hasDepedencies) {
             loadDependencies(mod.deps, info);
+        }
+    }
+
+    function has(name: string): boolean {
+        console.log(`has - ${name}`);
+        return !!externalRegistry[name] || !!internalRegistry[name];
+    }
+
+    export function load(name: string, onSuccess: (mod: any) => void) {
+        console.log(`load - ${name}`);
+        const endTreeLoading = onSuccess;
+        const normalizedName = normalizeName(name, []);
+
+        const moduleAsCode = get(normalizedName);
+        if (moduleAsCode && endTreeLoading) {
+            endTreeLoading(moduleAsCode);
+        } else {
+
+            // To determine, "if all dependencies are loaded", this "rootInfo" object will be passed to and updated during the load process. 
+            const rootInfo: ILoadInfo = {
+                counter: 0,
+                done: endTreeLoading,
+                mod: null,
+                normalizedName: normalizedName,
+                parentInfo: null,
+                total: 0
+            };
+
+            fetchAndEval(rootInfo);
         }
     }
 
