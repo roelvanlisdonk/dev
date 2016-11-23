@@ -36,21 +36,39 @@ namespace am.systemUsingCallbacks {
         }
 
         if (ie) {
-            node["onreadystatechange"] = function () {
-                
+            // This code is based on: https://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
+            node["onreadystatechange"] = function () {    
                 console.log(`onreadystatechange - ${this.readyState} - src - ${src}`);
-                if (/loaded|complete/.test(this.readyState)) {
-                    this.onreadystatechange = null;
+
+                // if (/loaded|complete/.test(this.readyState)) {
+                //     this.onreadystatechange = null;
+                //     callback(info);
+                // }
+
+                if(this.readyState === 'loaded'){
+                    // Adding the script tag to the head will start execution of the script.
+                    headEl.appendChild(node);
+                    
+                } else if(this.readyState === 'complete') {
+                    //document.body.appendChild(this);
                     callback(info);
+                    
+                    this.onreadystatechange= null;
+                    
                 }
-            };
+            }  
+            // After setting the src attribute the network fetching starts.
+            node.setAttribute("src", src);
         } else {
             node.onload = node.onerror = function () {
                 callback(info);
             };
+            // After setting the src attribute the network fetching starts.
+            node.setAttribute("src", src);
+
+            // Adding the script tag to the head will start execution of the script.
+            headEl.appendChild(node);
         }
-        node.setAttribute("src", src);
-        headEl.appendChild(node);
     }
 
     function isArray(obj: any): boolean {

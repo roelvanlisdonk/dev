@@ -19,19 +19,23 @@ var am;
             if (ie) {
                 node["onreadystatechange"] = function () {
                     console.log("onreadystatechange - " + this.readyState + " - src - " + src);
-                    if (/loaded|complete/.test(this.readyState)) {
-                        this.onreadystatechange = null;
+                    if (this.readyState === 'loaded') {
+                        headEl.appendChild(node);
+                    }
+                    else if (this.readyState === 'complete') {
                         callback(info);
+                        this.onreadystatechange = null;
                     }
                 };
+                node.setAttribute("src", src);
             }
             else {
                 node.onload = node.onerror = function () {
                     callback(info);
                 };
+                node.setAttribute("src", src);
+                headEl.appendChild(node);
             }
-            node.setAttribute("src", src);
-            headEl.appendChild(node);
         }
         function isArray(obj) {
             return obj && obj.constructor === Array;
@@ -48,39 +52,14 @@ var am;
             }
             return mod && mod.proxy;
         }
-        function get(name) {
-            console.log("get - " + name);
-            return externalRegistry[name] || ensuredExecute(name);
-        }
-        function has(name) {
-            console.log("has - " + name);
-            return !!externalRegistry[name] || !!internalRegistry[name];
-        }
-        function load(name, onSuccess) {
-            console.log("load - " + name);
-            var endTreeLoading = onSuccess;
-            var normalizedName = normalizeName(name, []);
-            var moduleAsCode = get(normalizedName);
-            if (moduleAsCode && endTreeLoading) {
-                endTreeLoading(moduleAsCode);
-            }
-            else {
-                var rootInfo = {
-                    counter: 0,
-                    done: endTreeLoading,
-                    mod: null,
-                    normalizedName: normalizedName,
-                    parentInfo: null,
-                    total: 0
-                };
-                fetchAndEval(rootInfo);
-            }
-        }
-        systemUsingCallbacks.load = load;
         function fetchAndEval(info) {
             console.log("fetchAndEval - " + info.normalizedName);
             var url = (System.baseURL || "/") + info.normalizedName + ".js";
             createScriptNode(url, onScriptLoad, info);
+        }
+        function get(name) {
+            console.log("get - " + name);
+            return externalRegistry[name] || ensuredExecute(name);
         }
         function getModuleFromInternalRegistry(name) {
             console.log("getModuleFromInternalRegistry - " + name);
@@ -109,6 +88,31 @@ var am;
                 loadDependencies(mod.deps, info);
             }
         }
+        function has(name) {
+            console.log("has - " + name);
+            return !!externalRegistry[name] || !!internalRegistry[name];
+        }
+        function load(name, onSuccess) {
+            console.log("load - " + name);
+            var endTreeLoading = onSuccess;
+            var normalizedName = normalizeName(name, []);
+            var moduleAsCode = get(normalizedName);
+            if (moduleAsCode && endTreeLoading) {
+                endTreeLoading(moduleAsCode);
+            }
+            else {
+                var rootInfo = {
+                    counter: 0,
+                    done: endTreeLoading,
+                    mod: null,
+                    normalizedName: normalizedName,
+                    parentInfo: null,
+                    total: 0
+                };
+                fetchAndEval(rootInfo);
+            }
+        }
+        systemUsingCallbacks.load = load;
         function loadDependencies(deps, parentInfo) {
             console.log("loadDependencies - " + parentInfo.normalizedName);
             for (var i = 0; i < deps.length; i++) {
