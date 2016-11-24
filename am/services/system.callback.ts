@@ -10,9 +10,7 @@
 namespace am.systemUsingCallbacks {
     "use strict";
 
-    // console.log("system.callback.js loaded.");
     let anonymousEntry: any;
-    const _anonymousModules: Array<IAnonymousModule> = [];
     const seen: any = {};
     const internalRegistry: any = {};
     const externalRegistry: any = {};
@@ -24,14 +22,11 @@ namespace am.systemUsingCallbacks {
      * A script tag is used to fetch and eval sources,
      * because fetching the data directly will not allow developers to see / debug the sources in the browser.
      */
-    function createScriptNode(src: string, callback: (info: ILoadInfo) => void, info: ILoadInfo) {
+    function createScriptNode(src: string, callback: (info: ILoadInfo) => void, info: ILoadInfo, nextDepForIEIndex?: number, depsForIE?: string[]) {
         console.log(`createScriptNode - ${src}`);
-        _anonymousModules.push({
-            deps: null,
-            normalizedName: info.normalizedName
-        });
-
+        
         const node = document.createElement("script") as any;
+
         // use async=false for ordered async?
         // parallel-load-serial-execute http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
         if (node.async) {
@@ -43,37 +38,35 @@ namespace am.systemUsingCallbacks {
             node["onreadystatechange"] = function () {    
                 //console.log(`onreadystatechange - ${this.readyState} - src - ${src}`);
 
-                // if (/loaded|complete/.test(this.readyState)) {
-                //     this.onreadystatechange = null;
-                //     callback(info);
-                // }
+                if (/loaded|complete/.test(this.readyState)) {
+                    // Load next dependecy for IE synchronously.
+                     if(depsForIE) {
+                        if(nextDepForIEIndex < depsForIE.length) {
+                            loadDependency(depsForIE[nextDepForIEIndex], info, nextDepForIEIndex + 1, depsForIE);
+                        }
 
-                if(this.readyState === 'loaded'){
-                    // Adding the script tag to the head will start execution of the script.
-                    //headEl.appendChild(this);
-
-                    document.body.appendChild(this); 
+                        if(nextDepForIEIndex === depsForIE.length) {
+                            info.parentInfo.total = depsForIE.length;
+                            info.parentInfo.counter = depsForIE.length - 1;
+                        }
+                     }
                     
-                } else if(this.readyState === 'complete') {
-                    //document.body.appendChild(this);
-                    this.onreadystatechange= null;
+                    
+                    this.onreadystatechange = null;
                     callback(info);
-                    
-                    
                 }
-            }  
-            // After setting the src attribute the network fetching starts.
-            node.setAttribute("src", src);
+            }
         } else {
             node.onload = node.onerror = function () {
                 callback(info);
             };
-            // After setting the src attribute the network fetching starts.
-            node.setAttribute("src", src);
-
-            // Adding the script tag to the head will start execution of the script.
-            headEl.appendChild(node);
         }
+
+        // After setting the src attribute the network fetching starts.
+        node.setAttribute("src", src);
+
+        // Adding the script tag to the head will start execution of the script in order at which they are added to the head.
+        headEl.appendChild(node);
     }
 
     function isArray(obj: any): boolean {
@@ -81,10 +74,11 @@ namespace am.systemUsingCallbacks {
     }
 
     function ensuredExecute(name: string): boolean {
-        // console.log(`ensuredExecute - ${name}`);
         const mod = internalRegistry[name];
         if (mod && !seen[name]) {
             seen[name] = true;
+
+            // console.log(`ensuredExecute - ${name}`);
             // one time operation to execute the module body
             mod.execute();
         }
@@ -94,47 +88,17 @@ namespace am.systemUsingCallbacks {
         return mod && mod.proxy;
     }
 
-    function fetchAndEval(info: ILoadInfo) {
+    function fetchAndEval(info: ILoadInfo, nextDepForIEIndex?: number, depsForIE?: string[]) {
         // console.log(`fetchAndEval - ${info.normalizedName}`);
         const url = (System.baseURL || "/") + info.normalizedName + ".js";
-        createScriptNode(url, onScriptLoad, info);
+        createScriptNode(url, onScriptLoad, info, nextDepForIEIndex, depsForIE);
     }
 
     function get(name: string): any {
-        // console.log(`get - ${name}`);
+        console.log(`get - ${name}`);
         return externalRegistry[name] || ensuredExecute(name);
     }
-
-    /**
-     * IE <= 10, has a problem when downloading scripts in parallel, to fix this problem we use an array,
-     * so we can match a register call from inside a TypeScript generated ES6 module to it's correct normalized name. 
-     */
-    function getAnonymousModule(normalizedName: string): IAnonymousModule {
-        for (let i = 0, length = _anonymousModules.length; i < length; i++) {
-            const item = _anonymousModules[i];
-            if(item.normalizedName === normalizedName) {
-                return item;
-            }
-        }
-
-        throw new Error("getAnonymousModule - Anonymous module not found!");
-    }
-
-    /**
-     * IE <= 10, has a problem when downloading scripts in parallel, to fix this problem we use an array,
-     * so we can match a register call from inside a TypeScript generated ES6 module to it's correct normalized name. 
-     */
-    function getAnonymousModuleForRegistration(): IAnonymousModule {
-        for (let i = 0, length = _anonymousModules.length; i < length; i++) {
-            const item = _anonymousModules[i];
-            if(!item.deps) {
-                return item;
-            }
-        }
-
-        throw new Error("getAnonymousModuleRegistration - Anonymous module not found!");
-    }
-
+    
     function getModuleFromInternalRegistry(name: string): any {
         //console.log(`getModuleFromInternalRegistry - ${name}`);
         const mod = internalRegistry[name];
@@ -145,13 +109,15 @@ namespace am.systemUsingCallbacks {
     }
 
     function handleLoadedModule(info: ILoadInfo) {
-        // console.log(`handleLoadedModule - ${info.normalizedName}`);
+        // console.log(`handleLoadedModule - normalizedName - ${info.normalizedName}`);
+
         const mod = info.mod;
         const isRootModule = (info.parentInfo === null);
         const hasDepedencies = (mod.deps.length > 0);
         const shouldExecuteDone = (
             ((isRootModule && !hasDepedencies) || (!isRootModule && !hasDepedencies))
         );
+
         if (shouldExecuteDone) {
             const moduleAsCode = get(info.normalizedName);
             if (info.done) {
@@ -159,7 +125,8 @@ namespace am.systemUsingCallbacks {
             }
         }
 
-        if (!isRootModule && !hasDepedencies) {
+        const shouldUpdateParentInfo = (!isRootModule && !hasDepedencies);
+        if (shouldUpdateParentInfo) {
             updateParentInfo(info);
         }
 
@@ -174,7 +141,7 @@ namespace am.systemUsingCallbacks {
     }
 
     export function load(name: string, onSuccess: (mod: any) => void) {
-        //console.log(`load - ${name}`);
+        console.log(`load - ${name}`);
         const endTreeLoading = onSuccess;
         const normalizedName = normalizeName(name, []);
 
@@ -199,13 +166,19 @@ namespace am.systemUsingCallbacks {
 
     function loadDependencies(deps: Array<string>, parentInfo: ILoadInfo) {
         //console.log(`loadDependencies - ${parentInfo.normalizedName}`);
-        for (let i = 0, length = deps.length; i < length; i++) {
-            const dep: string = deps[i];
-            loadDependency(dep, parentInfo);
+
+        // For IE we have to execute the scripts synchronously, so we add the name
+        if(ie ) {
+            loadDependency(deps[0], parentInfo, 1, deps);
+        } else {
+            for (let i = 0, length = deps.length; i < length; i++) {
+                const dep: string = deps[i];
+                loadDependency(dep, parentInfo);
+            }
         }
     }
 
-    function loadDependency(name: string, parentInfo: ILoadInfo) {
+    function loadDependency(name: string, parentInfo: ILoadInfo, nextDepForIEIndex?: number, depsForIE?: string[]) {
         //console.log(`loadDependency - ${name}`);
         const normalizedName = normalizeName(name, []);
 
@@ -223,7 +196,7 @@ namespace am.systemUsingCallbacks {
             childInfo.mod = mod;
             handleLoadedModule(childInfo);
         } else {
-            fetchAndEval(childInfo);
+            fetchAndEval(childInfo, nextDepForIEIndex, depsForIE);
         }
     }
     
@@ -248,11 +221,8 @@ namespace am.systemUsingCallbacks {
     }
 
     function onScriptLoad(info: ILoadInfo) {
-        const anonymousModule = getAnonymousModule(info.normalizedName);
-        //console.log(`onScriptLoad - normalizedName - ${anonymousModule.normalizedName}`);
-        //console.log(`onScriptLoad - deps - ${anonymousModule.deps}`);
-
-        // console.log(`onScriptLoad - anonymousEntry - ${anonymousEntry}`);
+        console.log(`onScriptLoad - normalizedName - ${info.normalizedName}`);
+        
         if (anonymousEntry) {
             // Register as an named module.
             System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
@@ -274,11 +244,6 @@ namespace am.systemUsingCallbacks {
             // register is called from typescript generated es6 module
             anonymousEntry = [];
             anonymousEntry.push.apply(anonymousEntry, arguments);
-            
-            const anonymousModule = getAnonymousModuleForRegistration();
-            anonymousModule.deps = anonymousEntry;
-            console.log(`register - anonymousModule -  ${anonymousModule.normalizedName}`);
-            console.log(`register - anonymousModule -  ${anonymousModule.deps}`);
 
             // Breaking to let the script tag to name it (the module will be registered on its "url / path on the filesystem").
             return;
@@ -355,12 +320,16 @@ namespace am.systemUsingCallbacks {
     }
 
     function updateParentInfo(info: ILoadInfo) {
-        // console.log(`updateParentInfo - ${info.normalizedName}`);
+        console.log(`updateParentInfo - ${info.normalizedName}`);
         const parentInfo = info.parentInfo;
         if (parentInfo) {
+            console.log(`updateParentInfo - parentInfo.normalizedName - ${parentInfo.normalizedName}`);
+            console.log(`updateParentInfo - parentInfo.total - ${parentInfo.total}`);
             parentInfo.counter += 1;
+            console.log(`updateParentInfo - parentInfo.counter - ${parentInfo.counter}`);
             if (parentInfo.counter === parentInfo.total) {
                 const moduleAsCode = get(parentInfo.normalizedName);
+                console.log(`updateParentInfo - execute done on - ${moduleAsCode}`);
                 if (parentInfo.done) {
                     parentInfo.done(moduleAsCode);
                 }

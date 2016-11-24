@@ -4,41 +4,41 @@ var am;
     (function (systemUsingCallbacks) {
         "use strict";
         var anonymousEntry;
-        var _anonymousModules = [];
         var seen = {};
         var internalRegistry = {};
         var externalRegistry = {};
         var headEl = document.getElementsByTagName("head")[0];
         var ie = /MSIE/.test(navigator.userAgent);
-        function createScriptNode(src, callback, info) {
+        function createScriptNode(src, callback, info, nextDepForIEIndex, depsForIE) {
             console.log("createScriptNode - " + src);
-            _anonymousModules.push({
-                deps: null,
-                normalizedName: info.normalizedName
-            });
             var node = document.createElement("script");
             if (node.async) {
                 node.async = false;
             }
             if (ie) {
                 node["onreadystatechange"] = function () {
-                    if (this.readyState === 'loaded') {
-                        document.body.appendChild(this);
-                    }
-                    else if (this.readyState === 'complete') {
+                    if (/loaded|complete/.test(this.readyState)) {
+                        if (depsForIE) {
+                            if (nextDepForIEIndex < depsForIE.length) {
+                                loadDependency(depsForIE[nextDepForIEIndex], info, nextDepForIEIndex + 1, depsForIE);
+                            }
+                            if (nextDepForIEIndex === depsForIE.length) {
+                                info.parentInfo.total = depsForIE.length;
+                                info.parentInfo.counter = depsForIE.length - 1;
+                            }
+                        }
                         this.onreadystatechange = null;
                         callback(info);
                     }
                 };
-                node.setAttribute("src", src);
             }
             else {
                 node.onload = node.onerror = function () {
                     callback(info);
                 };
-                node.setAttribute("src", src);
-                headEl.appendChild(node);
             }
+            node.setAttribute("src", src);
+            headEl.appendChild(node);
         }
         function isArray(obj) {
             return obj && obj.constructor === Array;
@@ -54,30 +54,13 @@ var am;
             }
             return mod && mod.proxy;
         }
-        function fetchAndEval(info) {
+        function fetchAndEval(info, nextDepForIEIndex, depsForIE) {
             var url = (System.baseURL || "/") + info.normalizedName + ".js";
-            createScriptNode(url, onScriptLoad, info);
+            createScriptNode(url, onScriptLoad, info, nextDepForIEIndex, depsForIE);
         }
         function get(name) {
+            console.log("get - " + name);
             return externalRegistry[name] || ensuredExecute(name);
-        }
-        function getAnonymousModule(normalizedName) {
-            for (var i = 0, length_1 = _anonymousModules.length; i < length_1; i++) {
-                var item = _anonymousModules[i];
-                if (item.normalizedName === normalizedName) {
-                    return item;
-                }
-            }
-            throw new Error("getAnonymousModule - Anonymous module not found!");
-        }
-        function getAnonymousModuleForRegistration() {
-            for (var i = 0, length_2 = _anonymousModules.length; i < length_2; i++) {
-                var item = _anonymousModules[i];
-                if (!item.deps) {
-                    return item;
-                }
-            }
-            throw new Error("getAnonymousModuleRegistration - Anonymous module not found!");
         }
         function getModuleFromInternalRegistry(name) {
             var mod = internalRegistry[name];
@@ -97,7 +80,8 @@ var am;
                     info.done(moduleAsCode);
                 }
             }
-            if (!isRootModule && !hasDepedencies) {
+            var shouldUpdateParentInfo = (!isRootModule && !hasDepedencies);
+            if (shouldUpdateParentInfo) {
                 updateParentInfo(info);
             }
             if (hasDepedencies) {
@@ -108,6 +92,7 @@ var am;
             return !!externalRegistry[name] || !!internalRegistry[name];
         }
         function load(name, onSuccess) {
+            console.log("load - " + name);
             var endTreeLoading = onSuccess;
             var normalizedName = normalizeName(name, []);
             var moduleAsCode = get(normalizedName);
@@ -128,12 +113,17 @@ var am;
         }
         systemUsingCallbacks.load = load;
         function loadDependencies(deps, parentInfo) {
-            for (var i = 0, length_3 = deps.length; i < length_3; i++) {
-                var dep = deps[i];
-                loadDependency(dep, parentInfo);
+            if (ie) {
+                loadDependency(deps[0], parentInfo, 1, deps);
+            }
+            else {
+                for (var i = 0, length_1 = deps.length; i < length_1; i++) {
+                    var dep = deps[i];
+                    loadDependency(dep, parentInfo);
+                }
             }
         }
-        function loadDependency(name, parentInfo) {
+        function loadDependency(name, parentInfo, nextDepForIEIndex, depsForIE) {
             var normalizedName = normalizeName(name, []);
             var childInfo = {
                 counter: 0,
@@ -149,7 +139,7 @@ var am;
                 handleLoadedModule(childInfo);
             }
             else {
-                fetchAndEval(childInfo);
+                fetchAndEval(childInfo, nextDepForIEIndex, depsForIE);
             }
         }
         function normalizeName(child, parentBase) {
@@ -168,7 +158,7 @@ var am;
             return parentBase.concat(parts).join("/");
         }
         function onScriptLoad(info) {
-            var anonymousModule = getAnonymousModule(info.normalizedName);
+            console.log("onScriptLoad - normalizedName - " + info.normalizedName);
             if (anonymousEntry) {
                 System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
                 anonymousEntry = undefined;
@@ -183,10 +173,6 @@ var am;
             if (isArray(name)) {
                 anonymousEntry = [];
                 anonymousEntry.push.apply(anonymousEntry, arguments);
-                var anonymousModule = getAnonymousModuleForRegistration();
-                anonymousModule.deps = anonymousEntry;
-                console.log("register - anonymousModule -  " + anonymousModule.normalizedName);
-                console.log("register - anonymousModule -  " + anonymousModule.deps);
                 return;
             }
             var proxy = {};
@@ -224,7 +210,7 @@ var am;
             meta = wrapper(function (identifier, value) {
                 values[identifier] = value;
                 mod.lock = true;
-                for (var i = 0, length_4 = mod.dependants.length; i < length_4; i++) {
+                for (var i = 0, length_2 = mod.dependants.length; i < length_2; i++) {
                     var moduleName = mod.dependants[i];
                     if (internalRegistry[moduleName] && !internalRegistry[moduleName].lock) {
                         internalRegistry[moduleName].update(name, values);
@@ -241,11 +227,16 @@ var am;
             externalRegistry[name] = values;
         }
         function updateParentInfo(info) {
+            console.log("updateParentInfo - " + info.normalizedName);
             var parentInfo = info.parentInfo;
             if (parentInfo) {
+                console.log("updateParentInfo - parentInfo.normalizedName - " + parentInfo.normalizedName);
+                console.log("updateParentInfo - parentInfo.total - " + parentInfo.total);
                 parentInfo.counter += 1;
+                console.log("updateParentInfo - parentInfo.counter - " + parentInfo.counter);
                 if (parentInfo.counter === parentInfo.total) {
                     var moduleAsCode = get(parentInfo.normalizedName);
+                    console.log("updateParentInfo - execute done on - " + moduleAsCode);
                     if (parentInfo.done) {
                         parentInfo.done(moduleAsCode);
                     }
@@ -273,7 +264,7 @@ var am;
             }
             else {
                 var scripts = document.getElementsByTagName('script');
-                for (var i = 0, length_5 = scripts.length; i < length_5; i++) {
+                for (var i = 0, length_3 = scripts.length; i < length_3; i++) {
                     var script = scripts[i];
                     var moduleName = script.getAttribute("data-main");
                     if (moduleName) {
