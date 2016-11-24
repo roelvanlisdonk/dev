@@ -1,8 +1,6 @@
-// TODO: I think the solution to the <= IE 10 problem can be solved by NOT using a global anonymousEntry, 
-//       but keep track of the dependencies chain, the "System.register" call inside a script will be called first
-//       then the "System.register" calls inside the scripts it depends on, in order that the dependencies are given.
-//       The first script will always load first, then the dependent scripts will be loaded, thats, where the problem starts.
-
+// Volgens mij moet je dus bij het laden van een dependency de naam op de stack zetten
+// Bij register op de juiste plek toevoegen
+// bij load de juiste gebruiken.
 
 
 /**
@@ -12,7 +10,7 @@
 namespace am.systemUsingCallbacks {
     "use strict";
 
-    console.log("system.callback.js loaded.");
+    // console.log("system.callback.js loaded.");
 
     const seen: any = {};
     const internalRegistry: any = {};
@@ -76,7 +74,7 @@ namespace am.systemUsingCallbacks {
     }
 
     function ensuredExecute(name: string): boolean {
-        console.log(`ensuredExecute - ${name}`);
+        // console.log(`ensuredExecute - ${name}`);
         const mod = internalRegistry[name];
         if (mod && !seen[name]) {
             seen[name] = true;
@@ -90,13 +88,13 @@ namespace am.systemUsingCallbacks {
     }
 
     function fetchAndEval(info: ILoadInfo) {
-        console.log(`fetchAndEval - ${info.normalizedName}`);
+        // console.log(`fetchAndEval - ${info.normalizedName}`);
         const url = (System.baseURL || "/") + info.normalizedName + ".js";
         createScriptNode(url, onScriptLoad, info);
     }
 
     function get(name: string): any {
-        console.log(`get - ${name}`);
+        // console.log(`get - ${name}`);
         return externalRegistry[name] || ensuredExecute(name);
     }
 
@@ -110,7 +108,7 @@ namespace am.systemUsingCallbacks {
     }
 
     function handleLoadedModule(info: ILoadInfo) {
-        console.log(`handleLoadedModule - ${info.normalizedName}`);
+        // console.log(`handleLoadedModule - ${info.normalizedName}`);
         const mod = info.mod;
         const isRootModule = (info.parentInfo === null);
         const hasDepedencies = (mod.deps.length > 0);
@@ -134,7 +132,7 @@ namespace am.systemUsingCallbacks {
     }
 
     function has(name: string): boolean {
-        console.log(`has - ${name}`);
+        // console.log(`has - ${name}`);
         return !!externalRegistry[name] || !!internalRegistry[name];
     }
 
@@ -196,7 +194,7 @@ namespace am.systemUsingCallbacks {
      * Convert given "relative path" to "absolute path".
      */
     function normalizeName(child: string, parentBase: Array<string>) {
-        console.log(`normalizeName - ${child}`);
+        // console.log(`normalizeName - ${child}`);
         if (child.charAt(0) === "/") {
             child = child.slice(1);
         }
@@ -213,7 +211,8 @@ namespace am.systemUsingCallbacks {
     }
 
     function onScriptLoad(info: ILoadInfo) {
-        console.log(`onScriptLoad - ${info.normalizedName} - anonymousEntry - ${anonymousEntry}`);
+        console.log(`onScriptLoad - normalizedName - ${info.normalizedName}`);
+        // console.log(`onScriptLoad - anonymousEntry - ${anonymousEntry}`);
         if (anonymousEntry) {
             // Register as an named module.
             System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
@@ -228,14 +227,14 @@ namespace am.systemUsingCallbacks {
     
     function register(name: string| Array<string>, deps: Array<string> | Function, wrapper?: Function) {
         const nameAsString = name.toString() || "module has no dependencies.";
-        console.log(`register - ${nameAsString}`);
+        console.log(`register - name - ${nameAsString}`);
+        // console.log(`register - deps - ${deps}.`);
 
         if (isArray(name)) {
-            console.log(`register - deps - ${deps}.`);
-            console.log("Anounymous module (Note: TypeScript modules are generated as anonymous modules).");
+            // register is called from typescript generated es6 module
             anonymousEntry = [];
             anonymousEntry.push.apply(anonymousEntry, arguments);
-
+            console.log(`register - anonymousEntry -  ${anonymousEntry}`);
             // Breaking to let the script tag to name it (the module will be registered on its "url / path on the filesystem").
             return;
         }
@@ -254,20 +253,20 @@ namespace am.systemUsingCallbacks {
             values: values,
             // normalized deps
             deps: depsAsArray.map(function (dep) {
-                console.log(`deps - ${dep}`);
+                // console.log(`deps - ${dep}`);
                 return normalizeName(dep, nameAsString.split("/").slice(0, -1));
             }),
             // other modules that depends on this so we can push updates into those modules
             dependants: [],
             // method used to push updates of deps into the module body
             update: function (moduleName: string, moduleObj: any) {
-                console.log(`update - ${moduleName}`);
+                // // console.log(`update - ${moduleName}`);
                 meta.setters[mod.deps.indexOf(moduleName)](moduleObj);
             },
             execute: function () {
-                console.log(`execute`);
+                // console.log(`execute`);
                 mod.deps.map(function (dep: string) {
-                    console.log(`map - ${dep}`);
+                    // console.log(`map - ${dep}`);
                     let imports = externalRegistry[dep];
                     if (imports) {
                         mod.update(dep, imports);
@@ -285,7 +284,7 @@ namespace am.systemUsingCallbacks {
         };
         // collecting execute() and setters[]
         meta = wrapper(function (identifier: any, value: any) {
-            console.log(`wrapper - ${identifier}`);
+            // console.log(`wrapper - ${identifier}`);
             values[identifier] = value;
             mod.lock = true; // locking down the updates on the module to avoid infinite loop
             for(let i = 0, length = mod.dependants.length; i < length; i++) {
@@ -306,12 +305,12 @@ namespace am.systemUsingCallbacks {
     }
 
     function set(name: string, values: any): void {
-        console.log(`set - ${name}`);
+        // console.log(`set - ${name}`);
         externalRegistry[name] = values;
     }
 
     function updateParentInfo(info: ILoadInfo) {
-        console.log(`updateParentInfo - ${info.normalizedName}`);
+        // console.log(`updateParentInfo - ${info.normalizedName}`);
         const parentInfo = info.parentInfo;
         if (parentInfo) {
             parentInfo.counter += 1;

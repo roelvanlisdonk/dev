@@ -3,7 +3,6 @@ var am;
     var systemUsingCallbacks;
     (function (systemUsingCallbacks) {
         "use strict";
-        console.log("system.callback.js loaded.");
         var seen = {};
         var internalRegistry = {};
         var externalRegistry = {};
@@ -41,7 +40,6 @@ var am;
             return obj && obj.constructor === Array;
         }
         function ensuredExecute(name) {
-            console.log("ensuredExecute - " + name);
             var mod = internalRegistry[name];
             if (mod && !seen[name]) {
                 seen[name] = true;
@@ -53,12 +51,10 @@ var am;
             return mod && mod.proxy;
         }
         function fetchAndEval(info) {
-            console.log("fetchAndEval - " + info.normalizedName);
             var url = (System.baseURL || "/") + info.normalizedName + ".js";
             createScriptNode(url, onScriptLoad, info);
         }
         function get(name) {
-            console.log("get - " + name);
             return externalRegistry[name] || ensuredExecute(name);
         }
         function getModuleFromInternalRegistry(name) {
@@ -70,7 +66,6 @@ var am;
             return mod;
         }
         function handleLoadedModule(info) {
-            console.log("handleLoadedModule - " + info.normalizedName);
             var mod = info.mod;
             var isRootModule = (info.parentInfo === null);
             var hasDepedencies = (mod.deps.length > 0);
@@ -89,7 +84,6 @@ var am;
             }
         }
         function has(name) {
-            console.log("has - " + name);
             return !!externalRegistry[name] || !!internalRegistry[name];
         }
         function load(name, onSuccess) {
@@ -141,7 +135,6 @@ var am;
             }
         }
         function normalizeName(child, parentBase) {
-            console.log("normalizeName - " + child);
             if (child.charAt(0) === "/") {
                 child = child.slice(1);
             }
@@ -157,7 +150,7 @@ var am;
             return parentBase.concat(parts).join("/");
         }
         function onScriptLoad(info) {
-            console.log("onScriptLoad - " + info.normalizedName + " - anonymousEntry - " + anonymousEntry);
+            console.log("onScriptLoad - normalizedName - " + info.normalizedName);
             if (anonymousEntry) {
                 System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
                 anonymousEntry = undefined;
@@ -169,12 +162,11 @@ var am;
         }
         function register(name, deps, wrapper) {
             var nameAsString = name.toString() || "module has no dependencies.";
-            console.log("register - " + nameAsString);
+            console.log("register - name - " + nameAsString);
             if (isArray(name)) {
-                console.log("register - deps - " + deps + ".");
-                console.log("Anounymous module (Note: TypeScript modules are generated as anonymous modules).");
                 anonymousEntry = [];
                 anonymousEntry.push.apply(anonymousEntry, arguments);
+                console.log("register - anonymousEntry -  " + anonymousEntry);
                 return;
             }
             var proxy = {};
@@ -186,18 +178,14 @@ var am;
                 proxy: proxy,
                 values: values,
                 deps: depsAsArray.map(function (dep) {
-                    console.log("deps - " + dep);
                     return normalizeName(dep, nameAsString.split("/").slice(0, -1));
                 }),
                 dependants: [],
                 update: function (moduleName, moduleObj) {
-                    console.log("update - " + moduleName);
                     meta.setters[mod.deps.indexOf(moduleName)](moduleObj);
                 },
                 execute: function () {
-                    console.log("execute");
                     mod.deps.map(function (dep) {
-                        console.log("map - " + dep);
                         var imports = externalRegistry[dep];
                         if (imports) {
                             mod.update(dep, imports);
@@ -214,7 +202,6 @@ var am;
                 }
             };
             meta = wrapper(function (identifier, value) {
-                console.log("wrapper - " + identifier);
                 values[identifier] = value;
                 mod.lock = true;
                 for (var i = 0, length_1 = mod.dependants.length; i < length_1; i++) {
@@ -231,11 +218,9 @@ var am;
             });
         }
         function set(name, values) {
-            console.log("set - " + name);
             externalRegistry[name] = values;
         }
         function updateParentInfo(info) {
-            console.log("updateParentInfo - " + info.normalizedName);
             var parentInfo = info.parentInfo;
             if (parentInfo) {
                 parentInfo.counter += 1;
