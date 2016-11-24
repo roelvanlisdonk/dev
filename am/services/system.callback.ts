@@ -11,11 +11,11 @@ namespace am.systemUsingCallbacks {
     "use strict";
 
     // console.log("system.callback.js loaded.");
-
+    let anonymousEntry: any;
+    const _anonymousModules: Array<IAnonymousModule> = [];
     const seen: any = {};
     const internalRegistry: any = {};
     const externalRegistry: any = {};
-    let anonymousEntry: any;
 
     const headEl = document.getElementsByTagName("head")[0];
     const ie = /MSIE/.test(navigator.userAgent);
@@ -26,6 +26,11 @@ namespace am.systemUsingCallbacks {
      */
     function createScriptNode(src: string, callback: (info: ILoadInfo) => void, info: ILoadInfo) {
         console.log(`createScriptNode - ${src}`);
+        _anonymousModules.push({
+            deps: null,
+            normalizedName: info.normalizedName
+        });
+
         const node = document.createElement("script") as any;
         // use async=false for ordered async?
         // parallel-load-serial-execute http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
@@ -36,7 +41,7 @@ namespace am.systemUsingCallbacks {
         if (ie) {
             // This code is based on: https://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
             node["onreadystatechange"] = function () {    
-                console.log(`onreadystatechange - ${this.readyState} - src - ${src}`);
+                //console.log(`onreadystatechange - ${this.readyState} - src - ${src}`);
 
                 // if (/loaded|complete/.test(this.readyState)) {
                 //     this.onreadystatechange = null;
@@ -45,13 +50,15 @@ namespace am.systemUsingCallbacks {
 
                 if(this.readyState === 'loaded'){
                     // Adding the script tag to the head will start execution of the script.
-                    headEl.appendChild(node);
+                    //headEl.appendChild(this);
+
+                    document.body.appendChild(this); 
                     
                 } else if(this.readyState === 'complete') {
                     //document.body.appendChild(this);
+                    this.onreadystatechange= null;
                     callback(info);
                     
-                    this.onreadystatechange= null;
                     
                 }
             }  
@@ -98,8 +105,38 @@ namespace am.systemUsingCallbacks {
         return externalRegistry[name] || ensuredExecute(name);
     }
 
+    /**
+     * IE <= 10, has a problem when downloading scripts in parallel, to fix this problem we use an array,
+     * so we can match a register call from inside a TypeScript generated ES6 module to it's correct normalized name. 
+     */
+    function getAnonymousModule(normalizedName: string): IAnonymousModule {
+        for (let i = 0, length = _anonymousModules.length; i < length; i++) {
+            const item = _anonymousModules[i];
+            if(item.normalizedName === normalizedName) {
+                return item;
+            }
+        }
+
+        throw new Error("getAnonymousModule - Anonymous module not found!");
+    }
+
+    /**
+     * IE <= 10, has a problem when downloading scripts in parallel, to fix this problem we use an array,
+     * so we can match a register call from inside a TypeScript generated ES6 module to it's correct normalized name. 
+     */
+    function getAnonymousModuleForRegistration(): IAnonymousModule {
+        for (let i = 0, length = _anonymousModules.length; i < length; i++) {
+            const item = _anonymousModules[i];
+            if(!item.deps) {
+                return item;
+            }
+        }
+
+        throw new Error("getAnonymousModuleRegistration - Anonymous module not found!");
+    }
+
     function getModuleFromInternalRegistry(name: string): any {
-        console.log(`getModuleFromInternalRegistry - ${name}`);
+        //console.log(`getModuleFromInternalRegistry - ${name}`);
         const mod = internalRegistry[name];
         if (!mod) {
             throw new Error("Error loading module " + name);
@@ -137,7 +174,7 @@ namespace am.systemUsingCallbacks {
     }
 
     export function load(name: string, onSuccess: (mod: any) => void) {
-        console.log(`load - ${name}`);
+        //console.log(`load - ${name}`);
         const endTreeLoading = onSuccess;
         const normalizedName = normalizeName(name, []);
 
@@ -161,15 +198,15 @@ namespace am.systemUsingCallbacks {
     }
 
     function loadDependencies(deps: Array<string>, parentInfo: ILoadInfo) {
-        console.log(`loadDependencies - ${parentInfo.normalizedName}`);
-        for (let i = 0; i < deps.length; i++) {
+        //console.log(`loadDependencies - ${parentInfo.normalizedName}`);
+        for (let i = 0, length = deps.length; i < length; i++) {
             const dep: string = deps[i];
             loadDependency(dep, parentInfo);
         }
     }
 
     function loadDependency(name: string, parentInfo: ILoadInfo) {
-        console.log(`loadDependency - ${name}`);
+        //console.log(`loadDependency - ${name}`);
         const normalizedName = normalizeName(name, []);
 
         const childInfo: ILoadInfo = {
@@ -211,7 +248,10 @@ namespace am.systemUsingCallbacks {
     }
 
     function onScriptLoad(info: ILoadInfo) {
-        console.log(`onScriptLoad - normalizedName - ${info.normalizedName}`);
+        const anonymousModule = getAnonymousModule(info.normalizedName);
+        //console.log(`onScriptLoad - normalizedName - ${anonymousModule.normalizedName}`);
+        //console.log(`onScriptLoad - deps - ${anonymousModule.deps}`);
+
         // console.log(`onScriptLoad - anonymousEntry - ${anonymousEntry}`);
         if (anonymousEntry) {
             // Register as an named module.
@@ -227,14 +267,19 @@ namespace am.systemUsingCallbacks {
     
     function register(name: string| Array<string>, deps: Array<string> | Function, wrapper?: Function) {
         const nameAsString = name.toString() || "module has no dependencies.";
-        console.log(`register - name - ${nameAsString}`);
+        // console.log(`register - name - ${nameAsString}`);
         // console.log(`register - deps - ${deps}.`);
 
         if (isArray(name)) {
             // register is called from typescript generated es6 module
             anonymousEntry = [];
             anonymousEntry.push.apply(anonymousEntry, arguments);
-            console.log(`register - anonymousEntry -  ${anonymousEntry}`);
+            
+            const anonymousModule = getAnonymousModuleForRegistration();
+            anonymousModule.deps = anonymousEntry;
+            console.log(`register - anonymousModule -  ${anonymousModule.normalizedName}`);
+            console.log(`register - anonymousModule -  ${anonymousModule.deps}`);
+
             // Breaking to let the script tag to name it (the module will be registered on its "url / path on the filesystem").
             return;
         }
@@ -394,6 +439,11 @@ namespace am.systemUsingCallbacks {
 
     interface INodeOnreadystatechange {
         onreadystatechange: any;
+    }
+
+    interface IAnonymousModule {
+        normalizedName: string;
+        deps: any;
     }
 
     function getMainModuleName(): string {
