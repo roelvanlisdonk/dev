@@ -8,8 +8,6 @@ import { get, IStoreBooleanField, IStoreNumberField, IStoreObject, IStoreStringF
 
 const user = get<User>('test@test.com');
 
-
-
 class Topic implements IStoreObject {
     id: string;
     readonly typeId: string = StoreTypes.Topic.toString();
