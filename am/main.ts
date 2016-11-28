@@ -45,3 +45,4 @@ const enum TopicGroup {
     Read = 1,
     Watch = 2
 }
+
