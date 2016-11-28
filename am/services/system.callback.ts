@@ -23,8 +23,6 @@ namespace am.systemUsingCallbacks {
      * because fetching the data directly will not allow developers to see / debug the sources in the browser.
      */
     function createScriptNode(src: string, callback: (info: ILoadInfo) => void, info: ILoadInfo, nextDepForIEIndex?: number, depsForIE?: string[]) {
-        console.log(`createScriptNode - ${src}`);
-        
         const node = document.createElement("script") as any;
 
         // use async=false for ordered async?
@@ -36,9 +34,8 @@ namespace am.systemUsingCallbacks {
         if (ie) {
             // This code is based on: https://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
             node["onreadystatechange"] = function () {    
-                //console.log(`onreadystatechange - ${this.readyState} - src - ${src}`);
-
                 if (/loaded|complete/.test(this.readyState)) {
+
                     // Load next dependecy for IE synchronously.
                      if(depsForIE) {
                         if(nextDepForIEIndex < depsForIE.length) {
@@ -78,7 +75,6 @@ namespace am.systemUsingCallbacks {
         if (mod && !seen[name]) {
             seen[name] = true;
 
-            // console.log(`ensuredExecute - ${name}`);
             // one time operation to execute the module body
             mod.execute();
         }
@@ -89,18 +85,15 @@ namespace am.systemUsingCallbacks {
     }
 
     function fetchAndEval(info: ILoadInfo, nextDepForIEIndex?: number, depsForIE?: string[]) {
-        // console.log(`fetchAndEval - ${info.normalizedName}`);
         const url = (System.baseURL || "/") + info.normalizedName + ".js";
         createScriptNode(url, onScriptLoad, info, nextDepForIEIndex, depsForIE);
     }
 
     function get(name: string): any {
-        console.log(`get - ${name}`);
         return externalRegistry[name] || ensuredExecute(name);
     }
     
     function getModuleFromInternalRegistry(name: string): any {
-        //console.log(`getModuleFromInternalRegistry - ${name}`);
         const mod = internalRegistry[name];
         if (!mod) {
             throw new Error("Error loading module " + name);
@@ -109,8 +102,6 @@ namespace am.systemUsingCallbacks {
     }
 
     function handleLoadedModule(info: ILoadInfo) {
-        // console.log(`handleLoadedModule - normalizedName - ${info.normalizedName}`);
-
         const mod = info.mod;
         const isRootModule = (info.parentInfo === null);
         const hasDepedencies = (mod.deps.length > 0);
@@ -136,12 +127,10 @@ namespace am.systemUsingCallbacks {
     }
 
     function has(name: string): boolean {
-        // console.log(`has - ${name}`);
         return !!externalRegistry[name] || !!internalRegistry[name];
     }
 
     export function load(name: string, onSuccess: (mod: any) => void) {
-        console.log(`load - ${name}`);
         const endTreeLoading = onSuccess;
         const normalizedName = normalizeName(name, []);
 
@@ -165,9 +154,9 @@ namespace am.systemUsingCallbacks {
     }
 
     function loadDependencies(deps: Array<string>, parentInfo: ILoadInfo) {
-        //console.log(`loadDependencies - ${parentInfo.normalizedName}`);
-
-        // For IE we have to execute the scripts synchronously, so we add the name
+        // For IE we have to execute the scripts synchronously, so we supply the next dependency to load indexOf
+        // and the dependency array to the "loadDependency" function, so it can load the next dependency, when 
+        // it's script is fully loaded.
         if(ie ) {
             loadDependency(deps[0], parentInfo, 1, deps);
         } else {
@@ -179,7 +168,6 @@ namespace am.systemUsingCallbacks {
     }
 
     function loadDependency(name: string, parentInfo: ILoadInfo, nextDepForIEIndex?: number, depsForIE?: string[]) {
-        //console.log(`loadDependency - ${name}`);
         const normalizedName = normalizeName(name, []);
 
         const childInfo: ILoadInfo = {
@@ -204,7 +192,6 @@ namespace am.systemUsingCallbacks {
      * Convert given "relative path" to "absolute path".
      */
     function normalizeName(child: string, parentBase: Array<string>) {
-        // console.log(`normalizeName - ${child}`);
         if (child.charAt(0) === "/") {
             child = child.slice(1);
         }
@@ -221,8 +208,6 @@ namespace am.systemUsingCallbacks {
     }
 
     function onScriptLoad(info: ILoadInfo) {
-        console.log(`onScriptLoad - normalizedName - ${info.normalizedName}`);
-        
         if (anonymousEntry) {
             // Register as an named module.
             System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
@@ -237,8 +222,6 @@ namespace am.systemUsingCallbacks {
     
     function register(name: string| Array<string>, deps: Array<string> | Function, wrapper?: Function) {
         const nameAsString = name.toString() || "module has no dependencies.";
-        // console.log(`register - name - ${nameAsString}`);
-        // console.log(`register - deps - ${deps}.`);
 
         if (isArray(name)) {
             // register is called from typescript generated es6 module
@@ -263,20 +246,16 @@ namespace am.systemUsingCallbacks {
             values: values,
             // normalized deps
             deps: depsAsArray.map(function (dep) {
-                // console.log(`deps - ${dep}`);
                 return normalizeName(dep, nameAsString.split("/").slice(0, -1));
             }),
             // other modules that depends on this so we can push updates into those modules
             dependants: [],
             // method used to push updates of deps into the module body
             update: function (moduleName: string, moduleObj: any) {
-                // // console.log(`update - ${moduleName}`);
                 meta.setters[mod.deps.indexOf(moduleName)](moduleObj);
             },
             execute: function () {
-                // console.log(`execute`);
                 mod.deps.map(function (dep: string) {
-                    // console.log(`map - ${dep}`);
                     let imports = externalRegistry[dep];
                     if (imports) {
                         mod.update(dep, imports);
@@ -294,7 +273,6 @@ namespace am.systemUsingCallbacks {
         };
         // collecting execute() and setters[]
         meta = wrapper(function (identifier: any, value: any) {
-            // console.log(`wrapper - ${identifier}`);
             values[identifier] = value;
             mod.lock = true; // locking down the updates on the module to avoid infinite loop
             for(let i = 0, length = mod.dependants.length; i < length; i++) {
@@ -315,21 +293,15 @@ namespace am.systemUsingCallbacks {
     }
 
     function set(name: string, values: any): void {
-        // console.log(`set - ${name}`);
         externalRegistry[name] = values;
     }
 
     function updateParentInfo(info: ILoadInfo) {
-        console.log(`updateParentInfo - ${info.normalizedName}`);
         const parentInfo = info.parentInfo;
         if (parentInfo) {
-            console.log(`updateParentInfo - parentInfo.normalizedName - ${parentInfo.normalizedName}`);
-            console.log(`updateParentInfo - parentInfo.total - ${parentInfo.total}`);
             parentInfo.counter += 1;
-            console.log(`updateParentInfo - parentInfo.counter - ${parentInfo.counter}`);
             if (parentInfo.counter === parentInfo.total) {
                 const moduleAsCode = get(parentInfo.normalizedName);
-                console.log(`updateParentInfo - execute done on - ${moduleAsCode}`);
                 if (parentInfo.done) {
                     parentInfo.done(moduleAsCode);
                 }
@@ -416,8 +388,6 @@ namespace am.systemUsingCallbacks {
     }
 
     function getMainModuleName(): string {
-        console.log("getMainModuleName");
-
         if(document.querySelector) {
             const scriptTag = document.querySelector("script[data-main]");
             return scriptTag.getAttribute("data-main");
@@ -436,16 +406,14 @@ namespace am.systemUsingCallbacks {
     }
 
     export function loadMain() {
-        console.log("loadMain");
-
         const moduleName = getMainModuleName();
 
         // Load "main" module.
-        console.log(`Loading module ${moduleName}`);
+        console.log(`Module ${moduleName} loading started.`);
 
         // IE8 reserverd keyword "import".
         System["import"](moduleName, function onSuccess(mod){
-            console.log(`Loaded module ${moduleName}`);
+            console.log(`Module ${moduleName} loading completed.`);
         });
     }
 

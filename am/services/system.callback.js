@@ -10,7 +10,6 @@ var am;
         var headEl = document.getElementsByTagName("head")[0];
         var ie = /MSIE/.test(navigator.userAgent);
         function createScriptNode(src, callback, info, nextDepForIEIndex, depsForIE) {
-            console.log("createScriptNode - " + src);
             var node = document.createElement("script");
             if (node.async) {
                 node.async = false;
@@ -59,7 +58,6 @@ var am;
             createScriptNode(url, onScriptLoad, info, nextDepForIEIndex, depsForIE);
         }
         function get(name) {
-            console.log("get - " + name);
             return externalRegistry[name] || ensuredExecute(name);
         }
         function getModuleFromInternalRegistry(name) {
@@ -92,7 +90,6 @@ var am;
             return !!externalRegistry[name] || !!internalRegistry[name];
         }
         function load(name, onSuccess) {
-            console.log("load - " + name);
             var endTreeLoading = onSuccess;
             var normalizedName = normalizeName(name, []);
             var moduleAsCode = get(normalizedName);
@@ -158,7 +155,6 @@ var am;
             return parentBase.concat(parts).join("/");
         }
         function onScriptLoad(info) {
-            console.log("onScriptLoad - normalizedName - " + info.normalizedName);
             if (anonymousEntry) {
                 System.register(info.normalizedName, anonymousEntry[0], anonymousEntry[1]);
                 anonymousEntry = undefined;
@@ -227,16 +223,11 @@ var am;
             externalRegistry[name] = values;
         }
         function updateParentInfo(info) {
-            console.log("updateParentInfo - " + info.normalizedName);
             var parentInfo = info.parentInfo;
             if (parentInfo) {
-                console.log("updateParentInfo - parentInfo.normalizedName - " + parentInfo.normalizedName);
-                console.log("updateParentInfo - parentInfo.total - " + parentInfo.total);
                 parentInfo.counter += 1;
-                console.log("updateParentInfo - parentInfo.counter - " + parentInfo.counter);
                 if (parentInfo.counter === parentInfo.total) {
                     var moduleAsCode = get(parentInfo.normalizedName);
-                    console.log("updateParentInfo - execute done on - " + moduleAsCode);
                     if (parentInfo.done) {
                         parentInfo.done(moduleAsCode);
                     }
@@ -257,7 +248,6 @@ var am;
         var amWindow = window;
         amWindow.System = System;
         function getMainModuleName() {
-            console.log("getMainModuleName");
             if (document.querySelector) {
                 var scriptTag = document.querySelector("script[data-main]");
                 return scriptTag.getAttribute("data-main");
@@ -275,11 +265,10 @@ var am;
             throw new Error("Could not find script tag in head with attribute data-main.");
         }
         function loadMain() {
-            console.log("loadMain");
             var moduleName = getMainModuleName();
-            console.log("Loading module " + moduleName);
+            console.log("Module " + moduleName + " loading started.");
             System["import"](moduleName, function onSuccess(mod) {
-                console.log("Loaded module " + moduleName);
+                console.log("Module " + moduleName + " loading completed.");
             });
         }
         systemUsingCallbacks.loadMain = loadMain;
