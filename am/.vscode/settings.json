@@ -1,5 +1,9 @@
 // Place your settings in this file to overwrite default and user settings.
 {
+    "files.exclude": {
+        "**/*.js": true,
+        "**/*.map": true
+    },
     // Use TypeScript compiler from the node_modules folder instead of the default visual studio code TypeScript compiler. 
     "typescript.tsdk": "node_modules/typescript/lib"
 }

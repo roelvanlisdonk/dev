@@ -1,5 +1,6 @@
 
-const index: any = {}; // Array<IStoreObject>
+const _index: any = {}; // Array<IStoreObject>
+const _types: any = {}; // Each type should be registerd in the store so we can handle schema changes.
 
 
 // To support renaming of types and fields, we expect objects in the store to be of type IStoreObject
@@ -30,7 +31,7 @@ function cloneSimpleType(obj: any): any {
 }
 
 export function get<T>(id: string): T {
-    const obj: any = index[id];   
+    const obj: any = _index[id];   
 
     // Only handle "typed" objects.
     if (obj instanceof Object && obj.id && obj.typeId) {
@@ -74,14 +75,22 @@ export function get<T>(id: string): T {
     throw new Error(`Unable to get store object ${id}! Its type isn't supported.`);
 }
 
+export function registerType<T extends IStoreType>(type: { new(): T ;} ): void {
+    const instanceOfGivenConstructorFn = new type();
+
+    // Register the type on TypeId.
+    const index = instanceOfGivenConstructorFn.typeId.toLowerCase();
+    _types[index] = instanceOfGivenConstructorFn;
+}
+
 export function save(storeObject: IStoreObject) {
     if(storeObject && storeObject.id) {
         
         //TODO: save change to changeLog.
 
-        const current = index[storeObject.id];
+        const current = _index[storeObject.id];
         if(!current) {
-            index[storeObject.id] = storeObject;
+            _index[storeObject.id] = storeObject;
         }
 
         for (let fieldName in storeObject) {
@@ -166,8 +175,4 @@ export interface IStoreNumberArrayField extends IStoreField {
 
 export interface IStoreStringArrayField extends IStoreField {
     value: Array<string>;
-}
-
-function fillStoreWithStubData() {
-
 }

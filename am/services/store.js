@@ -1,7 +1,7 @@
 System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var index;
+    var _index, _types;
     function fixDataBasedOnSchemaChanges(types) {
         throw new Error("Not implemented exception.");
     }
@@ -20,7 +20,7 @@ System.register([], function(exports_1, context_1) {
         throw new Error("Unable to clone simple type. This is most likely cast by IStoreField.value containing In the curren version of the store, arrays can only have types (boolean, Date, number, string) and ");
     }
     function get(id) {
-        var obj = index[id];
+        var obj = _index[id];
         if (obj instanceof Object && obj.id && obj.typeId) {
             var copy = {
                 id: obj.id,
@@ -54,11 +54,17 @@ System.register([], function(exports_1, context_1) {
         throw new Error("Unable to get store object " + id + "! Its type isn't supported.");
     }
     exports_1("get", get);
+    function registerType(type) {
+        var instanceOfGivenConstructorFn = new type();
+        var index = instanceOfGivenConstructorFn.typeId.toLowerCase();
+        _types[index] = instanceOfGivenConstructorFn;
+    }
+    exports_1("registerType", registerType);
     function save(storeObject) {
         if (storeObject && storeObject.id) {
-            var current = index[storeObject.id];
+            var current = _index[storeObject.id];
             if (!current) {
-                index[storeObject.id] = storeObject;
+                _index[storeObject.id] = storeObject;
             }
             for (var fieldName in storeObject) {
                 saveField(storeObject, current, fieldName);
@@ -88,12 +94,11 @@ System.register([], function(exports_1, context_1) {
             }
         }
     }
-    function fillStoreWithStubData() {
-    }
     return {
         setters:[],
         execute: function() {
-            index = {};
+            _index = {};
+            _types = {};
         }
     }
 });

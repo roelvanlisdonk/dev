@@ -1,43 +1,28 @@
-System.register(['./services/store'], function(exports_1, context_1) {
+System.register(['./schema/User', './services/cuid', './services/store'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var store_1;
-    var user, Topic, User;
+    var User_1, cuid_1, store_1;
+    var user;
+    function AddTestData() {
+        var user = new User_1.User();
+        user.id = cuid_1.cuid();
+        user.email.value = 'test@test.com';
+        store_1.save(user);
+    }
     return {
         setters:[
+            function (User_1_1) {
+                User_1 = User_1_1;
+            },
+            function (cuid_1_1) {
+                cuid_1 = cuid_1_1;
+            },
             function (store_1_1) {
                 store_1 = store_1_1;
             }],
         execute: function() {
+            AddTestData();
             user = store_1.get('test@test.com');
-            Topic = (function () {
-                function Topic() {
-                    this.typeId = 2 .toString();
-                    this.done = {
-                        fieldId: "1",
-                        value: false
-                    };
-                    this.group = {
-                        fieldId: "2",
-                        value: null
-                    };
-                    this.partialDone = {
-                        fieldId: "3",
-                        value: false
-                    };
-                }
-                return Topic;
-            }());
-            User = (function () {
-                function User() {
-                    this.typeId = 1 .toString();
-                    this.name = {
-                        fieldId: "1",
-                        value: null
-                    };
-                }
-                return User;
-            }());
         }
     }
 });
