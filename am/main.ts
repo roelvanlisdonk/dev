@@ -4,15 +4,6 @@ import { render } from './services/dom'
 import { get, IStoreBooleanField, IStoreNumberField, IStoreObject, IStoreStringField, save } from './services/store'
 import { div, getVirtualDom, IVirtualDomNode, span } from './services/virtual.dom'
 
-AddTestData();
-
-// const body = document.querySelector('body');
-
-// const bodyVirtualDom = getVirtualDom(body);
-
-const user = get<User>('test@test.com');
-
-
 function AddTestData() {
     const user = new User();
     user.id = cuid();
@@ -20,3 +11,5 @@ function AddTestData() {
     save(user);
 }
 
+AddTestData();
+const user = get<User>('test@test.com');

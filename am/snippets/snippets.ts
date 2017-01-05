@@ -16,19 +16,3 @@ export function performanceTiming(){
     console.log(`Call to doSomething took $(t1 - t0) milliseconds.`);
     
 }
-
-
-// Jasmine unit test.
-// namespace unittests {
-//     'use strict';
-
-//     describe('zvdz.helpers.repl', function () {
-//         it('should just execute this test to support adhoc TDD.', function () {
-//             const subject = null;
-//             const actual = null;
-//             const expected = null;
-
-//             expect(actual).toEqual(expected);
-//         });
-//     });
-// }
