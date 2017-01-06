@@ -22,17 +22,18 @@ namespace am.services {
     "use strict";
 
     // TODO: move to store.data
+    // An in memory cache for modules (moduels are downloaded, loaded and executed).
     const modules: any = {};
 
     function createScriptNode(src: string) {
-        const script = document.createElement('script');
+        const script = document.createElement("script");
         script.src = src;
         script.async = false;
         document.head.appendChild(script);
     }
     
     function getMainModuleName(): string {
-        const scripts = document.head.getElementsByTagName('script');
+        const scripts = document.head.getElementsByTagName("script");
         for(let i = 0, length = scripts.length; i < length; i++) {
             const script = scripts[i];
             const moduleName = script.getAttribute("data-main");
@@ -58,26 +59,79 @@ namespace am.services {
 
         imports(moduleName);
     }
+
+    /**
+     * Convert a relative path to an absolute path.
+     * @param {string} relativePath - In this module the "registrationPath" (@see IModule) will be used as relative path.
+     * @param {string} basePath - The base path string will be used to resolve the relative path to.
+     * @return {string} Absolute path.
+     */
+    function convertToAbsolutePath(relativePath: string, basePath?: string): string {
+        const seperator = "/";
+        
+        basePath = basePath || "";
+        if (basePath === seperator) {
+            basePath = "";
+        }
+        if (relativePath.charAt(0) === "/") {
+            relativePath = relativePath.slice(1);
+        }
+        if (relativePath.charAt(0) !== ".") {
+            return relativePath;
+        }
+
+        const baseParts = basePath.split(seperator);
+        const parts = relativePath.split("/");
+        while (parts[0] === "." || parts[0] === "..") {
+            if (parts.shift() === "..") {
+                baseParts.pop();
+            }
+        }
+
+        const absolutePath = baseParts.concat(parts).join("/");
+        return absolutePath;
+    }
+
     
     function register(deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) {
-        console.log('register');
+        console.log("register");
         // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
         // Before we can execute this module.
     }
 
-    const windowAsAny = window as any;
+    function registerSystemOnWindow() {
+        const windowAsAny = window as any;
 
-    // Use browser System, when available.
-    if(!windowAsAny.System) {
-        windowAsAny.System = {};
+        // Use browser System, when available.
+        if(!windowAsAny.System) {
+            windowAsAny.System = {};
+        }
+
+        // Overwrite existing System functions, so we can be in charge of importing modules.
+        windowAsAny.System.import = imports;
+        windowAsAny.System.register = register;
+    }
+    
+    // Is used to collect state during a System.Import call.
+    interface IImportInfo {
+        modules: Array<IModule>;    // Contains the state for the modules loaded by the a System.Import call.
     }
 
-    // Overwrite existing System functions, so we can be in charge of importing modules.
-    windowAsAny.System.import = imports;
-    windowAsAny.System.register = register;
-        
     interface IModule {
-
+        registrationPath: string;   // This is litarally the text used to register the module.
+                                    // It is only used, when it is converted to the normalizedName.
+                                    // e.g. import User from "./components/user", then name will be "./components/user".
+                                    // e.g. <script src="services/system.js" data-main="am/main"></script>, then name will be "am/main".
+                                    // e.g. System.import("../../components/user"), then name will be "../../components/user".
+        absolutePath: string;   // This is the path to the location where the module can be found.
+                                // This absolute path is used as key to indentify the module in code.
+                                // e.g. url structure:
+                                //    /app
+                                //        /services
+                                //            data.service.ts
+                                //        /components
+                                //            user.ts (import DataService from "../services/data.service" )
+                                // Then the absolute path for the data service will be "/app/services/data.service".
     }
 
     interface IRegistrationInfo {
@@ -92,10 +146,7 @@ namespace am.services {
     interface IWindow {
         System: ISystem
     }
-
-    
-
-    
-
+   
+    registerSystemOnWindow();    
     loadMain();
 }

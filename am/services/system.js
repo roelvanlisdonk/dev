@@ -5,13 +5,13 @@ var am;
         "use strict";
         var modules = {};
         function createScriptNode(src) {
-            var script = document.createElement('script');
+            var script = document.createElement("script");
             script.src = src;
             script.async = false;
             document.head.appendChild(script);
         }
         function getMainModuleName() {
-            var scripts = document.head.getElementsByTagName('script');
+            var scripts = document.head.getElementsByTagName("script");
             for (var i = 0, length_1 = scripts.length; i < length_1; i++) {
                 var script = scripts[i];
                 var moduleName = script.getAttribute("data-main");
@@ -30,7 +30,7 @@ var am;
             imports(moduleName);
         }
         function register(deps, fn) {
-            console.log('register');
+            console.log("register");
         }
         var windowAsAny = window;
         if (!windowAsAny.System) {
