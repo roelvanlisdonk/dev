@@ -1,4 +1,7 @@
 import { IStoreObject, IStoreStringField, registerType } from '../services/store'
+export function userModule() {
+    
+}
 
 export class User implements IStoreObject {
     id: string;

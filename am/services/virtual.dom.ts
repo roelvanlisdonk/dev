@@ -1,3 +1,7 @@
+export function virtualModule() {
+    
+}
+
 let root: IVirtualDomNode = null;
 
 function convertDomToVirtualDomInternal(node: Node): IVirtualDomNode {

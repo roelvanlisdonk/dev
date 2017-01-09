@@ -3,6 +3,9 @@ System.register(['../services/store'], function(exports_1, context_1) {
     var __moduleName = context_1 && context_1.id;
     var store_1;
     var User;
+    function userModule() {
+    }
+    exports_1("userModule", userModule);
     return {
         setters:[
             function (store_1_1) {

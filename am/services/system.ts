@@ -21,23 +21,109 @@
 namespace am.services {
     "use strict";
 
+    const head = document.head || document.getElementsByTagName("head")[0];
+    const isIE = /MSIE/.test(navigator.userAgent);
     // TODO: move to store.data
     // An in memory cache for modules (moduels are downloaded, loaded and executed).
-    const modules: any = {};
+    const modulesIndex: any = {};
+    const modules: Array<IModule> = [];
+    const registrations: Array<IRegistration> = [];
+
+    const seperator = "/";
 
     function createScriptNode(src: string) {
-        const script = document.createElement("script");
+        const script: any = document.createElement("script");
+        if (isIE) {
+            script["onreadystatechange"] = onreadystatechange;
+        } else {
+            script.onload = onload;
+        }
+        script.onerror = onerror;
         script.src = src;
-        script.async = false;
-        document.head.appendChild(script);
+
+        head.appendChild(script);
     }
-    
+
+    function executeModules() {
+        for (let length = modules.length, i = length - 1; i >= 0; i--) {
+            const mod = modules[i];
+
+            
+            if(!mod.executed) {
+                // First set the dependencies in the module
+                // Door het uitvoeren van de mod.registration.fn worden de volgende zaken geregeld:
+                // - exports
+                // - imports
+                // - returns a object that contains a execute function that should be executed.
+                // Execute the module.
+                
+                // Store exports
+                mod.registrationInfo = mod.registration.fn((name: string, code: any) => {
+                    mod.exports[name] = code;
+                }, {});
+
+                // Set imports
+                setImports(mod);
+
+                // execute
+                mod.registrationInfo.execute();
+                mod.executed = true;
+            }
+        }
+    }
+
+    function setImports(mod: IModule) {
+        const setters =  mod.registrationInfo.setters;
+        const deps = mod.registration.deps;
+        for (let i = 0, length = deps.length; i < length; i++) {
+            const dep = deps[i];
+            const depCode = imports(dep);
+            const setter = setters[i];
+            setter(depCode);
+        }
+    }
+
+    function onerror() {
+        console.log("onerror");
+    }
+
+    function onload() {
+        const script: HTMLScriptElement = this;
+        const src = script.src;
+        console.log(`onload - ${src}`);
+        updateModule(src);
+    }
+
+    function onreadystatechange() {
+        const script: HTMLScriptElement = this;
+        const src = script.src;
+        const readystate = (script as any)["readyState"];
+        console.log(`onreadystatechange - ${readystate} - ${src}`);
+
+        if (readystate === "loaded") {
+            updateModule(src);
+        }
+    }
+
+    function getLocation(href: string) {
+        var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/);
+        return match && {
+            protocol: match[1],
+            host: match[2],
+            hostname: match[3],
+            port: match[4],
+            pathname: match[5],
+            search: match[6],
+            hash: match[7]
+        }
+    }
+
     function getMainModuleName(): string {
-        const scripts = document.head.getElementsByTagName("script");
-        for(let i = 0, length = scripts.length; i < length; i++) {
+        const scripts = head.getElementsByTagName("script");
+        for (let i = 0, length = scripts.length; i < length; i++) {
             const script = scripts[i];
             const moduleName = script.getAttribute("data-main");
-            if(moduleName) {
+            if (moduleName) {
                 return moduleName;
             }
         }
@@ -45,10 +131,33 @@ namespace am.services {
     }
 
     /**
+     * This function is the custom System.import implementation.
      * This function should be called import, but that's not allowed in TypeScript.
      */
-    function imports(name: string) {
-        createScriptNode('main.js');    
+    function imports(name: string): IModule {
+        const basePath = document.location.pathname.split(seperator).slice(0, -1).join(seperator);
+        const normalizedName = resolve(name, basePath);
+
+        const mod: IModule = {
+            executed: false,
+            exports: {},
+            importName: name,
+            loaded: false,
+            name: normalizedName,
+            registration: null,
+            registrationInfo: null
+        };
+
+        const exists = modulesIndex[normalizedName];
+        if (exists) {
+            return exists;
+        } else {
+            modulesIndex[normalizedName] = mod;
+
+            const src = `${normalizedName}.js`;
+            createScriptNode(src);
+            return null;
+        }
     }
 
     function loadMain() {
@@ -57,7 +166,7 @@ namespace am.services {
         // Load "main" module.
         console.log(`Module ${moduleName} loading started.`);
 
-        imports(moduleName);
+        System['import'](moduleName);
     }
 
     /**
@@ -66,87 +175,96 @@ namespace am.services {
      * @param {string} basePath - The base path string will be used to resolve the relative path to.
      * @return {string} Absolute path.
      */
-    function convertToAbsolutePath(relativePath: string, basePath?: string): string {
-        const seperator = "/";
-        
+    function resolve(relativePath: string, basePath?: string): string {
         basePath = basePath || "";
         if (basePath === seperator) {
             basePath = "";
         }
-        if (relativePath.charAt(0) === "/") {
+        if (relativePath.charAt(0) === seperator) {
             relativePath = relativePath.slice(1);
         }
-        if (relativePath.charAt(0) !== ".") {
-            return relativePath;
+        if (relativePath.charAt(0) === ".") {
+            const parts = relativePath.split(seperator).slice(1);
+            return [basePath].concat(parts).join(seperator);
+        } else {
+            return [basePath, relativePath].join(seperator);
         }
-
-        const baseParts = basePath.split(seperator);
-        const parts = relativePath.split("/");
-        while (parts[0] === "." || parts[0] === "..") {
-            if (parts.shift() === "..") {
-                baseParts.pop();
-            }
-        }
-
-        const absolutePath = baseParts.concat(parts).join("/");
-        return absolutePath;
     }
 
-    
     function register(deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) {
-        console.log("register");
+        console.log(`register - ${fn.toString().substring(120, 160)}`);
+
+        registrations.push({ deps: deps, fn: fn });
+
         // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
         // Before we can execute this module.
-    }
 
-    function registerSystemOnWindow() {
-        const windowAsAny = window as any;
-
-        // Use browser System, when available.
-        if(!windowAsAny.System) {
-            windowAsAny.System = {};
+        for (let i = 0, length = deps.length; i < length; i++) {
+            const name = deps[i];
+            System['import'](name);
         }
-
-        // Overwrite existing System functions, so we can be in charge of importing modules.
-        windowAsAny.System.import = imports;
-        windowAsAny.System.register = register;
     }
-    
+
+    function updateModule(src: string) {
+        const location = getLocation(src);
+        const name = location.pathname.substring(0, location.pathname.length - 3);
+        const mod: IModule = modulesIndex[name];
+        mod.loaded = true;
+        mod.registration = registrations.shift();
+        modules.push(mod);
+
+        const allModulesLoaded = (registrations.length === 0);
+        if(allModulesLoaded) {
+            executeModules();
+        }
+    }
+
     // Is used to collect state during a System.Import call.
     interface IImportInfo {
-        modules: Array<IModule>;    // Contains the state for the modules loaded by the a System.Import call.
+        modules: Array<IModule>;    // Contains the state information about the modules loaded by the a System.Import call.
     }
 
     interface IModule {
-        registrationPath: string;   // This is litarally the text used to register the module.
-                                    // It is only used, when it is converted to the normalizedName.
-                                    // e.g. import User from "./components/user", then name will be "./components/user".
-                                    // e.g. <script src="services/system.js" data-main="am/main"></script>, then name will be "am/main".
-                                    // e.g. System.import("../../components/user"), then name will be "../../components/user".
-        absolutePath: string;   // This is the path to the location where the module can be found.
-                                // This absolute path is used as key to indentify the module in code.
-                                // e.g. url structure:
-                                //    /app
-                                //        /services
-                                //            data.service.ts
-                                //        /components
-                                //            user.ts (import DataService from "../services/data.service" )
-                                // Then the absolute path for the data service will be "/app/services/data.service".
+        executed: boolean;
+        exports: any; // Contains all exported functions / objects etc.
+        importName: string; // This is litarally the text used to import the module in code.
+        loaded: boolean;
+        // This importName is resolved to an absolute path and stored in IModule.name
+        // e.g. import User from "./components/user", then importName will be "./components/user".
+        // e.g. <script src="services/system.js" data-main="am/main"></script>, then importName will be "am/main".
+        // e.g. System.import("../../components/user"), then importName will be "../../components/user".
+        name: string;   // This is the location where the module is found and also used as the unique module identifieran.
+        // e.g. url structure:
+        //    /app
+        //        /services
+        //            data.service.ts
+        //        /components
+        //            user.ts (import DataService from "../services/data.service" )
+        // Then the name for the data.service module will be "/app/services/data.service".
+        registration: IRegistration;
+        registrationInfo: IRegistrationInfo;
+    }
+
+    interface IRegistration {
+        deps: Array<string>;
+        fn: (exports: any, context: any) => IRegistrationInfo;
     }
 
     interface IRegistrationInfo {
         execute: () => void;
-        setters: Array<(dep: any) => void>;
+        setters: Array<(dep: any) => void>; // Can be used to hotload / reload modules and can be used for mocking / stubing / dynamic dependency injection.
     }
 
     interface ISystem {
+        import: (name: string) => void;
         register: (deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) => void;
     }
 
-    interface IWindow {
-        System: ISystem
-    }
-   
-    registerSystemOnWindow();    
+    const System: ISystem = {
+        'import': imports,
+        register: register
+    };
+    (window as any).System = System;
+
     loadMain();
 }

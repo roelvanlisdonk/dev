@@ -1,3 +1,6 @@
+export function storeModule() {
+    
+}
 
 const _index: any = {}; // Array<IStoreObject>
 const _types: any = {}; // Each type should be registerd in the store so we can handle schema changes.

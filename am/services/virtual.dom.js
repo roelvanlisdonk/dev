@@ -2,6 +2,9 @@ System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var root;
+    function virtualModule() {
+    }
+    exports_1("virtualModule", virtualModule);
     function convertDomToVirtualDomInternal(node) {
         var vdNode = createNode({ nodeName: node.nodeName, renderFn: null });
         for (var i = 0, length_1 = node.childNodes.length; i < length_1; i++) {

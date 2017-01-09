@@ -2,6 +2,9 @@ System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var _c, _blockSize, _base, _discreteValues, _globalCountCache;
+    function cuidModule() {
+    }
+    exports_1("cuidModule", cuidModule);
     function cuid() {
         var letter = 'c';
         var timestamp = (new Date().getTime()).toString(_base);

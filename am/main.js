@@ -3,6 +3,9 @@ System.register(['./schema/User', './services/cuid', './services/store'], functi
     var __moduleName = context_1 && context_1.id;
     var User_1, cuid_1, store_1;
     var user;
+    function mainModule() {
+    }
+    exports_1("mainModule", mainModule);
     function AddTestData() {
         var user = new User_1.User();
         user.id = cuid_1.cuid();

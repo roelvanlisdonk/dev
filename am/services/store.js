@@ -2,6 +2,9 @@ System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var _index, _types;
+    function storeModule() {
+    }
+    exports_1("storeModule", storeModule);
     function fixDataBasedOnSchemaChanges(types) {
         throw new Error("Not implemented exception.");
     }

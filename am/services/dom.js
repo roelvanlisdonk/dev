@@ -1,6 +1,9 @@
 System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
+    function domModule() {
+    }
+    exports_1("domModule", domModule);
     function addEventListener(element, type, listener) {
         if (element.addEventListener) {
             element.addEventListener(type, listener, false);

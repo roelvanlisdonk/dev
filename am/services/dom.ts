@@ -1,5 +1,10 @@
 import {IVirtualDomNode} from './virtual.dom'
 
+export function domModule() {
+    
+}
+
+
 export function addEventListener(element: HTMLElement, type: string, listener: EventListenerOrEventListenerObject) {
     if (element.addEventListener) {
         element.addEventListener(type, listener, false);
