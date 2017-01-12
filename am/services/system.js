@@ -5,9 +5,9 @@ var am;
         "use strict";
         var head = document.head || document.getElementsByTagName("head")[0];
         var isIE = /MSIE/.test(navigator.userAgent);
-        var modulesIndex = {};
-        var modules = [];
-        var registrations = [];
+        var moduleMap = {};
+        var moduleList = [];
+        var registrationList = [];
         var seperator = "/";
         function createScriptNode(src) {
             var script = document.createElement("script");
@@ -23,7 +23,7 @@ var am;
         }
         function executeModules() {
             var _loop_1 = function(length_1, i) {
-                var mod = modules[i];
+                var mod = moduleList[i];
                 if (!mod.executed) {
                     mod.registrationInfo = mod.registration.fn(function (name, code) {
                         mod.exports[name] = code;
@@ -33,7 +33,7 @@ var am;
                     mod.executed = true;
                 }
             };
-            for (var length_1 = modules.length, i = length_1 - 1; i >= 0; i--) {
+            for (var length_1 = moduleList.length, i = length_1 - 1; i >= 0; i--) {
                 _loop_1(length_1, i);
             }
         }
@@ -89,8 +89,7 @@ var am;
             throw new Error("Could not find script tag in head with attribute data-main. Note the attribute data-main should have a non empty value.");
         }
         function imports(name) {
-            var basePath = document.location.pathname.split(seperator).slice(0, -1).join(seperator);
-            var normalizedName = resolve(name, basePath);
+            var normalizedName = resolve(name);
             var mod = {
                 executed: false,
                 exports: {},
@@ -100,12 +99,12 @@ var am;
                 registration: null,
                 registrationInfo: null
             };
-            var exists = modulesIndex[normalizedName];
+            var exists = moduleMap[normalizedName];
             if (exists) {
                 return exists;
             }
             else {
-                modulesIndex[normalizedName] = mod;
+                moduleMap[normalizedName] = mod;
                 var src = normalizedName + ".js";
                 createScriptNode(src);
                 return null;
@@ -117,7 +116,7 @@ var am;
             System['import'](moduleName);
         }
         function resolve(relativePath, basePath) {
-            basePath = basePath || "";
+            basePath = basePath || document.location.pathname.split(seperator).slice(0, -1).join(seperator);
             if (basePath === seperator) {
                 basePath = "";
             }
@@ -134,7 +133,7 @@ var am;
         }
         function register(deps, fn) {
             console.log("register - " + fn.toString().substring(120, 160));
-            registrations.push({ deps: deps, fn: fn });
+            registrationList.push({ deps: deps, fn: fn });
             for (var i = 0, length_4 = deps.length; i < length_4; i++) {
                 var name_1 = deps[i];
                 System['import'](name_1);
@@ -143,11 +142,11 @@ var am;
         function updateModule(src) {
             var location = getLocation(src);
             var name = location.pathname.substring(0, location.pathname.length - 3);
-            var mod = modulesIndex[name];
+            var mod = moduleMap[name];
             mod.loaded = true;
-            mod.registration = registrations.shift();
-            modules.push(mod);
-            var allModulesLoaded = (registrations.length === 0);
+            mod.registration = registrationList.shift();
+            moduleList.push(mod);
+            var allModulesLoaded = (registrationList.length === 0);
             if (allModulesLoaded) {
                 executeModules();
             }

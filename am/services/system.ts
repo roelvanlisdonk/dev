@@ -16,19 +16,17 @@
  * This is great, because we can use these "excute" function to execute childe (dependend) modules before executing the parent module.
  * The "execute" functions allow for downloading and loading modules in parallel, but execute them in the correct dependency tree order.
  * 
- * 
  */
 namespace am.services {
     "use strict";
 
     const head = document.head || document.getElementsByTagName("head")[0];
     const isIE = /MSIE/.test(navigator.userAgent);
-    // TODO: move to store.data
+        
     // An in memory cache for modules (moduels are downloaded, loaded and executed).
-    const modulesIndex: any = {};
-    const modules: Array<IModule> = [];
-    const registrations: Array<IRegistration> = [];
-
+    const moduleMap: any = {}; // TODO: move to store.data
+    const moduleList: Array<IModule> = []; // TODO: move to store.data
+    const registrationList: Array<IRegistration> = []; // TODO: move to store.data
     const seperator = "/";
 
     function createScriptNode(src: string) {
@@ -45,8 +43,8 @@ namespace am.services {
     }
 
     function executeModules() {
-        for (let length = modules.length, i = length - 1; i >= 0; i--) {
-            const mod = modules[i];
+        for (let length = moduleList.length, i = length - 1; i >= 0; i--) {
+            const mod = moduleList[i];
 
             
             if(!mod.executed) {
@@ -135,8 +133,8 @@ namespace am.services {
      * This function should be called import, but that's not allowed in TypeScript.
      */
     function imports(name: string): IModule {
-        const basePath = document.location.pathname.split(seperator).slice(0, -1).join(seperator);
-        const normalizedName = resolve(name, basePath);
+        
+        const normalizedName = resolve(name);
 
         const mod: IModule = {
             executed: false,
@@ -148,11 +146,11 @@ namespace am.services {
             registrationInfo: null
         };
 
-        const exists = modulesIndex[normalizedName];
+        const exists = moduleMap[normalizedName];
         if (exists) {
             return exists;
         } else {
-            modulesIndex[normalizedName] = mod;
+            moduleMap[normalizedName] = mod;
 
             const src = `${normalizedName}.js`;
             createScriptNode(src);
@@ -176,7 +174,7 @@ namespace am.services {
      * @return {string} Absolute path.
      */
     function resolve(relativePath: string, basePath?: string): string {
-        basePath = basePath || "";
+        basePath = basePath || document.location.pathname.split(seperator).slice(0, -1).join(seperator);
         if (basePath === seperator) {
             basePath = "";
         }
@@ -194,7 +192,7 @@ namespace am.services {
     function register(deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) {
         console.log(`register - ${fn.toString().substring(120, 160)}`);
 
-        registrations.push({ deps: deps, fn: fn });
+        registrationList.push({ deps: deps, fn: fn });
 
         // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
         // Before we can execute this module.
@@ -208,12 +206,12 @@ namespace am.services {
     function updateModule(src: string) {
         const location = getLocation(src);
         const name = location.pathname.substring(0, location.pathname.length - 3);
-        const mod: IModule = modulesIndex[name];
+        const mod: IModule = moduleMap[name];
         mod.loaded = true;
-        mod.registration = registrations.shift();
-        modules.push(mod);
+        mod.registration = registrationList.shift();
+        moduleList.push(mod);
 
-        const allModulesLoaded = (registrations.length === 0);
+        const allModulesLoaded = (registrationList.length === 0);
         if(allModulesLoaded) {
             executeModules();
         }
