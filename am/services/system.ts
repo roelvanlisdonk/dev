@@ -1,3 +1,10 @@
+// TODO: move to external file
+namespace am.store {
+    export const moduleMap: any = {}; 
+    export const moduleList: Array<am.system.IModule> = [];
+    export const registrationList: Array<am.system.IRegistration> = [];
+}
+
 /**
  * This System wrapper is inspired by the https://github.com/caridy/es6-micro-loader
  * 
@@ -17,16 +24,14 @@
  * The "execute" functions allow for downloading and loading modules in parallel, but execute them in the correct dependency tree order.
  * 
  */
-namespace am.services {
+namespace am.system {
     "use strict";
 
     const head = document.head || document.getElementsByTagName("head")[0];
     const isIE = /MSIE/.test(navigator.userAgent);
-        
-    // An in memory cache for modules (moduels are downloaded, loaded and executed).
-    const moduleMap: any = {}; // TODO: move to store.data
-    const moduleList: Array<IModule> = []; // TODO: move to store.data
-    const registrationList: Array<IRegistration> = []; // TODO: move to store.data
+    const moduleMap: any = am.store.moduleMap; 
+    const moduleList: Array<am.system.IModule> = am.store.moduleList;
+    const registrationList: Array<am.system.IRegistration> = am.store.registrationList;
     const seperator = "/";
 
     function createScriptNode(src: string) {
@@ -60,7 +65,7 @@ namespace am.services {
                     mod.exports[name] = code;
                 }, {});
 
-                // Set imports
+                // Set imports TODO: dit gaat nog niet goed 
                 setImports(mod);
 
                 // execute
@@ -75,7 +80,7 @@ namespace am.services {
         const deps = mod.registration.deps;
         for (let i = 0, length = deps.length; i < length; i++) {
             const dep = deps[i];
-            const depCode = imports(dep);
+            const depCode = imports(dep).exports; // TODO: Dit  klopt niet hier moet je de code van de module zetten en niet de module zelf.
             const setter = setters[i];
             setter(depCode);
         }
@@ -85,11 +90,34 @@ namespace am.services {
         console.log("onerror");
     }
 
+    function determineIfAllModuleAreLoaded() : boolean {
+        const result = true;
+        for (let i = 0, length = moduleList.length; i < length; i++) {
+            const mod = moduleList[i];
+            if(mod.registration === null) {
+                return false;
+            }
+        }
+        return result;
+    }
+    function setRegistration(src: string) {
+        const name = getModuleNameFromSrc(src);
+        const mod: IModule = moduleMap[name];
+
+        const registration: IRegistration = registrationList.shift();
+        mod.registration = registration;
+
+        const allModulesLoaded = determineIfAllModuleAreLoaded();
+        if(allModulesLoaded) {
+            executeModules();
+        }
+    }
+
     function onload() {
         const script: HTMLScriptElement = this;
         const src = script.src;
         console.log(`onload - ${src}`);
-        updateModule(src);
+        setRegistration(src);
     }
 
     function onreadystatechange() {
@@ -99,7 +127,7 @@ namespace am.services {
         console.log(`onreadystatechange - ${readystate} - ${src}`);
 
         if (readystate === "loaded") {
-            updateModule(src);
+            setRegistration(src);
         }
     }
 
@@ -135,23 +163,22 @@ namespace am.services {
     function imports(name: string): IModule {
         
         const normalizedName = resolve(name);
-
-        const mod: IModule = {
-            executed: false,
-            exports: {},
-            importName: name,
-            loaded: false,
-            name: normalizedName,
-            registration: null,
-            registrationInfo: null
-        };
+        console.log(`System.import -  ${normalizedName}.`);
 
         const exists = moduleMap[normalizedName];
         if (exists) {
             return exists;
         } else {
+            const mod: IModule = {
+                executed: false,
+                exports: {},            // Properties will be added after the module is exectued.
+                name: normalizedName,
+                registration: null,     // Will be set in the onload or onreadestatechange-loaded event.
+                registrationInfo: null  // Will be set after this module is exectued.
+            };
             moduleMap[normalizedName] = mod;
-
+            moduleList.push(mod);
+            
             const src = `${normalizedName}.js`;
             createScriptNode(src);
             return null;
@@ -192,7 +219,12 @@ namespace am.services {
     function register(deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) {
         console.log(`register - ${fn.toString().substring(120, 160)}`);
 
-        registrationList.push({ deps: deps, fn: fn });
+        // Add registration to a list so the load or onreadestatechange-loaded event can use it. 
+        const registration: IRegistration = { 
+            deps: deps, 
+            fn: fn
+        };
+        registrationList.push(registration);
 
         // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
         // Before we can execute this module.
@@ -203,52 +235,41 @@ namespace am.services {
         }
     }
 
-    function updateModule(src: string) {
+    function getModuleNameFromSrc(src: string): string {
         const location = getLocation(src);
         const name = location.pathname.substring(0, location.pathname.length - 3);
-        const mod: IModule = moduleMap[name];
-        mod.loaded = true;
-        mod.registration = registrationList.shift();
-        moduleList.push(mod);
-
-        const allModulesLoaded = (registrationList.length === 0);
-        if(allModulesLoaded) {
-            executeModules();
-        }
+        return name;
     }
+
+    
 
     // Is used to collect state during a System.Import call.
     interface IImportInfo {
         modules: Array<IModule>;    // Contains the state information about the modules loaded by the a System.Import call.
     }
 
-    interface IModule {
-        executed: boolean;
-        exports: any; // Contains all exported functions / objects etc.
-        importName: string; // This is litarally the text used to import the module in code.
-        loaded: boolean;
-        // This importName is resolved to an absolute path and stored in IModule.name
-        // e.g. import User from "./components/user", then importName will be "./components/user".
-        // e.g. <script src="services/system.js" data-main="am/main"></script>, then importName will be "am/main".
-        // e.g. System.import("../../components/user"), then importName will be "../../components/user".
-        name: string;   // This is the location where the module is found and also used as the unique module identifieran.
-        // e.g. url structure:
-        //    /app
-        //        /services
-        //            data.service.ts
-        //        /components
-        //            user.ts (import DataService from "../services/data.service" )
-        // Then the name for the data.service module will be "/app/services/data.service".
-        registration: IRegistration;
-        registrationInfo: IRegistrationInfo;
+    export interface IModule {
+        executed: boolean;                      // When true, the module is downloaded, evaled and executed.
+        exports: any;                           // Contains all exported functions / objects etc. and will be set after the module is executed.
+        name: string;                           // This is the location where the module is found and also used as the unique module identifieran.
+                                                // e.g. url structure:
+                                                //    /app
+                                                //        /services
+                                                //            data.service.ts
+                                                //        /components
+                                                //            user.ts (import DataService from "../services/data.service" )
+                                                // Then the name for the data.service module will be "/app/services/data.service".
+        registration: IRegistration;            // This object is set when the registration call is executed from the module code.
+        registrationInfo: IRegistrationInfo;    // Contains informatio for setting the dependencies of the module (hot reloading, stubing, mocking, dependency injection etc.)
+                                                // Will be set after this module is exectued.
     }
 
-    interface IRegistration {
+    export interface IRegistration {
         deps: Array<string>;
         fn: (exports: any, context: any) => IRegistrationInfo;
     }
 
-    interface IRegistrationInfo {
+    export interface IRegistrationInfo {
         execute: () => void;
         setters: Array<(dep: any) => void>; // Can be used to hotload / reload modules and can be used for mocking / stubing / dynamic dependency injection.
     }

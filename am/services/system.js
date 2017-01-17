@@ -1,13 +1,22 @@
 var am;
 (function (am) {
-    var services;
-    (function (services) {
+    var store;
+    (function (store) {
+        store.moduleMap = {};
+        store.moduleList = [];
+        store.registrationList = [];
+    })(store = am.store || (am.store = {}));
+})(am || (am = {}));
+var am;
+(function (am) {
+    var system;
+    (function (system) {
         "use strict";
         var head = document.head || document.getElementsByTagName("head")[0];
         var isIE = /MSIE/.test(navigator.userAgent);
-        var moduleMap = {};
-        var moduleList = [];
-        var registrationList = [];
+        var moduleMap = am.store.moduleMap;
+        var moduleList = am.store.moduleList;
+        var registrationList = am.store.registrationList;
         var seperator = "/";
         function createScriptNode(src) {
             var script = document.createElement("script");
@@ -42,7 +51,7 @@ var am;
             var deps = mod.registration.deps;
             for (var i = 0, length_2 = deps.length; i < length_2; i++) {
                 var dep = deps[i];
-                var depCode = imports(dep);
+                var depCode = imports(dep).exports;
                 var setter = setters[i];
                 setter(depCode);
             }
@@ -50,11 +59,31 @@ var am;
         function onerror() {
             console.log("onerror");
         }
+        function determineIfAllModuleAreLoaded() {
+            var result = true;
+            for (var i = 0, length_3 = moduleList.length; i < length_3; i++) {
+                var mod = moduleList[i];
+                if (mod.registration === null) {
+                    return false;
+                }
+            }
+            return result;
+        }
+        function setRegistration(src) {
+            var name = getModuleNameFromSrc(src);
+            var mod = moduleMap[name];
+            var registration = registrationList.shift();
+            mod.registration = registration;
+            var allModulesLoaded = determineIfAllModuleAreLoaded();
+            if (allModulesLoaded) {
+                executeModules();
+            }
+        }
         function onload() {
             var script = this;
             var src = script.src;
             console.log("onload - " + src);
-            updateModule(src);
+            setRegistration(src);
         }
         function onreadystatechange() {
             var script = this;
@@ -62,7 +91,7 @@ var am;
             var readystate = script["readyState"];
             console.log("onreadystatechange - " + readystate + " - " + src);
             if (readystate === "loaded") {
-                updateModule(src);
+                setRegistration(src);
             }
         }
         function getLocation(href) {
@@ -79,7 +108,7 @@ var am;
         }
         function getMainModuleName() {
             var scripts = head.getElementsByTagName("script");
-            for (var i = 0, length_3 = scripts.length; i < length_3; i++) {
+            for (var i = 0, length_4 = scripts.length; i < length_4; i++) {
                 var script = scripts[i];
                 var moduleName = script.getAttribute("data-main");
                 if (moduleName) {
@@ -90,21 +119,21 @@ var am;
         }
         function imports(name) {
             var normalizedName = resolve(name);
-            var mod = {
-                executed: false,
-                exports: {},
-                importName: name,
-                loaded: false,
-                name: normalizedName,
-                registration: null,
-                registrationInfo: null
-            };
+            console.log("System.import -  " + normalizedName + ".");
             var exists = moduleMap[normalizedName];
             if (exists) {
                 return exists;
             }
             else {
+                var mod = {
+                    executed: false,
+                    exports: {},
+                    name: normalizedName,
+                    registration: null,
+                    registrationInfo: null
+                };
                 moduleMap[normalizedName] = mod;
+                moduleList.push(mod);
                 var src = normalizedName + ".js";
                 createScriptNode(src);
                 return null;
@@ -133,23 +162,20 @@ var am;
         }
         function register(deps, fn) {
             console.log("register - " + fn.toString().substring(120, 160));
-            registrationList.push({ deps: deps, fn: fn });
-            for (var i = 0, length_4 = deps.length; i < length_4; i++) {
+            var registration = {
+                deps: deps,
+                fn: fn
+            };
+            registrationList.push(registration);
+            for (var i = 0, length_5 = deps.length; i < length_5; i++) {
                 var name_1 = deps[i];
                 System['import'](name_1);
             }
         }
-        function updateModule(src) {
+        function getModuleNameFromSrc(src) {
             var location = getLocation(src);
             var name = location.pathname.substring(0, location.pathname.length - 3);
-            var mod = moduleMap[name];
-            mod.loaded = true;
-            mod.registration = registrationList.shift();
-            moduleList.push(mod);
-            var allModulesLoaded = (registrationList.length === 0);
-            if (allModulesLoaded) {
-                executeModules();
-            }
+            return name;
         }
         var System = {
             'import': imports,
@@ -157,6 +183,6 @@ var am;
         };
         window.System = System;
         loadMain();
-    })(services = am.services || (am.services = {}));
+    })(system = am.system || (am.system = {}));
 })(am || (am = {}));
 //# sourceMappingURL=system.js.map
