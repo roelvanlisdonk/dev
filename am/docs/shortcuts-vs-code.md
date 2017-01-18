@@ -7,6 +7,10 @@ All standard keyboard shortcuts can be found at:
 https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf
 
 
+PowerShell
+debug / run - F5 - Note: select "PowerShell" as launcher.
+debug / run selection - F8
+
 
 Git
 git commit all - ctrl + enter

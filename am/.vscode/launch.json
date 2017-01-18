@@ -5,9 +5,15 @@
             "name": "am - index.html",
             "type": "chrome",
             "request": "launch",
-            "url": "http://dev.localhost/am/index.html",
+            "url": "https://localhost.dev/am/index.html",
             "sourceMaps": true,
             "webRoot": "${workspaceRoot}"
+        },
+        {
+            "name": "PowerShell",
+            "type": "PowerShell",
+            "request": "launch",
+            "program": "${file}"
         }
     ]
 }
