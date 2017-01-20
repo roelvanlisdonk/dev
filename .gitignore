@@ -198,5 +198,8 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
+
+
+# Customizations
 /am/**/*.js
 /am/**/*.map
