@@ -35,6 +35,24 @@ This document contains the highlevel overview of the app architecture.
 
 
 
+# Boot
+* An am application is started by calling am.boot.
+
+```TypeScript
+
+const root: VirtualDomNode = am.boot(
+    nativeNode: any,
+    convertToNativeAttribute(virtualDomAttribute: VirtualDomAttribute): any,
+    convertToNativeNode(virtualDomNode: VirtualDomNode): any,
+    convertToVirtualDomAttribute(nativeAttribute: any): VirtualDomAttribute,
+    convertToVirtualDomNode(nativeNode: any): VirtualDomNode,
+);
+
+// Now we can start adding childs to the root...
+
+```
+
+
 ## Rendering
 * See rendering.md
 
