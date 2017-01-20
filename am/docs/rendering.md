@@ -1,9 +1,5 @@
-# Architecture
-This document contains the highlevel overview of the app architecture.
-
-
-
-## Rendering
+# Rendering
+* The UI will only change, when a StoreObject.onChange event is emitted.
 * The ui is contructed by generating a VirtualDomNode tree.
 * When a VirtualDomObject.onChange is called, a ChangeEvent is added to the **dom change event stream**.
 * The app contains a **requestAnimationFrame loop**, that runs when the **dom change event stream** contains ChangeEvents.
@@ -12,49 +8,81 @@ This document contains the highlevel overview of the app architecture.
 
 
 
-### VirtualDomNode implements IVirtualDomEvents
-* attrs: StoreArray<VirtualDomAttribute>
-    * onChange - add ChangeEvent to the **dom change event stream**.
-* childs: StoreArray<VirtualDomNode>
-    * can contain VirtualDomTextNode
-    * onChange - add ChangeEvent to the **dom change event stream**.
-* name: string
-* nativeNode: any;          // Can be server side html, client side html, native script etc.
-* onAdded: () => void;      
-* onChange: () => void;     // Update attrs or childs.
-* onRemoved: () => void;    
+## Rederer
+
+```TypeScript
+    class Renderer {
+        toNativeAttribute(virtualDomAttribute: VirtualDomAttribute): any {}
+        toNativeEvent(virtualDomEvent: VirtualDomEvent): any {}
+        toNativeNode(virtualDomNode: VirtualDomNode): any {}
+        toVirtualDomAttribute(nativeAttribute: any): VirtualDomAttribute {}
+        toVirtualDomEvent(nativeEvent: any): VirtualDomEvent {}
+        toVirtualDomNode(nativeNode: any): VirtualDomNode {}
+    }
+```
+
+
+### VirtualDomObject
+
+```TypeScript
+    class VirtualDomObject {
+        // Is called after the node is added to the real UI.
+        onAdded: () => void {}
+
+        // Is called when one of the deps changes. After it is called an change event is added to the **dom change event stream**.  
+        onChange: () => void {}
+
+        // Is called after the node removed from the real UI.
+        onRemoved: () => void {}
+    }
+```  
 
 
 
-### VirtualDomTextNode extends VirtualDomObject
-* deps: Array<StoreObject>
-* onAdded: () => void;      
-* onChange: () => void;     // Set text 
-* onRemoved: () => void;    
-* text: string;
+### VirtualDomAttribute
+
+```TypeScript
+    class VirtualDomAttribute extends VirtualDomObject {
+        deps: Array<StoreObject>;
+        enabled: boolean;         // When true, it's added to the UI.
+        name: string;
+        value: string;
+    }
+```
 
 
 
-### VirtualDomAttribute extends VirtualDomObject
-* deps: Array<StoreObject>;
-* enabled: boolean;         // When true, it's added to the UI.
-* onAdded: () => void;      
-* onChange: () => void;     // Set value and or enabled property.
-* onRemoved: () => void;    
-* name: string;
-* value: string;
+### VirtualDomEvent
+
+```TypeScript
+    class VirtualDomEvent extends VirtualDomObject {
+        deps: Array<StoreObject>;   
+        name: string;
+    }
+```
 
 
 
-### IVirtualDomEvents
-* onAdded: () => void;      // Is called after the node is added to the real UI.
-* onChange: () => void;     // Is called when one of the deps changes. After it is called an change event is added to the **dom change event stream**.
-* onRemoved: () => void;    // Is called after the node removed from the real UI.
+### VirtualDomNode
+
+```TypeScript
+
+    class VirtualDomNode extends VirtualDomObject {
+        attrs: StoreArray<VirtualDomAttribute>;
+        nodes: StoreArray<VirtualDomNode>;
+        events: StoreArray<VirtualDomEvent>
+        name: string
+        nativeNode: any;          // Can be server side html, client side html, native script etc.
+    }
+```
 
 
 
-### VirtualDomObject implements IVirtualDomEvents
-* deps: Array<StoreObject>
-* onAdded: () => void;      // Is called after the node is added to the real UI.
-* onChange: () => void;     // Is called when one of the deps changes.
-* onRemoved: () => void;    // Is called after the node removed from the real UI.
+### VirtualDomTextNode
+
+```TypeScript
+    class VirtualDomTextNode extends VirtualDomNode {
+        deps: Array<StoreObject>;
+        text: string;
+    }
+```
