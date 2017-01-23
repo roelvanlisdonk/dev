@@ -1,4 +1,3 @@
-
 import { IStoreArray, IStoreObject } from './store';
 
 export interface IVirtualDomObject {
@@ -54,12 +53,15 @@ export class VirtualDomEvent implements IVirtualDomObject {
     }
 }
 
+
+
 export class VirtualDomNode implements IVirtualDomObject {
     attrs: IStoreArray<VirtualDomAttribute>;
-    nodes: IStoreArray<VirtualDomNode>;
+    classes: Array<CSSStyleDeclaration>;
     events: IStoreArray<VirtualDomEvent>
     name: string;
     nativeNode: any; // Can be server side html, client side html, native script etc.
+    nodes: IStoreArray<VirtualDomNode>;
 
     onAdded() {
 

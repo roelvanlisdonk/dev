@@ -2,7 +2,7 @@
  * Renders to browser DOM.
  */
 import { VirtualDomAttribute, VirtualDomEvent, VirtualDomNode } from './virtual.dom';
-import { IRenderer } from './render';
+import { IRenderer } from './renderer';
 
 export class Renderer implements IRenderer {
     toNativeAttribute(virtualDomAttribute: VirtualDomAttribute): any {
@@ -12,6 +12,7 @@ export class Renderer implements IRenderer {
     toNativeEvent(virtualDomEvent: VirtualDomEvent): any {
         throw new Error("Not implemented exception.");
     }
+    
     toNativeNode(virtualDomNode: VirtualDomNode): any {
         throw new Error("Not implemented exception.");
     }

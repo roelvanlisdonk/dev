@@ -1,15 +1,13 @@
-// import { IStoreObject, IStoreStringField, registerType } from '../services/store'
-// export function userModule() {
-    
-// }
+import { StoreField, StoreObject } from '../am/services/store';
 
-// export class User implements IStoreObject {
-//     id: string;
-//     email: IStoreStringField = {
-//         fieldId: "1",
-//         value: null
-//     };
-//     readonly typeId: string = "1";
-// }
+export class User extends StoreObject {
+    email: StoreField;
 
-// registerType(User);
+    constructor() {
+        super();
+
+        this.email = new StoreField();
+        
+    }
+}
+

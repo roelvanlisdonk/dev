@@ -1,4 +1,4 @@
-
+import { cuid } from './cuid';
 
 export interface IStoreObject {
     /**
@@ -10,8 +10,62 @@ export interface IStoreObject {
     // TODO: add validation rules.
 }
 
+export interface IStoreField extends IStoreObject {
+    /**
+     * Unique id in the store.
+     */
+    id: string;
+    onChange: () => void;
+    value: boolean | number | Date | string;
+
+    // TODO: add validation rules.
+}
+
 export interface IStoreArray<T> extends Array<T> {
     
+}
+
+export class StoreObject implements IStoreObject {
+    private _onChange: () => void;
+    private _onChangeHandlers: Array<() => void> = [];
+
+    id: string;
+
+    constructor() {
+        const self: StoreObject = this;
+        self.id = cuid();
+        self._onChange = function() {
+            const changeHandlers = self._onChangeHandlers;
+            for(let i = 0, length = changeHandlers.length; i < length; i++) {
+                const handler = changeHandlers[i];
+                handler();
+            }
+        }
+    }
+
+    get onChange(): () => void {
+        return this._onChange;
+    }
+
+    set onChange(handler: () => void) {
+        this._onChangeHandlers.push(handler);
+    }
+}
+
+export class StoreField extends StoreObject implements IStoreField {
+    
+    private _value: boolean | number | Date | string;
+
+    get value(): boolean | number | Date | string {
+        return this._value;
+    }
+
+    set value(val: boolean | number | Date | string) {
+        if(this._value !== val) {
+            this._value = val;
+            this.onChange();
+        }
+    }
 }
 
 
