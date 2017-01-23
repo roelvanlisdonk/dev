@@ -1,8 +1,7 @@
 # Deployment
 
 ## App
-- All app source files (css, images, javascript, html) are deployed to a CDN.
-- Non of the source files contains data (not even static text, except for technical error messages)
+
 - Each source file name is appended with a version tag (e.g. user.**yyymmddHHmmsshash**.js)
 - When a source file is changed, it will be redeployed, with an other version tag.
 - The old file will be kept online for some time and removed by a futher deployment, automatically based on time.

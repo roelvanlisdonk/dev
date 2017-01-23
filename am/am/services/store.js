@@ -16,48 +16,49 @@ System.register(['./cuid'], function(exports_1, context_1) {
         execute: function() {
             StoreObject = (function () {
                 function StoreObject() {
-                    this._onChangeHandlers = [];
                     var self = this;
                     self.id = cuid_1.cuid();
-                    self._onChange = function () {
-                        var changeHandlers = self._onChangeHandlers;
+                    var _onChangeHandlers = [];
+                    function _onChange() {
+                        var changeHandlers = _onChangeHandlers;
                         for (var i = 0, length_1 = changeHandlers.length; i < length_1; i++) {
                             var handler = changeHandlers[i];
                             handler();
                         }
-                    };
+                    }
+                    Object.defineProperty(self, 'onChange', {
+                        get: function () {
+                            return _onChange;
+                        },
+                        set: function (handler) {
+                            _onChangeHandlers.push(handler);
+                        },
+                        enumerable: true
+                    });
                 }
-                Object.defineProperty(StoreObject.prototype, "onChange", {
-                    get: function () {
-                        return this._onChange;
-                    },
-                    set: function (handler) {
-                        this._onChangeHandlers.push(handler);
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
                 return StoreObject;
             }());
             exports_1("StoreObject", StoreObject);
             StoreField = (function (_super) {
                 __extends(StoreField, _super);
                 function StoreField() {
-                    _super.apply(this, arguments);
+                    _super.call(this);
+                    var self = this;
+                    var _value;
+                    Object.defineProperty(self, 'value', {
+                        get: function () {
+                            return _value;
+                        },
+                        set: function (newValue) {
+                            _value = newValue;
+                            if (_value !== newValue) {
+                                _value = newValue;
+                                self.onChange();
+                            }
+                        },
+                        enumerable: true
+                    });
                 }
-                Object.defineProperty(StoreField.prototype, "value", {
-                    get: function () {
-                        return this._value;
-                    },
-                    set: function (val) {
-                        if (this._value !== val) {
-                            this._value = val;
-                            this.onChange();
-                        }
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
                 return StoreField;
             }(StoreObject));
             exports_1("StoreField", StoreField);

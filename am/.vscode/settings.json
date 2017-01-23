@@ -3,7 +3,7 @@
     "files.exclude": {
         "**/*.js": true,
         "**/*.map": true
-    },
-    // Use TypeScript compiler from the node_modules folder instead of the default visual studio code TypeScript compiler. 
-    "typescript.tsdk": "node_modules/typescript/lib"
+    }
+,
+"typescript.check.workspaceVersion": false
 }

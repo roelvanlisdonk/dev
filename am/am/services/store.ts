@@ -1,5 +1,6 @@
 import { cuid } from './cuid';
 
+
 export interface IStoreObject {
     /**
      * Unique id in the store.
@@ -25,46 +26,71 @@ export interface IStoreArray<T> extends Array<T> {
     
 }
 
+/**
+ * To allow for lazy loading of data, each property (except 'id') in a StoreObject will be converted to getters and setters.
+ * The getter will get the data from localstorage if it is not loaded yet.
+ */
 export class StoreObject implements IStoreObject {
-    private _onChange: () => void;
-    private _onChangeHandlers: Array<() => void> = [];
-
-    id: string;
+    public id: string;
+    public onChange: () => void;
 
     constructor() {
         const self: StoreObject = this;
         self.id = cuid();
-        self._onChange = function() {
-            const changeHandlers = self._onChangeHandlers;
+
+        const _onChangeHandlers: Array<() => void> = [];
+        function _onChange() {
+            
+            const changeHandlers = _onChangeHandlers;
             for(let i = 0, length = changeHandlers.length; i < length; i++) {
                 const handler = changeHandlers[i];
                 handler();
             }
         }
-    }
-
-    get onChange(): () => void {
-        return this._onChange;
-    }
-
-    set onChange(handler: () => void) {
-        this._onChangeHandlers.push(handler);
+        Object.defineProperty(self, 'onChange', {
+            get: function () { 
+                return _onChange;
+            },
+            set: function(handler: () => void) {
+                _onChangeHandlers.push(handler);       
+            },
+            enumerable: true
+        }); 
     }
 }
 
 export class StoreField extends StoreObject implements IStoreField {
+    public parentId: string;
+    public value: boolean | number | Date | string;
     
-    private _value: boolean | number | Date | string;
+    // TODO: add validation rules.
 
-    get value(): boolean | number | Date | string {
-        return this._value;
-    }
+    constructor() {
+        super();
+        const self: StoreField = this;
+        let _value: boolean | number | Date | string;
 
-    set value(val: boolean | number | Date | string) {
-        if(this._value !== val) {
-            this._value = val;
-            this.onChange();
-        }
+        Object.defineProperty(self, 'value', {
+            get: function () { 
+                return _value;
+            },
+            set: function(newValue: boolean | number | Date | string) {
+                _value = newValue;
+                if(_value !== newValue) {
+                    _value = newValue;
+
+                    // TODO: update localstorage
+
+                    // TODO: add change event to sync.
+
+                    // Notify watchers
+                    self.onChange();
+
+                    // 
+                }         
+            },
+            enumerable: true
+        });
     }
 }
 
