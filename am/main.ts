@@ -60,67 +60,64 @@ const resources = new Resources();
 
 const calculatedText = { deps:[resources.ok], onchange: () => { return resources.ok + ' test'; }};
 
-// const div: any = {
-//     attrs: {
-//         classes: [],
-//         title: resources.ok,
-//     },
-//     events: {
-//         onclick: () => {}
-//     },
-//     nodes: [
-//         titleText,
-//         okButton
-//         cancelButton 
-//     ]
-// }
-
 /*
 
-const user;
-
-const div = {
-    attrs: { classes: [] },
-    
-    text: resources.ok,
-    text: vd.text([resources.ok], onchange: () => { return resources.ok + ' test'; })
-    div: {},
-    div: {},
-    button: {
-        type: '';
+function getFullName(firstName: ObservableValue, lastName: ObservableValue) {
+    return {
+        deps:[firstName, lastName],
+        onchange: () => { `${firstName} ${lastName}` };
     }
 }
+
+
+
+// Colors and images should be
+const myDiv = overwriteClass()
+
+export okButtonClass: string = addClass('ok-button', { width: 100px; });
+
+
+export class ActionButton {
+    
+}
+
+export class ActionButtonOptions {
+    borderColor: string;
+    background
+}
+
+// Now other modules can use this class to overwrite is or any other elements in it.
+
+const okButtonClass = {
+    selector: `${}`
+    width: 100px;
+};
+
+const div: any = {
+    // attrs are of type Observable
+    attrs: {
+        classes: [],            // Will be converted to an ObservableArray<T> during initial rendering, when it is not an ObservableArray<T>
+        description: getFullName(user.firstName, user.lastName),
+        title: resources.ok     // When the resource.locale changes, just rerender ui.
+    },
+    events: {
+        onclick: () => {} // When the dom click event is fired, the given onclick eventhandler will be called.
+    },
+    nativeNode: HtmlDivElement, when 
+    nodes: [
+        text(resources.ok),
+        actionButton(resources.ok),
+        actionButton(resources.cancel)
+    ] // Observable array when items are added removed or ordered after the first rendering, the div will rerender.
+}
+
+
 
 
 */
 
 
 
-// These resources can now be used as deps, so when the main user language changes, the ui changes.
-// const resources = new Resources();
 
-// const vd: any = {};
-// const div: any = {
-//     nodes: [
-//         { deps: [resources.ok], onchange: () => { return resources.ok + ' test'; }},
-//         vd.text(resources.ok)
-
-//     ]
-// };
-// const div = vd.div([],[
-//  vd.text(resources.ok)
-// ]);
-// const textNode = vd.text(resources.ok)
-// const textNode = vd.text([resources.ok],() => { return resources.ok + ' test'; })
-// addResources(resources);
-
-// class resources
-
-// const resources = new Resource(){
-//     ok: addResource({ en: 'ok', nl: 'ok'})
-// };
-
-
-// const b = resources.ok
 
 export const a = "";

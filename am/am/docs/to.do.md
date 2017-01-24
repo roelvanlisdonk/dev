@@ -1,5 +1,6 @@
 # To do
 
+* When a am.Observable.value is get add a dep to the observer (this), so when the observable changes the observer will be rerendered.
 * Create StoreRoot class with property user (property should have saveToLocalStorage = true).
 * Add StoreRoot class to store with sync to localstorage
 * Get StoreRoot  from store (lazy loading user, only when it is rendered)
