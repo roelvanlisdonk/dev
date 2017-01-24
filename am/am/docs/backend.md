@@ -10,3 +10,10 @@
 - In the first version there will be just one **.NET core** service with 2 entry points.
     - One for **unauthorised** users
     - One for **authorised** users (can only be called with a valid JToken, containing claims data)
+
+
+
+## Azure functions
+* Azure functions will be used to:
+    * share data between users, by adding change to the user data streams.
+    * aggregate monitoring- and reporting data.

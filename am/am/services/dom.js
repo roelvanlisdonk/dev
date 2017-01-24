@@ -1,40 +1,34 @@
 System.register([], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    function domModule() {
-    }
-    exports_1("domModule", domModule);
-    function addEventListener(element, type, listener) {
-        if (element.addEventListener) {
-            element.addEventListener(type, listener, false);
-            return;
-        }
-        var el = element;
-        el["attachEvent"]("on" + type, listener);
-    }
-    exports_1("addEventListener", addEventListener);
-    function render(element, vdNode) {
-        element.innerHTML = convertToHtml(vdNode);
-    }
-    exports_1("render", render);
-    function convertToHtml(node) {
-        var html = "<" + node.nodeName;
-        var containsContent = (node.childNodes.length > 0 || node.text);
-        if (containsContent) {
-            var contentHtml = '';
-            for (var i = 0, length_1 = node.childNodes.length; i < length_1; i++) {
-                contentHtml += convertToHtml(node.childNodes[i]);
-            }
-            html += ">" + node.text + contentHtml + "</" + node.nodeName + ">";
-        }
-        else {
-            html += '/>';
-        }
-        return html;
-    }
+    var Renderer;
     return {
         setters:[],
         execute: function() {
+            Renderer = (function () {
+                function Renderer() {
+                }
+                Renderer.prototype.toNativeAttribute = function (virtualDomAttribute) {
+                    throw new Error("Not implemented exception.");
+                };
+                Renderer.prototype.toNativeEvent = function (virtualDomEvent) {
+                    throw new Error("Not implemented exception.");
+                };
+                Renderer.prototype.toNativeNode = function (virtualDomNode) {
+                    throw new Error("Not implemented exception.");
+                };
+                Renderer.prototype.toVirtualDomAttribute = function (nativeAttribute) {
+                    throw new Error("Not implemented exception.");
+                };
+                Renderer.prototype.toVirtualDomEvent = function (nativeEvent) {
+                    throw new Error("Not implemented exception.");
+                };
+                Renderer.prototype.toVirtualDomNode = function (nativeNode) {
+                    throw new Error("Not implemented exception.");
+                };
+                return Renderer;
+            }());
+            exports_1("Renderer", Renderer);
         }
     }
 });
