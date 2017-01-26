@@ -161,7 +161,6 @@ namespace am.system {
      * This function should be called import, but that's not allowed in TypeScript.
      */
     function imports(name: string): IModule {
-        
         const normalizedName = resolve(name);
         console.log(`System.import -  ${normalizedName}.`);
 

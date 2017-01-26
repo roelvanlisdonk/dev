@@ -1,4 +1,4 @@
-import { IStoreArray, IStoreObject } from './store';
+import { IStoreArray, IStoreObject } from '../storage/store';
 
 export interface IVirtualDomObject {
     /**

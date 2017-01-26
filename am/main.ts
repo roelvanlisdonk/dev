@@ -1,6 +1,22 @@
 // import { clientStorage } from './am/services/local.storage';
 // import { StoreField, StoreObject } from './am/services/store';
 
+
+
+function checkLocation() {
+    debugger;
+    const a = 1;
+    const b = 2 + 2;
+}
+
+
+
+checkLocation();
+
+
+
+
+
 // In v1 just store each StoreObject in store._index and sync this with localstorage per get and set.
 // In v1 just use a serve datetime value to dertimine syncing.
 
@@ -15,50 +31,50 @@
 // };
 
 
-let passcode = "secret passcode";
+// let passcode = "secret passcode";
 
-class Employee {
-    private _fullName: string;
+// class Employee {
+//     private _fullName: string;
 
-    get fullName(): string {
-        return this._fullName;
-    }
+//     get fullName(): string {
+//         return this._fullName;
+//     }
 
-    set fullName(newName: string) {
-        this._fullName = newName;
-    }
-}
+//     set fullName(newName: string) {
+//         this._fullName = newName;
+//     }
+// }
 
-const employee = new Employee();
-employee.fullName = "Bob Smith";
+// const employee = new Employee();
+// employee.fullName = "Bob Smith";
 
-const employeeAsString = JSON.stringify(employee);
-console.log(employeeAsString);
+// const employeeAsString = JSON.stringify(employee);
+// console.log(employeeAsString);
 
-const employeeAsObject = JSON.parse(employeeAsString);
+// const employeeAsObject = JSON.parse(employeeAsString);
 
-const e2 = employee as any;
-console.log(e2._fullName);
-
-
-// Extrends IStoreField, so it can be used as dep
-export interface IResource {
-    en?: string;
-    nl?: string;
-    value?: string;
-}
-
-class AmResources {
-
-}
-
-class Resources extends AmResources {
-    ok: IResource = { en: 'ok', nl: 'ok'}  
-}
-const resources = new Resources();
+// const e2 = employee as any;
+// console.log(e2._fullName);
 
 
-const calculatedText = { deps:[resources.ok], onchange: () => { return resources.ok + ' test'; }};
+// // Extrends IStoreField, so it can be used as dep
+// export interface IResource {
+//     en?: string;
+//     nl?: string;
+//     value?: string;
+// }
+
+// class AmResources {
+
+// }
+
+// class Resources extends AmResources {
+//     ok: IResource = { en: 'ok', nl: 'ok'}  
+// }
+// const resources = new Resources();
+
+
+// const calculatedText = { deps:[resources.ok], onchange: () => { return resources.ok + ' test'; }};
 
 /*
 

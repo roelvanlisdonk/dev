@@ -1,5 +1,5 @@
-# Observables
 
+# Observables
 One of the most important things in the AM architecture, are observables.
 They are used to detect changes in the store.
 Changes in the store are reflected in the UI and synced to storage (localstorage and/or cloudstorage).
@@ -7,18 +7,18 @@ Changes in the store are reflected in the UI and synced to storage (localstorage
 
 
 ## Observable
-By default only the onchange event of properties of an observable object, that are of type ObservableValue or ArrayObservable<T>, will trigger the onchange event of the observable.
-You can set "onchangeSubscriptionType" = "all" to listen to all change events, including change event of array items and childs form childs from childs.
-* onchange: () => any;
 
-The onchange property is an accessor (getter / setter):
-* Get: call all onchange event subscribers.
-* Set: add the given function to the private list of onchange event subscribers.
 
+### onchange
 You can subscribe multiple times to the onchange event, by setting the property to a event handler function.
-E.g. 
-user.name.onchange = () => { console.log('First onchange subscription'); };
-user.name.onchange = () => { console.log('Second onchange subscription'); };
+E.g. user.name.onchange = () => { console.log('First onchange subscription'); };
+     user.name.onchange = () => { console.log('Second onchange subscription'); };
+     
+* onchange: () => any;
+    * Get: when the onchange function is called, it will notify all event subscribers.
+    * Set: add the given function to the private list of onchange event subscribers.
+
+
 
 
 # ObservableDeps extends Observable
