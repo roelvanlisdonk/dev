@@ -1,7 +1,16 @@
 # Resources
+* Modules can use shared resoureces, by importing them.
+* Modules can export there own resources, so they can be overwritten.
+* When a module is a component the resources will be placed on the options
+  , so they can be overwritten per instance of a component
+  , when you want to overwrite it for all instances of a component, just declare a options with the correct settings en use that on all instance creations.
 
-* Resources are considered assets, like code en styling, and are not considered data.
-* Resources will be updated like normal assets.
+* Resources are assets, that means:
+    * They are immutable, when the resoureces changes and it is deployed to the cdn it gets a unique name, for cachebusting).
+    * They are deployed to a cdn
+    * They are .
+* Resources will be cachebusted as normal assets
+* Resources will be updated like normal assets and will be placed on the cdn.
 * There are shared resources that should be imported to use them.
 * Modules can have there own resources, so not all resources have to be loaded, when not needed
 * Modules should export resources as const resources: {}; where each property is an IResource.

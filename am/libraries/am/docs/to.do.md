@@ -1,6 +1,7 @@
 # To do
 
-* When a am.Observable.value is get add a dep to the observer (this), so when the observable changes the observer will be rerendered.
+* fix System
+    * import { ... } from "...." should load relative to the loader so it can use loads scripts based on the location of the script.
 * Create StoreRoot class with property user (property should have saveToLocalStorage = true).
 * Add StoreRoot class to store with sync to localstorage
 * Get StoreRoot  from store (lazy loading user, only when it is rendered)
@@ -9,11 +10,6 @@
 * render div with current username
 
 
-
-* remove services and helpers folders (create feature folders when needed)
-
-## System
-* fix loader so it can use loads scripts based on the location of the script.
 * move data in system to am.store.data.ts
 * load am.store.data before any other thing inside system and use it.
 

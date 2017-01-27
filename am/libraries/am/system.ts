@@ -34,6 +34,9 @@ namespace am.system {
     const registrationList: Array<am.system.IRegistration> = am.store.registrationList;
     const seperator = "/";
 
+    // All script tags in the head will get a src path that is relative to the location of the document that loads the am system servive.
+    let documentLocation = getDocumentLocation(document.location.pathname);
+
     function createScriptNode(src: string) {
         const script: any = document.createElement("script");
         if (isIE) {
@@ -45,6 +48,17 @@ namespace am.system {
         script.src = src;
 
         head.appendChild(script);
+    }
+
+    function determineIfAllModuleAreLoaded() : boolean {
+        const result = true;
+        for (let i = 0, length = moduleList.length; i < length; i++) {
+            const mod = moduleList[i];
+            if(mod.registration === null) {
+                return false;
+            }
+        }
+        return result;
     }
 
     function executeModules() {
@@ -75,60 +89,14 @@ namespace am.system {
         }
     }
 
-    function setImports(mod: IModule) {
-        const setters =  mod.registrationInfo.setters;
-        const deps = mod.registration.deps;
-        for (let i = 0, length = deps.length; i < length; i++) {
-            const dep = deps[i];
-            const depCode = imports(dep).exports; // TODO: Dit  klopt niet hier moet je de code van de module zetten en niet de module zelf.
-            const setter = setters[i];
-            setter(depCode);
-        }
-    }
-
-    function onerror() {
-        console.log("onerror");
-    }
-
-    function determineIfAllModuleAreLoaded() : boolean {
-        const result = true;
-        for (let i = 0, length = moduleList.length; i < length; i++) {
-            const mod = moduleList[i];
-            if(mod.registration === null) {
-                return false;
-            }
+    function getDocumentLocation(pathname: string): string {
+        let result = pathname.split(seperator).slice(0, -1).join(seperator);
+        if(!result || result === seperator) {
+            result = "";
+        } else if(result[0] === seperator) {
+            result = result.substr(1);
         }
         return result;
-    }
-    function setRegistration(src: string) {
-        const name = getModuleNameFromSrc(src);
-        const mod: IModule = moduleMap[name];
-
-        const registration: IRegistration = registrationList.shift();
-        mod.registration = registration;
-
-        const allModulesLoaded = determineIfAllModuleAreLoaded();
-        if(allModulesLoaded) {
-            executeModules();
-        }
-    }
-
-    function onload() {
-        const script: HTMLScriptElement = this;
-        const src = script.src;
-        console.log(`onload - ${src}`);
-        setRegistration(src);
-    }
-
-    function onreadystatechange() {
-        const script: HTMLScriptElement = this;
-        const src = script.src;
-        const readystate = (script as any)["readyState"];
-        console.log(`onreadystatechange - ${readystate} - ${src}`);
-
-        if (readystate === "loaded") {
-            setRegistration(src);
-        }
     }
 
     function getLocation(href: string) {
@@ -149,13 +117,16 @@ namespace am.system {
         for (let i = 0, length = scripts.length; i < length; i++) {
             const script = scripts[i];
             const moduleName = script.getAttribute("data-main");
-            if (moduleName) {
-                return moduleName;
-            }
+            return resolve(moduleName);
         }
         throw new Error("Could not find script tag in head with attribute data-main. Note the attribute data-main should have a non empty value.");
     }
 
+    function getModuleNameFromSrc(src: string): string {
+        const location = getLocation(src);
+        const name = location.pathname.substring(0, location.pathname.length - 3);
+        return name;
+    }
     /**
      * This function is the custom System.import implementation.
      * This function should be called import, but that's not allowed in TypeScript.
@@ -167,8 +138,7 @@ namespace am.system {
      *            the path is first resolved to the location of the script containing the import statement, before System.import is called. 
      */
     function imports(pathToModule: string): IModule {
-        console.log(`System.import -  ${pathToModule}.`);
-
+        console.log("System.import -  " + pathToModule);
         const exists = moduleMap[pathToModule];
         if (exists) {
             return exists;
@@ -183,7 +153,7 @@ namespace am.system {
             moduleMap[pathToModule] = mod;
             moduleList.push(mod);
             
-            const src = `${pathToModule}.js`;
+            const src = "${pathToModule}" + ".js";
             createScriptNode(src);
             return null;
         }
@@ -193,60 +163,111 @@ namespace am.system {
         const moduleName = getMainModuleName();
 
         // Load "main" module.
-        console.log(`Module ${moduleName} loading started.`);
+        console.log("Module " + moduleName + " loading started.");
 
         System['import'](moduleName);
     }
 
-    /**
-     * Convert a relative path to an absolute path.
-     * @param {string} relativePath - In this module the "registrationPath" (@see IModule) will be used as relative path.
-     * @param {string} basePath - The base path string will be used to resolve the relative path to.
-     * @return {string} Absolute path.
-     */
-    function resolve(relativePath: string, basePath?: string): string {
-        basePath = basePath || document.location.pathname.split(seperator).slice(0, -1).join(seperator);
-        if (basePath === seperator) {
-            basePath = "";
-        }
-        if (relativePath.charAt(0) === seperator) {
-            relativePath = relativePath.slice(1);
-        }
-        if (relativePath.charAt(0) === ".") {
-            const parts = relativePath.split(seperator).slice(1);
-            return [basePath].concat(parts).join(seperator);
-        } else {
-            return [basePath, relativePath].join(seperator);
+    function onerror() {
+        console.log("onerror");
+    }
+
+    function onload() {
+        const script: HTMLScriptElement = this;
+        const src = script.src;
+        console.log("onload " + src);
+        setRegistration(src);
+    }
+
+    function onreadystatechange() {
+        const script: HTMLScriptElement = this;
+        const src = script.src;
+        const readystate = (script as any)["readyState"];
+        console.log("onreadystatechange - " + readystate + " - " + src);
+
+        if (readystate === "loaded") {
+            setRegistration(src);
         }
     }
 
+    /**
+     * Given a relativePath (that might include "./" or "../") and a basePath, resolve the location of a module.
+     * For performance reasons we asume the basePath does not start with "/", "./" or "../" or contain "./" or "../".
+     */
+    function resolve(relativePath: string, basePath?: string): string {
+        if(!relativePath) { return ""; }
+        
+        let resultParts: Array<string> = [];
+        if(basePath && basePath.length > 0) {
+            resultParts = basePath.split(seperator);
+        }
+        
+        const parts = relativePath.split(seperator);
+        
+        for(let i = 0, length = parts.length; i < length; i++) {
+            const part = parts[i];
+            
+            if(!part || part === ".") {
+                continue;
+            }
+
+            if(part === "..") {
+                resultParts = resultParts.slice(0, -1);
+                continue;
+            }
+
+            resultParts.push(part)
+        }
+        return resultParts.join(seperator);
+    }
+
     function register(deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) {
-        console.log(`register - ${fn.toString().substring(120, 160)}`);
+        console.log("register - test");
 
         // Add registration to a list so the load or onreadestatechange-loaded event can use it. 
         const registration: IRegistration = { 
             deps: deps, 
             fn: fn
         };
-        registrationList.push(registration);
 
+        registrationList.push(registration);        
+    }
 
-        // TODO: move to location where registration is used, because there we know the path to the module, that loads this module.
-        // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
-        // Before we can execute this module.
+    function setImports(mod: IModule) {
+        const setters =  mod.registrationInfo.setters;
+        const deps = mod.registration.deps;
         for (let i = 0, length = deps.length; i < length; i++) {
-            const name = deps[i];
-            System['import'](name);
+            const dep = deps[i];
+            const depCode = imports(dep).exports; // TODO: Dit  klopt niet hier moet je de code van de module zetten en niet de module zelf.
+            const setter = setters[i];
+            setter(depCode);
         }
     }
 
-    function getModuleNameFromSrc(src: string): string {
-        const location = getLocation(src);
-        const name = location.pathname.substring(0, location.pathname.length - 3);
-        return name;
-    }
+    /**
+     * @param - src - is a complete url, like https://my.host.header/am/system.js
+     */
+    function setRegistration(src: string) {
+        const name = getModuleNameFromSrc(src);
+        const pathToModule = resolve(name);
+        const mod: IModule = moduleMap[pathToModule];
+        const registration: IRegistration = registrationList.shift();
+        mod.registration = registration;
 
-    
+        // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
+        // Before we can execute this module.
+        const deps = mod.registration.deps;
+        for (let i = 0, length = deps.length; i < length; i++) {
+            const name = deps[i];
+            const pathToDep = resolve(name);
+            System['import'](pathToDep);
+        }
+
+        const allModulesLoaded = determineIfAllModuleAreLoaded();
+        if(allModulesLoaded) {
+            executeModules();
+        }
+    }
 
     // Is used to collect state during a System.Import call.
     interface IImportInfo {

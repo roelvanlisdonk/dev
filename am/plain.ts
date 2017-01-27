@@ -1,50 +1,51 @@
 namespace plain {
-    let passcode = "secret passcodedsdsddssd";
+    
+    const seperator = "/";
 
+    let documentLocation = getDocumentLocation(document.location.pathname);
+    documentLocation = resolve(document.location.pathname.split(seperator).slice(0, -1).join(seperator));
+    console.log(documentLocation);
 
-    class Employee {
-        public fullName: string;
-
-        constructor() {
-            const self: Employee = this;
-            let _fullName: string;
-
-            Object.defineProperty(self, 'fullName', {
-                get: function () { return _fullName; },
-                set: function(name) {
-                    _fullName = name;           
-                },
-                enumerable: true
-            });
-        }        
+    function getDocumentLocation(pathname: string): string {
+        let result = pathname.split(seperator).slice(0, -1).join(seperator);
+        if(!result || result === seperator) {
+            result = "";
+        } else if(result[0] === seperator) {
+            result = result.substr(1);
+        }
+        return result;
     }
 
-    const employee1 = new Employee();
-    employee1.fullName = "Bob Smith";
-    const employee1AsString = JSON.stringify(employee1);
-    console.log(employee1AsString);
+    const basePath = "am/test/cuid";
+    const path = "./main";
+    const resolved = resolve(path);
+    console.log(resolved);
 
-    const employee2 = new Employee();
-    
-    const employee2AsString = JSON.stringify(employee2);
-    console.log(employee2AsString);
+    // we asume the basePath is correct.
+    function resolve(relativePath: string, basePath?: string): string {
+        if(!relativePath) { return ""; }
+        
+        let resultParts: Array<string> = [];
+        if(basePath && basePath.length > 0) {
+            resultParts = basePath.split(seperator);
+        }
+        
+        const parts = relativePath.split(seperator);
+        
+        for(let i = 0, length = parts.length; i < length; i++) {
+            const part = parts[i];
+            
+            if(!part || part === ".") {
+                continue;
+            }
 
+            if(part === "..") {
+                resultParts = resultParts.slice(0, -1);
+                continue;
+            }
 
-
-    // var car = {
-    //     name: 'audi'
-    // };
-
-    // Object.defineProperty(car, 'test', {
-    //     get: function () { return 1; }
-
-    //     enumerable: true
-    // });
-
-    // console.log(JSON.stringify(car));
-
+            resultParts.push(part)
+        }
+        return resultParts.join(seperator);
+    }
 }
-
-
-
-

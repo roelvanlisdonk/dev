@@ -1,6 +1,7 @@
-// import { clientStorage } from './am/services/local.storage';
-// import { StoreField, StoreObject } from './am/services/store';
+import { StoreField, StoreObject } from './libraries/am/storage/store';
 
+
+const sf = new StoreField();
 
 
 function checkLocation() {
