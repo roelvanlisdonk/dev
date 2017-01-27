@@ -1,4 +1,4 @@
-System.register([], function(exports_1, context_1) {
+System.register([], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     function forLoop() {
@@ -13,9 +13,9 @@ System.register([], function(exports_1, context_1) {
     }
     exports_1("performanceTiming", performanceTiming);
     return {
-        setters:[],
-        execute: function() {
+        setters: [],
+        execute: function () {
         }
-    }
+    };
 });
 //# sourceMappingURL=snippets.js.map

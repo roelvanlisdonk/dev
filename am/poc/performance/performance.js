@@ -1,7 +1,6 @@
-System.register([], function(exports_1, context_1) {
+System.register([], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    var questionsAsObject, questionsAsArray;
     function addQuestionToArray(id) {
         var question = {
             id: id.toString(),
@@ -34,13 +33,14 @@ System.register([], function(exports_1, context_1) {
         console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
     }
     exports_1("start", start);
+    var questionsAsObject, questionsAsArray;
     return {
-        setters:[],
-        execute: function() {
+        setters: [],
+        execute: function () {
             questionsAsObject = {};
             questionsAsArray = [];
             start();
         }
-    }
+    };
 });
 //# sourceMappingURL=performance.js.map

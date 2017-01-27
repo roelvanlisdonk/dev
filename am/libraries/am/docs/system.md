@@ -5,13 +5,26 @@
 * The tag should have a "data-main" attribute containing the relative path (based on the location of the index.html) 
   to the main module (exluding *.js extension).
 * The main module will use "import { ... } from ..." or the System.import to load other modules.
-* These modules will load based on the location of the "main" module.
+
+
+## import modules
+There are 2 ways you can import modules:
+* By using import { MyClass } from "./path/to/mymodule" at the top of a module.
+    * Modules will be resolved based on the location of the script containing the import statement.
+* By using System.import("./path/to/mymodule");
+    * Modules will be resolved based on the location of html document that loaded the AM system service.
+    * Note that relative paths parts will be stripped.
+    * eg https://local.dev/index.html constain the script tag that loads the "am/system.js" module.
+    * Then "path/to/mymodule", "/path/to/mymodule", "./path/to/mymodule" and "../path/to/mymodule" 
+      will all resolve to "https://local.dev/path/to/mymodule.js"
 
 Example
-./index.html
+URL: https://local.dev/index.html
+https://local.dev/index.html
     <script type="text/javascript" src="libraries/am/system.js" data-main="./main"></script>
-./main.ts
-./libraries/am/system.ts
+https://local.dev/main.ts
+https://local.dev/libraries/am/system.ts
+https://local.dev/path/to/mymodule.ts
 
 
 

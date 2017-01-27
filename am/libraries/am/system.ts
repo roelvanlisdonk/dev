@@ -159,26 +159,31 @@ namespace am.system {
     /**
      * This function is the custom System.import implementation.
      * This function should be called import, but that's not allowed in TypeScript.
+     * 
+     * @param {string} name - should be the path to the module without the ".js" extension
+     *      the path should be relative to the location of the document that loaded the "am/system.js" file.
+     *      Note: all relative path parts will be stripped, eg: ../my/path/../../test will resolve to /my/path/test  
+     *      Note: When using import statements, like import { MyModule } from "./path/to/mymodule",
+     *            the path is first resolved to the location of the script containing the import statement, before System.import is called. 
      */
-    function imports(name: string): IModule {
-        const normalizedName = resolve(name);
-        console.log(`System.import -  ${normalizedName}.`);
+    function imports(pathToModule: string): IModule {
+        console.log(`System.import -  ${pathToModule}.`);
 
-        const exists = moduleMap[normalizedName];
+        const exists = moduleMap[pathToModule];
         if (exists) {
             return exists;
         } else {
             const mod: IModule = {
                 executed: false,
-                exports: {},            // Properties will be added after the module is exectued.
-                name: normalizedName,
-                registration: null,     // Will be set in the onload or onreadestatechange-loaded event.
-                registrationInfo: null  // Will be set after this module is exectued.
+                exports: {},                // Properties will be added after the module is exectued.
+                pathToModule: pathToModule,
+                registration: null,         // Will be set in the onload or onreadestatechange-loaded event.
+                registrationInfo: null      // Will be set after this module is exectued.
             };
-            moduleMap[normalizedName] = mod;
+            moduleMap[pathToModule] = mod;
             moduleList.push(mod);
             
-            const src = `${normalizedName}.js`;
+            const src = `${pathToModule}.js`;
             createScriptNode(src);
             return null;
         }
@@ -225,9 +230,10 @@ namespace am.system {
         };
         registrationList.push(registration);
 
+
+        // TODO: move to location where registration is used, because there we know the path to the module, that loads this module.
         // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
         // Before we can execute this module.
-
         for (let i = 0, length = deps.length; i < length; i++) {
             const name = deps[i];
             System['import'](name);
@@ -250,14 +256,7 @@ namespace am.system {
     export interface IModule {
         executed: boolean;                      // When true, the module is downloaded, evaled and executed.
         exports: any;                           // Contains all exported functions / objects etc. and will be set after the module is executed.
-        name: string;                           // This is the location where the module is found and also used as the unique module identifieran.
-                                                // e.g. url structure:
-                                                //    /app
-                                                //        /services
-                                                //            data.service.ts
-                                                //        /components
-                                                //            user.ts (import DataService from "../services/data.service" )
-                                                // Then the name for the data.service module will be "/app/services/data.service".
+        pathToModule: string;                   // Used to identify the module.
         registration: IRegistration;            // This object is set when the registration call is executed from the module code.
         registrationInfo: IRegistrationInfo;    // Contains informatio for setting the dependencies of the module (hot reloading, stubing, mocking, dependency injection etc.)
                                                 // Will be set after this module is exectued.
