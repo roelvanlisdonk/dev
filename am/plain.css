@@ -19,3 +19,9 @@
     top: 9px;
     vertical-align: top;
 }
+
+.grid {
+    fill: rgb(0, 255, 0);
+    height: 100px;
+    width: 100px;
+}

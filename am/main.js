@@ -2,9 +2,7 @@ System.register(["./libraries/am/storage/store"], function (exports_1, context_1
     "use strict";
     var __moduleName = context_1 && context_1.id;
     function checkLocation() {
-        debugger;
-        var a = 1;
-        var b = 2 + 2;
+        console.log(sf.id);
     }
     var store_1, sf, a;
     return {

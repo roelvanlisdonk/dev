@@ -9,9 +9,39 @@
 * set user as dep for div
 * render div with current username
 
+CSS
+* each component should have all used classnames inside its options
+* each component should have all cssRules inside its options
+* A css rule should have a selector string.
 
+
+## Data flow
+* client and server should have a append only array of cuids containing all the field
 * move data in system to am.store.data.ts
 * load am.store.data before any other thing inside system and use it.
+
+
+### Frontend
+* Has an append only array per user of all change events from the last sync on.
+    * When a sync takes place:
+        * All local changes will be sent to the server
+        * The server send changes back that will be applied to the store.
+        * After a sync the frontend array will be empty the backend array will be updated.
+* A change event can contain multiple object and field changes.
+    * Creating an object will be one change event.
+* Has an key value store containing an entry per StoreObject / StoreField.
+* When a change takes place, that involves multiple users, a backend funtion will add these changes to the involved users change event arrays.
+
+
+
+
+### Backend
+* Has an append only array per user of all change events.
+* A change event can contain multiple object and field changes.
+    * Creating an object will be one change event.
+* Has an key value store containing an entry per StoreObject / StoreField.
+
+
 
 
 

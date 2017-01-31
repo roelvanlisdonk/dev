@@ -5,7 +5,7 @@
             "name": "am - index.html",
             "type": "chrome",
             "request": "launch",
-            "url": "https://localhost.dev/am/index.html",
+            "url": "https://local.dev/am/index.html",
             "sourceMaps": true,
             "webRoot": "${workspaceRoot}"
         },

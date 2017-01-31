@@ -1,7 +1,4 @@
-import { cuid } from './cuid';
-
-
-
+import { cuid } from '../common/cuid';
 
 export interface IStoreObject {
     /**

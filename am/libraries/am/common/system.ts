@@ -27,19 +27,21 @@ namespace am.store {
 namespace am.system {
     "use strict";
 
-    const head = document.head || document.getElementsByTagName("head")[0];
-    const isIE = /MSIE/.test(navigator.userAgent);
-    const moduleMap: any = am.store.moduleMap; 
-    const moduleList: Array<am.system.IModule> = am.store.moduleList;
-    const registrationList: Array<am.system.IRegistration> = am.store.registrationList;
-    const seperator = "/";
+    const _head = document.head || document.getElementsByTagName("head")[0];
+    const _isIE = /MSIE/.test(navigator.userAgent);
+    const _moduleMap: any = am.store.moduleMap; 
+    const _moduleList: Array<am.system.IModule> = am.store.moduleList;
+    const _registrationList: Array<am.system.IRegistration> = am.store.registrationList;
+    const _seperator = "/";
 
-    // All script tags in the head will get a src path that is relative to the location of the document that loads the am system servive.
-    let documentLocation = getDocumentLocation(document.location.pathname);
+    // All script tags will get an "absolute" path to the root of the web site.
+    // eg http://localhost/my/app/location/index.html has a tag <script type="text/javascript" src="libraries/am/common/system.js" data-main="./main"></script>,
+    //      then "main" will be loaded as <script type="text/javascript" src="/my/app/location/main.js"></script>.
+    const _basePath = getBasePath(document.location.pathname);
 
     function createScriptNode(src: string) {
         const script: any = document.createElement("script");
-        if (isIE) {
+        if (_isIE) {
             script["onreadystatechange"] = onreadystatechange;
         } else {
             script.onload = onload;
@@ -47,13 +49,13 @@ namespace am.system {
         script.onerror = onerror;
         script.src = src;
 
-        head.appendChild(script);
+        _head.appendChild(script);
     }
 
     function determineIfAllModuleAreLoaded() : boolean {
         const result = true;
-        for (let i = 0, length = moduleList.length; i < length; i++) {
-            const mod = moduleList[i];
+        for (let i = 0, length = _moduleList.length; i < length; i++) {
+            const mod = _moduleList[i];
             if(mod.registration === null) {
                 return false;
             }
@@ -62,8 +64,8 @@ namespace am.system {
     }
 
     function executeModules() {
-        for (let length = moduleList.length, i = length - 1; i >= 0; i--) {
-            const mod = moduleList[i];
+        for (let length = _moduleList.length, i = length - 1; i >= 0; i--) {
+            const mod = _moduleList[i];
 
             
             if(!mod.executed) {
@@ -89,12 +91,10 @@ namespace am.system {
         }
     }
 
-    function getDocumentLocation(pathname: string): string {
-        let result = pathname.split(seperator).slice(0, -1).join(seperator);
-        if(!result || result === seperator) {
+    function getBasePath(pathname: string): string {
+        let result = pathname.split(_seperator).slice(0, -1).join(_seperator);
+        if(!result || result === _seperator) {
             result = "";
-        } else if(result[0] === seperator) {
-            result = result.substr(1);
         }
         return result;
     }
@@ -112,14 +112,20 @@ namespace am.system {
         }
     }
 
-    function getMainModuleName(): string {
-        const scripts = head.getElementsByTagName("script");
+    function getPathToMainModule(): string {
+        const scripts = _head.getElementsByTagName("script");
         for (let i = 0, length = scripts.length; i < length; i++) {
             const script = scripts[i];
             const moduleName = script.getAttribute("data-main");
-            return resolve(moduleName);
+            return resolve(moduleName, _basePath);
         }
         throw new Error("Could not find script tag in head with attribute data-main. Note the attribute data-main should have a non empty value.");
+    }
+
+    function getPathToModuleFolder(pathToModule: string): string {
+        const parts = pathToModule.split(_seperator);
+        const folderPath = parts.slice(0, parts.length - 1).join(_seperator);
+        return folderPath;
     }
 
     function getModuleNameFromSrc(src: string): string {
@@ -138,8 +144,7 @@ namespace am.system {
      *            the path is first resolved to the location of the script containing the import statement, before System.import is called. 
      */
     function imports(pathToModule: string): IModule {
-        console.log("System.import -  " + pathToModule);
-        const exists = moduleMap[pathToModule];
+        const exists = _moduleMap[pathToModule];
         if (exists) {
             return exists;
         } else {
@@ -150,32 +155,27 @@ namespace am.system {
                 registration: null,         // Will be set in the onload or onreadestatechange-loaded event.
                 registrationInfo: null      // Will be set after this module is exectued.
             };
-            moduleMap[pathToModule] = mod;
-            moduleList.push(mod);
+            _moduleMap[pathToModule] = mod;
+            _moduleList.push(mod);
             
-            const src = "${pathToModule}" + ".js";
+            const src = `${pathToModule}.js`;
             createScriptNode(src);
             return null;
         }
     }
 
     function loadMain() {
-        const moduleName = getMainModuleName();
-
-        // Load "main" module.
-        console.log("Module " + moduleName + " loading started.");
-
+        const moduleName = getPathToMainModule();
         System['import'](moduleName);
     }
 
-    function onerror() {
-        console.log("onerror");
+    function onerror(e: any) {
+        console.log(`onerror - ${e}`);
     }
 
     function onload() {
         const script: HTMLScriptElement = this;
         const src = script.src;
-        console.log("onload " + src);
         setRegistration(src);
     }
 
@@ -183,8 +183,6 @@ namespace am.system {
         const script: HTMLScriptElement = this;
         const src = script.src;
         const readystate = (script as any)["readyState"];
-        console.log("onreadystatechange - " + readystate + " - " + src);
-
         if (readystate === "loaded") {
             setRegistration(src);
         }
@@ -194,15 +192,15 @@ namespace am.system {
      * Given a relativePath (that might include "./" or "../") and a basePath, resolve the location of a module.
      * For performance reasons we asume the basePath does not start with "/", "./" or "../" or contain "./" or "../".
      */
-    function resolve(relativePath: string, basePath?: string): string {
+    function resolve(relativePath: string, basePath: string): string {
         if(!relativePath) { return ""; }
         
         let resultParts: Array<string> = [];
         if(basePath && basePath.length > 0) {
-            resultParts = basePath.split(seperator);
+            resultParts = basePath.split(_seperator);
         }
         
-        const parts = relativePath.split(seperator);
+        const parts = relativePath.split(_seperator);
         
         for(let i = 0, length = parts.length; i < length; i++) {
             const part = parts[i];
@@ -218,27 +216,27 @@ namespace am.system {
 
             resultParts.push(part)
         }
-        return resultParts.join(seperator);
+        return resultParts.join(_seperator);
     }
 
     function register(deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) {
-        console.log("register - test");
-
         // Add registration to a list so the load or onreadestatechange-loaded event can use it. 
         const registration: IRegistration = { 
             deps: deps, 
             fn: fn
         };
 
-        registrationList.push(registration);        
+        _registrationList.push(registration);        
     }
 
     function setImports(mod: IModule) {
         const setters =  mod.registrationInfo.setters;
         const deps = mod.registration.deps;
+        const folderPath = getPathToModuleFolder(mod.pathToModule);
         for (let i = 0, length = deps.length; i < length; i++) {
-            const dep = deps[i];
-            const depCode = imports(dep).exports; // TODO: Dit  klopt niet hier moet je de code van de module zetten en niet de module zelf.
+            const relativePath = deps[i];
+            const pathToDep = resolve(relativePath, folderPath);
+            const depCode = imports(pathToDep).exports;
             const setter = setters[i];
             setter(depCode);
         }
@@ -249,17 +247,18 @@ namespace am.system {
      */
     function setRegistration(src: string) {
         const name = getModuleNameFromSrc(src);
-        const pathToModule = resolve(name);
-        const mod: IModule = moduleMap[pathToModule];
-        const registration: IRegistration = registrationList.shift();
+        const pathToModule = name;
+        const mod: IModule = _moduleMap[pathToModule];
+        const registration: IRegistration = _registrationList.shift();
         mod.registration = registration;
 
         // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
         // Before we can execute this module.
         const deps = mod.registration.deps;
+        const folderPath = getPathToModuleFolder(pathToModule);
         for (let i = 0, length = deps.length; i < length; i++) {
-            const name = deps[i];
-            const pathToDep = resolve(name);
+            const relativePath = deps[i];
+            const pathToDep = resolve(relativePath, folderPath);
             System['import'](pathToDep);
         }
 

@@ -1,8 +1,8 @@
 /**
  * Renders to browser DOM.
  */
-import { VirtualDomAttribute, VirtualDomEvent, VirtualDomNode } from '../services/virtual.dom';
-import { IRenderer } from '../services/renderer';
+import { VirtualDomAttribute, VirtualDomEvent, VirtualDomNode } from '../ui/virtual.dom';
+import { IRenderer } from '../ui/renderer';
 
 export function boot(nativeNode: HTMLElement) {
     

@@ -5,9 +5,7 @@ const sf = new StoreField();
 
 
 function checkLocation() {
-    debugger;
-    const a = 1;
-    const b = 2 + 2;
+    console.log(sf.id);
 }
 
 
