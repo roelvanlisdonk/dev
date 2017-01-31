@@ -1,14 +1,18 @@
-System.register(["./libraries/am/storage/store"], function (exports_1, context_1) {
+System.register(["./libraries/am/storage/store", "./libraries/am/common/http"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     function checkLocation() {
         console.log(sf.id);
+        http_1.get('http://localhost:8080?id=555');
     }
-    var store_1, sf, a;
+    var store_1, http_1, sf, a;
     return {
         setters: [
             function (store_1_1) {
                 store_1 = store_1_1;
+            },
+            function (http_1_1) {
+                http_1 = http_1_1;
             }
         ],
         execute: function () {

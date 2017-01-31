@@ -1,11 +1,14 @@
 import { StoreField, StoreObject } from './libraries/am/storage/store';
-
+import { get } from './libraries/am/common/http';
+ 
 
 const sf = new StoreField();
 
 
 function checkLocation() {
     console.log(sf.id);
+
+    get('http://localhost:8080?id=555');
 }
 
 
