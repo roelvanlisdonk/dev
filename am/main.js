@@ -3,7 +3,7 @@ System.register(["./libraries/am/storage/store", "./libraries/am/common/http"], 
     var __moduleName = context_1 && context_1.id;
     function checkLocation() {
         console.log(sf.id);
-        http_1.get('http://localhost:8080?id=555');
+        http_1.get('https://stub.service.am.dev:4433');
     }
     var store_1, http_1, sf, a;
     return {

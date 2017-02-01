@@ -1,11 +1,53 @@
 # To do
 
+
+## CSS
+
+
+
+## Resources
+
+
+## Sync
+
+
+## Virtual Dom
+
+## Authentication
+
+
+## Deployment
+
+
+
+## Hotreload
+Note: In dev hotreloading is not that important, because all state is stored localy so when we use livereload and the 
+      the page is refreshed the app will be in the same state as before.
+      So for version 1 we don't spend time on hotreload.
+
+
+## Push notification
+* Pushnotification in dev without setting up Google Cloud Messaging (GCM) or Apple Push Notification Service (APN):
+  http://docs.phonegap.com/develop/push-notifications/
+ 
+
+
+
+
+
 * Create StoreRoot class with property user (property should have saveToLocalStorage = true).
 * Add StoreRoot class to store with sync to localstorage
 * Get StoreRoot  from store (lazy loading user, only when it is rendered)
 * convert dom to virtual dom
 * set user as dep for div
 * render div with current username
+
+
+
+fix - Object reference not set to an instance of an object. in C:\Projects\ZvdZ\mijnzvdz\Service\Providers\DeelherstelProvider.cs:line 110
+fix - deelherstel - historie spinner niet op juiste plek
+
+
 
 CSS
 * each component should have all used classnames inside its options

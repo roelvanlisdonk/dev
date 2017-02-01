@@ -8,7 +8,7 @@ const sf = new StoreField();
 function checkLocation() {
     console.log(sf.id);
 
-    get('http://localhost:8080?id=555');
+    get('https://stub.service.am.dev:4433');
 }
 
 
