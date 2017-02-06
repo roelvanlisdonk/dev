@@ -93,8 +93,8 @@ namespace am.system {
 
     function getBasePath(pathname: string): string {
         let result = pathname.split(_seperator).slice(0, -1).join(_seperator);
-        if(!result || result === _seperator) {
-            result = "";
+        if(!result) {
+            result = _seperator;
         }
         return result;
     }
@@ -117,7 +117,9 @@ namespace am.system {
         for (let i = 0, length = scripts.length; i < length; i++) {
             const script = scripts[i];
             const moduleName = script.getAttribute("data-main");
-            return resolve(moduleName, _basePath);
+            if(moduleName) {
+                return resolve(moduleName, _basePath);
+            }
         }
         throw new Error("Could not find script tag in head with attribute data-main. Note the attribute data-main should have a non empty value.");
     }
@@ -196,7 +198,7 @@ namespace am.system {
         if(!relativePath) { return ""; }
         
         let resultParts: Array<string> = [];
-        if(basePath && basePath.length > 0) {
+        if(basePath && basePath.length > 0 && basePath !== _seperator) {
             resultParts = basePath.split(_seperator);
         }
         
@@ -216,7 +218,13 @@ namespace am.system {
 
             resultParts.push(part)
         }
-        return resultParts.join(_seperator);
+        
+        let result = resultParts.join(_seperator);
+        if(result[0] !== _seperator) {
+            result = _seperator + result;
+        }
+
+        return result;
     }
 
     function register(deps: Array<string>, fn: (exports: any, context: any) => IRegistrationInfo) {
