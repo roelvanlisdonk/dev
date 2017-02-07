@@ -39,6 +39,14 @@ namespace am.system {
     //      then "main" will be loaded as <script type="text/javascript" src="/my/app/location/main.js"></script>.
     const _basePath = getBasePath(document.location.pathname);
 
+    function alwaysStartWithSeperator(pathParts: Array<string>): string {
+        let result = pathParts.join(_seperator);
+        if(result[0] !== _seperator) {
+            result = _seperator + result;
+        }
+        return result;
+    }
+
     function createScriptNode(src: string) {
         const script: any = document.createElement("script");
         if (_isIE) {
@@ -219,10 +227,8 @@ namespace am.system {
             resultParts.push(part)
         }
         
-        let result = resultParts.join(_seperator);
-        if(result[0] !== _seperator) {
-            result = _seperator + result;
-        }
+
+        const result = alwaysStartWithSeperator(resultParts);
 
         return result;
     }

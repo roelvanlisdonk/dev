@@ -18,7 +18,8 @@ System.register(["../libraries/am/storage/store"], function (exports_1, context_
                 __extends(User, _super);
                 function User() {
                     var _this = _super.call(this) || this;
-                    _this.email = new store_1.StoreField();
+                    _this.test = "";
+                    _this.email = "email from constructor";
                     return _this;
                 }
                 return User;

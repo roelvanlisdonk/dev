@@ -1,13 +1,13 @@
 import { StoreField, StoreObject } from '../libraries/am/storage/store';
 
 export class User extends StoreObject {
-    email: StoreField;
+    test: string = "";
+    email: string;
 
     constructor() {
         super();
 
-        this.email = new StoreField();
-        
+        this.email = "email from constructor";
     }
 }
 
