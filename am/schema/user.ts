@@ -1,13 +1,12 @@
 import { StoreField, StoreObject } from '../libraries/am/storage/store';
 
+const sb = new StoreObject();
+
 export class User extends StoreObject {
-    test: string = "";
-    email: string;
+    authorizationToken = new StoreField<string>();
+    email = new StoreField<string>();
 
-    constructor() {
-        super();
-
-        this.email = "email from constructor";
+    isAuthorized(): boolean {
+        return Boolean(this.authorizationToken.value);
     }
 }
-

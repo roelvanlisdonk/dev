@@ -6,7 +6,7 @@ System.register(["../libraries/am/storage/store"], function (exports_1, context_
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
     var __moduleName = context_1 && context_1.id;
-    var store_1, User;
+    var store_1, sb, User;
     return {
         setters: [
             function (store_1_1) {
@@ -14,18 +14,22 @@ System.register(["../libraries/am/storage/store"], function (exports_1, context_
             }
         ],
         execute: function () {
+            sb = new store_1.StoreObject();
             User = (function (_super) {
                 __extends(User, _super);
                 function User() {
-                    var _this = _super.call(this) || this;
-                    _this.test = "";
-                    _this.email = "email from constructor";
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.authorizationToken = new store_1.StoreField();
+                    _this.email = new store_1.StoreField();
                     return _this;
                 }
+                User.prototype.isAuthorized = function () {
+                    return Boolean(this.authorizationToken.value);
+                };
                 return User;
             }(store_1.StoreObject));
             exports_1("User", User);
         }
     };
 });
-//# sourceMappingURL=user.js.map
+//# sourceMappingURL=User.js.map

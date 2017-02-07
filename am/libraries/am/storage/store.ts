@@ -5,11 +5,11 @@ import _data = am.store.data;
 
 const rootId = "am.root";
 
-function getObjectFromLocalStorage(id: string, schemaType: { new (generateCuid?: boolean): IStoreObject; }): IStoreObject {
+function getObjectFromLocalStorage<T extends IStoreObject>(id: string, schemaType: { new (): T; }): T {
     const json = clientStorage.getItem(id);
 
     if (json) {
-        const schemaObj: any = new schemaType(false);
+        const schemaObj: any = new schemaType();
         const storeObj = JSON.parse(json);
 
         const keys = Object.keys(storeObj);
@@ -22,8 +22,8 @@ function getObjectFromLocalStorage(id: string, schemaType: { new (generateCuid?:
             let schemaTypeProp = schemaObj[key];
             if (schemaTypeProp === undefined) { continue; }
 
-            // Id will not be observable.
-            if (key === "id") {
+            // The following properties, will not be observable.
+            if (key === "id" || key === "syncType") {
                 schemaObj.id = storeObj[key];
                 continue;
             }
@@ -34,9 +34,9 @@ function getObjectFromLocalStorage(id: string, schemaType: { new (generateCuid?:
             // When type does not contain a object create one.
             if (schemaTypeProp === null) {
                 if(isStorePropField) {
-                    schemaTypeProp = new StoreField(false);
+                    schemaTypeProp = new StoreField();
                 } else {
-                    schemaTypeProp = new StoreObject(false);
+                    schemaTypeProp = new StoreObject();
                 }
             }
             schemaObj[key] = schemaTypeProp;
@@ -53,14 +53,14 @@ function getObjectFromLocalStorage(id: string, schemaType: { new (generateCuid?:
     return null;
 }
 
-export function getRoot(rootType: { new (generateCuid?: boolean): IStoreObject; }): IStoreObject {
+export function getRoot<T extends IStoreObject>(rootType: { new (): T; }): T {
 
     // Check if root exists in memory.
-    let root: IStoreObject = _data[rootId];
+    let root: T = _data[rootId];
     if (root) { return root; }
 
     // Check if root exists in local storage
-    root = getObjectFromLocalStorage(rootId, rootType);
+    root = getObjectFromLocalStorage<T>(rootId, rootType);
     if (root) { return root; }
 
     // This is the first time the app boots, so return a new instance of the root type.
@@ -78,6 +78,12 @@ export function sync() {
 
 }
 
+export enum SyncType {
+    memory = 1, // Store object only in memory.
+    local,      // Store object in memory and local storage.
+    cloud       // Store object in memory, local storage and cloud storage.
+}
+
 export interface IChangeEvent {
     propertyName: string;
     newValue: any;
@@ -90,6 +96,7 @@ export interface IStoreObject {
      */
     id: string;
     onChange: (evt: IChangeEvent) => void;
+    syncType: SyncType;
 
     // TODO: add validation rules.
 }
@@ -99,17 +106,13 @@ export interface IStoreObject {
  * The getter will get the data from localstorage if it is not loaded yet.
  */
 export class StoreObject implements IStoreObject {
-    public id: string;
-    public onChange: (evt: IChangeEvent) => void;
+    id: string;
+    onChange: (evt: IChangeEvent) => void;
+    syncType = SyncType.local;
 
-    constructor(generateCuid = true) {
+    constructor() {
         const self: StoreObject = this;
-
-        // TODO:  make id read only.
-        if (generateCuid) {
-            self.id = cuid();
-        }
-
+        
         const onChangeHandlers: Array<(evt: IChangeEvent) => void> = [];
         function onChange(evt: IChangeEvent) {
             const handlersCount = onChangeHandlers.length;
@@ -149,8 +152,8 @@ export class StoreField<T extends boolean | number | Date | string | Array<IStor
 
     // TODO: add validation rules.
 
-    constructor(generateCuid = true) {
-        super(generateCuid);
+    constructor() {
+        super();
 
         const self: StoreField<T> = this;
         let value: T;

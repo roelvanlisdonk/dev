@@ -71,30 +71,43 @@ namespace am.system {
         return result;
     }
 
+    function executeModule(mod: IModule) {
+        // Execute dependencies
+        const deps = mod.registration.deps;
+        const depCount = deps.length;
+        for (let i = 0; i < depCount; i++) {
+            const pathToModule = deps[i];
+            const mod = _moduleMap[pathToModule];
+            
+            if(!mod.executed) {
+                executeModule(mod);
+            }
+        }
+        // First set the dependencies in the module
+        // Door het uitvoeren van de mod.registration.fn worden de volgende zaken geregeld:
+        // - exports
+        // - imports
+        // - returns a object that contains a execute function that should be executed.
+        // Execute the module.
+        
+        // Store exports
+        mod.registrationInfo = mod.registration.fn((name: string, code: any) => {
+            mod.exports[name] = code;
+        }, {});
+
+        setImports(mod);
+
+        // execute
+        mod.registrationInfo.execute();
+        mod.executed = true;
+    }
+
     function executeModules() {
         for (let length = _moduleList.length, i = length - 1; i >= 0; i--) {
             const mod = _moduleList[i];
-
             
             if(!mod.executed) {
-                // First set the dependencies in the module
-                // Door het uitvoeren van de mod.registration.fn worden de volgende zaken geregeld:
-                // - exports
-                // - imports
-                // - returns a object that contains a execute function that should be executed.
-                // Execute the module.
-                
-                // Store exports
-                mod.registrationInfo = mod.registration.fn((name: string, code: any) => {
-                    mod.exports[name] = code;
-                }, {});
-
-                // Set imports TODO: dit gaat nog niet goed 
-                setImports(mod);
-
-                // execute
-                mod.registrationInfo.execute();
-                mod.executed = true;
+                executeModule(mod);
             }
         }
     }
@@ -176,7 +189,7 @@ namespace am.system {
 
     function loadMain() {
         const moduleName = getPathToMainModule();
-        System['import'](moduleName);
+        System["import"](moduleName);
     }
 
     function onerror(e: any) {
@@ -248,9 +261,9 @@ namespace am.system {
         const deps = mod.registration.deps;
         const folderPath = getPathToModuleFolder(mod.pathToModule);
         for (let i = 0, length = deps.length; i < length; i++) {
-            const relativePath = deps[i];
-            const pathToDep = resolve(relativePath, folderPath);
-            const depCode = imports(pathToDep).exports;
+            const pathToDep = deps[i];
+            const depAsMod = _moduleMap[pathToDep];
+            const depCode = depAsMod.exports;
             const setter = setters[i];
             setter(depCode);
         }
@@ -273,6 +286,10 @@ namespace am.system {
         for (let i = 0, length = deps.length; i < length; i++) {
             const relativePath = deps[i];
             const pathToDep = resolve(relativePath, folderPath);
+
+            // Update relative path to absolute path.
+            deps[i] = pathToDep;
+
             System['import'](pathToDep);
         }
 

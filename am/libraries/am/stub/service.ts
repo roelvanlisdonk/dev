@@ -4,7 +4,7 @@
  */
 
 const fs = require("fs");
-const https = require("https");
+const https = require("http2");
 const path = require('path');
 const url = require('url');
 
