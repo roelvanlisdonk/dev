@@ -23,6 +23,7 @@ function getObjectFromLocalStorage<T extends IStoreObject>(id: string, schemaTyp
             let schemaTypeProp = schemaObj[key];
             if (schemaTypeProp === undefined) { continue; }
 
+            // TODO: 
             // The following properties, will not be observable.
             if (key === "id" || key === "syncType") {
                 schemaObj.id = storeObj[key];
