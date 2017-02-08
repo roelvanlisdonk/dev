@@ -1,3 +1,4 @@
+import { IChangeEvent, IObservable, Observable } from "../common/observable";
 import { cuid } from "../common/cuid";
 import { isArray } from "../common/validation/is-array"
 import { clientStorage } from "./local.storage";
@@ -84,13 +85,8 @@ export enum SyncType {
     cloud       // Store object in memory, local storage and cloud storage.
 }
 
-export interface IChangeEvent {
-    propertyName: string;
-    newValue: any;
-    oldValue: any;
-}
 
-export interface IStoreObject {
+export interface IStoreObject extends IObservable {
     /**
      * Unique id in the store.
      */
@@ -105,12 +101,13 @@ export interface IStoreObject {
  * To allow for lazy loading of data, each property (except 'id') in a StoreObject will be converted to getters and setters.
  * The getter will get the data from localstorage if it is not loaded yet.
  */
-export class StoreObject implements IStoreObject {
+export class StoreObject extends Observable implements IStoreObject {
     id: string;
     onChange: (evt: IChangeEvent) => void;
     syncType = SyncType.local;
 
     constructor() {
+        super();
         const self: StoreObject = this;
         
         const onChangeHandlers: Array<(evt: IChangeEvent) => void> = [];

@@ -1,15 +1,10 @@
-import { IStoreField, IStoreObject } from '../storage/store';
+import { IObservable } from "../common/observable";
 
-export interface IVirtualDomObject {
+export interface IVirtualDomObject extends IObservable {
     /**
      * Is called after the node is added to the real UI.
      */
     onAdded: () => void;
-
-    /**
-     * Is called when one of the deps changes. After it is called an change event is added to the **dom change event stream**.
-     */
-    onChange: () => void;
 
     /**
      * Is called after the node removed from the real UI.
@@ -18,7 +13,7 @@ export interface IVirtualDomObject {
 }
 
 export class VirtualDomAttribute implements IVirtualDomObject {
-        deps: Array<IStoreObject> = [];
+        deps: Array<IObservable> = [];
         enabled: boolean = true;         // When true, it's added to the UI.
         name: string;
         value: string;
@@ -37,7 +32,7 @@ export class VirtualDomAttribute implements IVirtualDomObject {
 }
 
 export class VirtualDomEvent implements IVirtualDomObject {
-    deps: Array<IStoreObject>;   
+    deps: Array<IObservable>;   
     name: string;
 
     onAdded() {
@@ -53,12 +48,11 @@ export class VirtualDomEvent implements IVirtualDomObject {
     }
 }
 
-
-
 export class VirtualDomNode implements IVirtualDomObject {
+    deps: Array<IObservable>;
     attrs: Array<VirtualDomAttribute>;
-    classes: Array<CSSStyleDeclaration>;
-    events: Array<VirtualDomEvent>
+    cssClasses: Array<string>;   // TODO: change type to string | Observable, so classes can be added when deps change.
+    events: Array<VirtualDomEvent>;
     name: string;
     nativeNode: any; // Can be server side html, client side html, native script etc.
     nodes: Array<VirtualDomNode>;
@@ -77,7 +71,7 @@ export class VirtualDomNode implements IVirtualDomObject {
 }
 
 export class VirtualDomTextNode extends VirtualDomNode {
-    deps: Array<IStoreObject>;
+    deps: Array<IObservable>;
     text: string;
 }
 
