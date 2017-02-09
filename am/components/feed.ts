@@ -1,8 +1,16 @@
 import { VirtualDomNode } from "../libraries/am/ui/virtual.dom";
-import { Root } from "../schema/root";
+import { CssStyle } from "../libraries/am/ui/styles";
 
-export function feed(root: Root): VirtualDomNode {
-    const result = new VirtualDomNode();
-
-    return result;
+export class FeedOptions {
+    style: CssStyle = {
+        boxSizing: "border-box"
+    };
 }
+
+export function feed(options?: FeedOptions): VirtualDomNode {
+    const node = new VirtualDomNode();
+    node.name = "feed";
+    return node;
+}
+
+export const DefaultLoginOptions = new FeedOptions();

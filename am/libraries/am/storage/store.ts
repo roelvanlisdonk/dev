@@ -106,30 +106,6 @@ export class StoreObject extends Observable implements IStoreObject {
     id: string;
     onChange: (evt: IChangeEvent) => void;
     syncType = SyncType.local;
-
-    constructor() {
-        super();
-        const self: StoreObject = this;
-        
-        const onChangeHandlers: Array<(evt: IChangeEvent) => void> = [];
-        function onChange(evt: IChangeEvent) {
-            const handlersCount = onChangeHandlers.length;
-            for (let i = 0, length = handlersCount; i < length; i++) {
-                const handler = onChangeHandlers[i];
-                handler(evt);
-            }
-        }
-
-        Object.defineProperty(self, 'onChange', {
-            get: function () {
-                return onChange;
-            },
-            set: function (handler: (evt: IChangeEvent) => void) {
-                onChangeHandlers.push(handler);
-            },
-            enumerable: true
-        });
-    }
 }
 
 

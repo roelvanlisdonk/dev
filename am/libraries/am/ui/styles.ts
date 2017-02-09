@@ -60,11 +60,21 @@ export interface CssClass {
     style: CssStyle;
 }
 
-export type BoxSizing = "content-box" |
-                 "border-box" |
-                 "inherit" |
-                 "initial" |
-                 "unset";
+export type BoxSizing = 
+    "content-box" |
+    "border-box" |
+    "inherit" |
+    "initial" |
+    "unset";
+
+export type Overflow = 
+    "auto" | // Let the browser decide
+    "hidden" | // Content is clipped, with no scrollbars   
+    "inherit" |
+    "initial" |
+    "scroll" | // Content is clipped, with scrollbars
+    "unset" |
+    "visible" // Content is not clipped;
 
 export interface CssStyle {
     alignContent?: string | null;
@@ -264,9 +274,9 @@ export interface CssStyle {
     outlineColor?: string | null;
     outlineStyle?: string | null;
     outlineWidth?: string | null;
-    overflow?: string | null;
-    overflowX?: string | null;
-    overflowY?: string | null;
+    overflow?: Overflow;
+    overflowX?: Overflow;
+    overflowY?: Overflow;
     padding?: string | null;
     paddingBottom?: string | null;
     paddingLeft?: string | null;

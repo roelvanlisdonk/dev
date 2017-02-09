@@ -11,7 +11,7 @@ function getOSLocale(): string {
  */
 export let defaultLocale: string = getOSLocale();
 
-export function getText(resource: IResource): string {
+export function getResource(resource: IResource): string {
     return (resource as any)[defaultLocale];
 }
 

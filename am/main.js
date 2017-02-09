@@ -1,24 +1,17 @@
-System.register(["./libraries/am/platform/dom", "./libraries/am/ui/virtual.dom", "./libraries/am/storage/store", "./schema/root"], function (exports_1, context_1) {
+System.register(["./libraries/am/platform/dom", "./libraries/am/ui/virtual.dom", "./libraries/am/storage/store", "./schema/root", "./components/login", "./components/feed"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    function Container() {
-        var node = new virtual_dom_1.VirtualDomNode();
-        node.name = "container";
-        node.cssClasses;
-        return node;
-    }
     function createRootVirtualDomNode() {
         var node = new virtual_dom_1.VirtualDomNode();
         var root = store_1.getRoot(root_1.Root);
         if (root.user.isAuthorized()) {
-            console.log("Show main page");
+            return feed_1.feed();
         }
         else {
-            console.log("Show login page");
+            return login_1.login();
         }
-        return node;
     }
-    var dom_1, virtual_dom_1, store_1, root_1, DefaultContainerOptions, ContainerOptions, a;
+    var dom_1, virtual_dom_1, store_1, root_1, login_1, feed_1, a;
     return {
         setters: [
             function (dom_1_1) {
@@ -32,19 +25,15 @@ System.register(["./libraries/am/platform/dom", "./libraries/am/ui/virtual.dom",
             },
             function (root_1_1) {
                 root_1 = root_1_1;
+            },
+            function (login_1_1) {
+                login_1 = login_1_1;
+            },
+            function (feed_1_1) {
+                feed_1 = feed_1_1;
             }
         ],
         execute: function () {
-            exports_1("DefaultContainerOptions", DefaultContainerOptions = new ContainerOptions());
-            ContainerOptions = (function () {
-                function ContainerOptions() {
-                    this.style = {
-                        boxSizing: "border-box"
-                    };
-                }
-                return ContainerOptions;
-            }());
-            exports_1("ContainerOptions", ContainerOptions);
             dom_1.boot(document.body, createRootVirtualDomNode);
             exports_1("a", a = "");
         }

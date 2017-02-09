@@ -1,4 +1,4 @@
-import { IObservable } from "../common/observable";
+import { IObservable, Observable } from "../common/observable";
 
 export interface IVirtualDomObject extends IObservable {
     /**
@@ -12,56 +12,25 @@ export interface IVirtualDomObject extends IObservable {
     onRemoved: () => void;
 }
 
-export class VirtualDomAttribute implements IVirtualDomObject {
-        deps: Array<IObservable> = [];
+export class VirtualDomAttribute extends Observable {
         enabled: boolean = true;         // When true, it's added to the UI.
         name: string;
         value: string;
-
-        onAdded() {
-
-        }
-
-        onChange() {
-
-        }
-
-        onRemoved() {
-
-        }
 }
 
-export class VirtualDomEvent implements IVirtualDomObject {
-    deps: Array<IObservable>;   
+export class VirtualDomEvent extends Observable {
     name: string;
-
-    onAdded() {
-
-    }
-
-    onChange() {
-
-    }
-
-    onRemoved() {
-
-    }
 }
 
-export class VirtualDomNode implements IVirtualDomObject {
-    deps: Array<IObservable>;
-    attrs: Array<VirtualDomAttribute>;
-    cssClasses: Array<string>;   // TODO: change type to string | Observable, so classes can be added when deps change.
-    events: Array<VirtualDomEvent>;
+export class VirtualDomNode extends Observable implements IVirtualDomObject {
+    attrs: Array<VirtualDomAttribute> = [];
+    cssClasses: Array<string> = [];   // TODO: change type to string | Observable, so classes can be added when deps change.
+    events: Array<VirtualDomEvent> = [];
     name: string;
     nativeNode: any; // Can be server side html, client side html, native script etc.
-    nodes: Array<VirtualDomNode>;
+    nodes: Array<VirtualDomNode> = [];
 
     onAdded() {
-
-    }
-
-    onChange() {
 
     }
 
@@ -71,10 +40,14 @@ export class VirtualDomNode implements IVirtualDomObject {
 }
 
 export class VirtualDomTextNode extends VirtualDomNode {
-    deps: Array<IObservable>;
     text: string;
 }
 
+export function text(value: string) {
+    const vdNode = new VirtualDomTextNode();
+    vdNode.text = value;
+    return vdNode;
+}
 
 // let root: IVirtualDomNode = null;
 
