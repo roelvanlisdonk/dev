@@ -1,15 +1,23 @@
 {
-  "name": "am",
+  "name": "blog",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "livereload": "livereload ./"
   },
   "private": true,
+  "dependencies": {
+    "angular": ">=1.6.1",
+    "angular-animate": ">=1.6.1",
+    "angular-sanitize": ">=1.6.1",
+    "es5-shim": ">=4.5.9",
+    "es6-shim": ">=0.35.3",
+    "jquery": ">=3.1.1"
+  },
   "devDependencies": {
     "@types/angular": "latest",
-    "@types/es6-promise": "latest",
-    "livereload": "latest",
-    "typescript": "latest"
+    "@types/angular-animate": "latest",
+    "@types/angular-sanitize": "latest",
+    "@types/jquery": ">=2.0.40",
+    "@types/node": ">=7.0.4"
   }
 }

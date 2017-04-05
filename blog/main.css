@@ -1,0 +1,67 @@
+
+html,
+body,
+.center,
+.center iframe,
+.container,
+.row {
+    border-width: 0;
+    box-sizing: border-box;
+    margin: 0;
+    outline-width: 0;
+    padding: 0;
+}
+
+html,
+body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Tahoma, Arial, sans-serif;
+    font-size: 16px;
+    height: 100%;
+}
+
+.center {
+    height: 100%;
+    margin: 0 auto 0 auto;
+    max-width: 800px;
+    padding: 50px 0 50px 0;
+    position: relative;
+}
+
+.center iframe {
+    border: 1px solid #c8c8c8;
+}
+
+.footer {
+    bottom: 10px;
+    font-size: 10px;
+    position: absolute;
+}
+
+.header {
+    box-sizing: border-box;
+    font-size: 0;
+    font-weight: bold;
+    overflow: hidden;
+    position: absolute;
+    top: 10px;
+    white-space: nowrap;
+}
+
+.header .icon {
+    box-sizing: border-box;
+    display: inline-block;
+    padding-top: 2px;
+    vertical-align: top;
+}
+
+.header .title {
+    box-sizing: border-box;
+    display: inline-block;
+    font-size: 20px;
+    padding-left: 20px;
+    height: 100%;
+    vertical-align: top;
+}
+
+
+

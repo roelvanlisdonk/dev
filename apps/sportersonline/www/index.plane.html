@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plane - styling</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <style>
+        html,
+        body,
+        page {
+            border-width: 0;
+            color: #262626;
+            font-family: 'Open Sans', sans-serif;
+            height: 100%;
+            margin: 0;
+            outline-style: none;
+            overflow: hidden;
+            padding: 0;
+        }
+
+
+        page {
+            display: block;
+            position: relative;
+        }
+
+        button-bar {
+            background-color: #F7F7F7;
+            border-width: 0;
+            border-top: 1px solid #B3B3B3;
+            bottom: 0;
+            display: block;
+            font-size: 0;
+            margin: 0;
+            outline-style: none;
+            padding: 0;
+            position: absolute;
+            text-align: center;
+            width: 100%;
+        }
+
+        button {
+            background-color: transparent;
+            border-width: 0;
+            box-sizing: border-box;
+            color: #595959;
+            cursor: pointer;
+            display: inline-block;
+            outline-style: none;
+            padding: 8px 10px 4px 10px;
+            text-align: center;
+            user-select: none;
+        }
+
+        icon {
+            border-width: 0;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 16px;
+            height: 24px;
+            margin: 0 auto;
+            outline-style: none;
+            padding: 0;
+            user-select: none;
+            width: 24px;
+        }
+
+        header {
+            display: block;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        text {
+            display: block;
+            font-size: 13px;
+        }
+
+        .active {
+            color: rgb(0, 122, 255);
+        }
+    </style>
+</head>
+<body>
+    <page>
+        <header>Welcome to the styling proof-of-concept!</header>
+        <button-bar>
+            <button type="button">
+                <icon>x</icon>
+                <text>Feed</text>
+            </button>
+            <button type="button">
+                <icon>x</icon>
+                <text>Favorites</text>
+            </button>
+            <button type="button" class="active">
+                <icon>x</icon>
+                <text>Settings</text>
+            </button>
+        </button-bar>
+    </page>
+</body>
+</html>

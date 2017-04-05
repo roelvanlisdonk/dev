@@ -1,0 +1,89 @@
+
+.carousel {
+    background-color: rgb(50, 50 , 50);
+    color: rgb(255, 255, 255);
+    height: 100px;
+    margin: 50px auto 50px auto;
+    overflow: hidden;
+    position: relative;
+    width: 1000px;
+}
+
+.carousel button {
+    background-color: transparent;
+    border: 0;
+    border-image-width: 0;
+    outline: 0;
+    cursor: pointer;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    z-index: 1;
+}
+
+.carousel button.previous {
+    left: 20px;
+}
+
+.carousel button.next {
+    right: 20px;
+}
+
+.carousel button.previous,
+.carousel button.next {
+    bottom: 0;
+    color: rgba(255, 255, 255, 0.6);
+    position: absolute;
+    top: 0;
+}
+
+.carousel button.previous i,
+.carousel button.next i {
+    font-family: 'FontAwesome';
+    font-size: 36px;
+    font-style: normal;
+    text-rendering: auto;
+}
+
+.carousel .pager {
+    bottom: 20px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+}
+
+.carousel .pager button.item {
+    color: rgb(255, 255, 255);
+    display: inline-block;
+    float: none;
+    margin-right: 10px;
+    padding: 4px;
+}
+
+.carousel .pager button.item i {
+    font-family: 'FontAwesome';
+    font-size: 14px;
+    font-style: normal;
+    text-rendering: auto;
+}
+
+.carousel .slide {
+    float: left;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 1000px;
+}
+
+.carousel .slides {
+    bottom: 0;
+    clear: both;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    top: 0;
+}

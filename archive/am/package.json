@@ -1,0 +1,14 @@
+{
+  "name": "am",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "livereload": "livereload ./"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/node": ">=7.0.4",
+    "http2": ">=3.3.6",
+    "livereload": ">=0.6.0"
+  }
+}
