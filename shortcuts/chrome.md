@@ -1,6 +1,5 @@
 
-
-#Shortcuts
+# Keyboard shortcuts
 
 ctrl + F4   |   Close the current tab.
 ctrl + t    |   Open a new tab, and jump to it.
