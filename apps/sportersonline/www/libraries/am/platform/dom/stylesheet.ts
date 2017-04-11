@@ -2,7 +2,7 @@ import { toSnakeCase } from "../../common/text/to.snake.case";
 import { IRule } from "../../virtual.dom/rule";
 import { IClass } from "../../virtual.dom/class";
 
-const _styles: any = am.store.data.cssRules;
+const _rules: any = am.store.data.cssRules;
 
 /**
  * An am app contains only one app stylesheet.
@@ -14,8 +14,14 @@ export function addClassToStyleSheet(cssClass: IClass): void {
     if (!cssClass.name) { throw new Error("Please provide cssClass.name."); }
     if (!cssClass.style) { throw new Error("Please provide cssClass.style."); }
 
-    cssClass.selector = `.${cssClass.name}`;
-    addRuleToStyleSheet(cssClass as any);
+    const selector = `.${cssClass.name}`;
+    if (!_rules[selector]) {
+        const rule: IRule = {
+            selector,
+            style: cssClass.style
+        };
+        addRuleToStyleSheet(rule);
+    }
 }
 
 /**
@@ -28,7 +34,7 @@ export function addRuleToStyleSheet(rule: IRule): void {
     if (!rule.style) { throw new Error("Please provide rule.style."); }
 
     const selector = rule.selector;
-    if (!_styles[selector]) {
+    if (!_rules[selector]) {
         let rules = "";
         const style = rule.style;
         const keys = Object.keys(style);
@@ -50,7 +56,7 @@ export function addRuleToStyleSheet(rule: IRule): void {
             styleSheet.addRule(`${selector}`, rules, 0);
         }
         
-        _styles[selector] = rule;
+        _rules[selector] = rule;
     }
 }
 

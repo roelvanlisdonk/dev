@@ -2,15 +2,14 @@ import { IListener, IObservableField, IObservableFn } from "../../common/observa
 import { isArray } from "../../common/validation/is.array";
 import { isFunction } from "../../common/validation/is.function";
 import { isObject } from "../../common/validation/is.object";
-import { IPart } from "../../virtual.dom/part";
-import { INode, INodeFactory, INodeRenderer } from "../../virtual.dom/node";
+import { INode } from "../../virtual.dom/node";
 import { EventName, IEvent } from "../../virtual.dom/event";
 import { removeAttribute, renderAttribute } from "./attribute";
 import { removeClass, renderClass } from "./class";
 import { renderParts } from "./part";
 import { removeEvent, renderEvent } from "./event";
 
-function appendNativeNode(node: INode) {
+export function appendNativeNode(node: INode) {
     if(!node) { throw new Error("Please provide node."); }
 
     const parentNode: INode = node.parentNode;
@@ -21,9 +20,11 @@ function appendNativeNode(node: INode) {
     const nodes = parentNode.nodes;
     for (let i = node.parentNodeChildIndex; i > 0; i--) {
         const child = nodes[i];
-        if(child && child.nativeNode) {
-            firstUp = child.nativeNode;
-        }
+
+        // TODO: fix this.
+        // if(child && child.nativeNode) {
+        //     firstUp = child.nativeNode;
+        // }
     }
 
     const shouldInsert = (firstUp && firstUp.nextSibling);

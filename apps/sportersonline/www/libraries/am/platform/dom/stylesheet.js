@@ -11,8 +11,14 @@ System.register(["../../common/text/to.snake.case"], function (exports_1, contex
         if (!cssClass.style) {
             throw new Error("Please provide cssClass.style.");
         }
-        cssClass.selector = "." + cssClass.name;
-        addRuleToStyleSheet(cssClass);
+        var selector = "." + cssClass.name;
+        if (!_rules[selector]) {
+            var rule = {
+                selector: selector,
+                style: cssClass.style
+            };
+            addRuleToStyleSheet(rule);
+        }
     }
     exports_1("addClassToStyleSheet", addClassToStyleSheet);
     function addRuleToStyleSheet(rule) {
@@ -26,7 +32,7 @@ System.register(["../../common/text/to.snake.case"], function (exports_1, contex
             throw new Error("Please provide rule.style.");
         }
         var selector = rule.selector;
-        if (!_styles[selector]) {
+        if (!_rules[selector]) {
             var rules = "";
             var style = rule.style;
             var keys = Object.keys(style);
@@ -45,7 +51,7 @@ System.register(["../../common/text/to.snake.case"], function (exports_1, contex
             else if ("addRule" in styleSheet) {
                 styleSheet.addRule("" + selector, rules, 0);
             }
-            _styles[selector] = rule;
+            _rules[selector] = rule;
         }
     }
     exports_1("addRuleToStyleSheet", addRuleToStyleSheet);
@@ -66,7 +72,7 @@ System.register(["../../common/text/to.snake.case"], function (exports_1, contex
         head.appendChild(style);
         return style.sheet || style.styleSheet;
     }
-    var to_snake_case_1, _styles, styleSheet;
+    var to_snake_case_1, _rules, styleSheet;
     return {
         setters: [
             function (to_snake_case_1_1) {
@@ -74,7 +80,7 @@ System.register(["../../common/text/to.snake.case"], function (exports_1, contex
             }
         ],
         execute: function () {
-            _styles = am.store.data.cssRules;
+            _rules = am.store.data.cssRules;
             styleSheet = create("am");
         }
     };

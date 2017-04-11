@@ -1,4 +1,3 @@
-import { IPart, IPartFactory, IPartRenderer } from "./part";
 
 export type BoxSizing =
     "content-box" |
@@ -108,7 +107,7 @@ export type TextAlign =
     "initial" |
     "unset";
 
-export interface IStyle extends IPart {
+export interface IStyle {
     alignContent?: string | null;
     alignItems?: string | null;
     alignSelf?: string | null;
@@ -440,18 +439,4 @@ export interface IStyle extends IPart {
     writingMode?: string | null;
     zIndex?: string | null;
     zoom?: string | null;
-}
-
-export interface IStyleFactory extends IPartFactory {
-    (input: any): IStyle | Array<IStyle>;
-}
-
-/**
- * You should read the properties on this object like:
- * (re)render x when y changes.
- */
-export interface IStyleRenderer extends IPartRenderer
-{
-    render: IStyle | IStyleFactory; // x
-    when: any; // y
 }

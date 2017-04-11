@@ -1,4 +1,4 @@
-System.register(["../virtual.dom/class", "../components/styles", "./text"], function (exports_1, context_1) {
+System.register(["../components/styles", "./text"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     function button(input) {
@@ -25,12 +25,9 @@ System.register(["../virtual.dom/class", "../components/styles", "./text"], func
         return node;
     }
     exports_1("button", button);
-    var class_1, styles_1, text_1, tagName, buttonClass;
+    var styles_1, text_1, tagName, buttonClass;
     return {
         setters: [
-            function (class_1_1) {
-                class_1 = class_1_1;
-            },
             function (styles_1_1) {
                 styles_1 = styles_1_1;
             },
@@ -40,14 +37,16 @@ System.register(["../virtual.dom/class", "../components/styles", "./text"], func
         ],
         execute: function () {
             tagName = "button";
-            exports_1("buttonClass", buttonClass = class_1.createClass(tagName, styles_1.container, {
-                borderColor: "#8F8E93",
-                borderStyle: "solid",
-                borderWidth: "1px",
-                cursor: "pointer",
-                display: "inline-block",
-                padding: "10px",
-                textAlign: "center"
+            exports_1("buttonClass", buttonClass = Object.assign({}, styles_1.container, { name: tagName,
+                style: {
+                    borderColor: "#8F8E93",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    cursor: "pointer",
+                    display: "inline-block",
+                    padding: "10px",
+                    textAlign: "center"
+                }
             }));
         }
     };

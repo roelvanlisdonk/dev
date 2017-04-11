@@ -1,20 +1,7 @@
-import { IPart, IPartFactory, IPartRenderer } from "./part";
+import { IObservableField, IObservableFn } from "../common/observable";
 
-export interface IAttribute extends IPart {
+export interface IAttribute {
     name: string;
-    value?: string;
-}
-
-export interface IAttributeFactory extends IPartFactory {
-    (input: any): IAttribute | Array<IAttribute>;
-}
-
-/**
- * You should read the properties on this object like:
- * (re)render x when y changes.
- */
-export interface IAttributeRenderer extends IPartRenderer
-{
-    render: IAttribute | IAttributeFactory; // x
-    when: any; // y
+    // When null attribute will not be rendered, when empty string only, attribute name will be rendered.
+    value?: string | IObservableField<string> | IObservableFn<any, string>;
 }

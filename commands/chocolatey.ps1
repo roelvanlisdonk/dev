@@ -18,8 +18,11 @@ npm -version
 # Update installed programs
 # DO NOT: choco upgrade npm, it is deprecated.
 nuget update -self
-choco upgrade chocolatey
+choco upgrade chocolatey -y
 choco upgrade nodejs -y
+
+# TO DO investigate which of the following to lines should be used.
+npm i -g npm
 npm install -g npm@latest
 
 # Update npm global packages

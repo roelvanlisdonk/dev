@@ -1,4 +1,4 @@
-System.register(["../../virtual.dom/class", "../../components/styles"], function (exports_1, context_1) {
+System.register(["../../components/styles"], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     function path(input) {
@@ -26,12 +26,9 @@ System.register(["../../virtual.dom/class", "../../components/styles"], function
         return node;
     }
     exports_1("icon", icon);
-    var class_1, styles_1, tagName, defaultInput, iconClass;
+    var styles_1, tagName, defaultInput, iconClass;
     return {
         setters: [
-            function (class_1_1) {
-                class_1 = class_1_1;
-            },
             function (styles_1_1) {
                 styles_1 = styles_1_1;
             }
@@ -44,10 +41,12 @@ System.register(["../../virtual.dom/class", "../../components/styles"], function
                 height: 24,
                 width: 24
             });
-            exports_1("iconClass", iconClass = class_1.createClass(tagName, styles_1.container, {
-                display: "block",
-                fill: "currentColor",
-                margin: "auto"
+            exports_1("iconClass", iconClass = Object.assign({}, styles_1.container, { name: tagName,
+                style: {
+                    display: "block",
+                    fill: "currentColor",
+                    margin: "auto"
+                }
             }));
         }
     };

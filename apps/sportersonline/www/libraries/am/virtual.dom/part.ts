@@ -1,22 +1,21 @@
+import { IObservable, IObservableField, IObservableFn, IObservableNot } from "../common/observable";
+
+type IWhen = IObservable | IObservableField<boolean> | IObservableFn<any, boolean> | IObservableNot;
+
 /**
- * A part of the virtual dom tree.
+ * You should read the properties "render" and "when" as: (re)render x when y changes.
  */
-export interface IPart {
-    name?: string;
+export interface IPartRenderer<T> {
+    render: (input: IWhen) => T;
+    renderResult?: T;
+    when: IWhen;
 }
 
 /**
- * A function that one ore multiple parts of the virtual dom tree.
+ * You should read the properties "render" and "when" as: (re)render x when y changes.
  */
-export interface IPartFactory {
-    (input: any): IPart | Array<IPart>;
-}
-
-/**
- * You should read the properties on this object like:
- * (re)render x when y changes.
- */
-export interface IPartRenderer {
-    render: IPart | IPartFactory; // x
-    when: any;   // y   
+export interface IPartsRenderer<T> {
+    render: (input: IWhen) => Array<T | IPartRenderer<T> | IPartsRenderer<T>>;
+    renderResult?: Array<T | IPartRenderer<T> | IPartsRenderer<T>>; // When the render functions is executed the result will be stored in "renderResult", so when the parts are re-rendered, the previous parts can be removed.
+    when: IWhen;
 }

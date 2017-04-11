@@ -1,4 +1,3 @@
-import { IPart, IPartFactory, IPartRenderer } from "./part";
 
 export type EventName =
     // Custom events
@@ -98,17 +97,7 @@ export type EventName =
     "onvolumechange" |
     "onwaiting";
 
-export interface IEvent extends IPart {
+export interface IEvent {
     name: EventName;
     handler: (evt: any) => void;
-}
-
-export interface IEventFactory extends IPartFactory {
-    (input: any): IEvent | Array<IEvent>;
-}
-
-export interface IEventRenderer extends IPartRenderer
-{
-    render: IEvent | IEventFactory;
-    when: any;
 }

@@ -11,9 +11,6 @@ System.register(["./attribute", "./class", "./part", "./event"], function (expor
         var nodes = parentNode.nodes;
         for (var i = node.parentNodeChildIndex; i > 0; i--) {
             var child = nodes[i];
-            if (child && child.nativeNode) {
-                firstUp = child.nativeNode;
-            }
         }
         var shouldInsert = (firstUp && firstUp.nextSibling);
         if (shouldInsert) {
@@ -24,6 +21,7 @@ System.register(["./attribute", "./class", "./part", "./event"], function (expor
         }
         fireCustomEvent("onadded", node);
     }
+    exports_1("appendNativeNode", appendNativeNode);
     function createSvg(node) {
         node.isSvg = true;
         node.nativeNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -42,7 +40,7 @@ System.register(["./attribute", "./class", "./part", "./event"], function (expor
             }
         }
     }
-    function removeNode(parentNode, node) {
+    function removeNode(node) {
         if (!node) {
             throw new Error("Please provide node.");
         }
@@ -57,32 +55,33 @@ System.register(["./attribute", "./class", "./part", "./event"], function (expor
         if (parentNode) {
             node.parentNode = parentNode;
         }
-        if (!node.nativeNode) {
-            var text = node["text"];
-            if (text) {
-                node.nativeNode = document.createTextNode(text);
-                appendNativeNode(node);
-                return;
-            }
-            var isSvg = (node.name.toLowerCase() === "svg");
-            if (isSvg) {
-                createSvg(node);
+        if (node.nativeNode) {
+            removeNode(node);
+        }
+        var text = node["text"];
+        if (text) {
+            node.nativeNode = document.createTextNode(text);
+            appendNativeNode(node);
+            return;
+        }
+        var isSvg = (node.name.toLowerCase() === "svg");
+        if (isSvg) {
+            createSvg(node);
+        }
+        else {
+            if (node.parentNode && node.parentNode.isSvg) {
+                node.isSvg = true;
+                node.nativeNode = document.createElementNS("http://www.w3.org/2000/svg", node.name);
             }
             else {
-                if (node.parentNode && node.parentNode.isSvg) {
-                    node.isSvg = true;
-                    node.nativeNode = document.createElementNS("http://www.w3.org/2000/svg", node.name);
-                }
-                else {
-                    node.nativeNode = document.createElement(node.name);
-                }
+                node.nativeNode = document.createElement(node.name);
             }
-            part_1.renderParts(node, node.attributes, attribute_1.renderAttribute, attribute_1.removeAttribute);
-            part_1.renderParts(node, node.classes, class_1.renderClass, class_1.removeClass);
-            part_1.renderParts(node, node.events, event_1.renderEvent, event_1.removeEvent);
-            part_1.renderParts(node, node.nodes, renderNode, removeNode);
-            appendNativeNode(node);
         }
+        part_1.renderParts(node, node.attributes, attribute_1.renderAttribute, attribute_1.removeAttribute);
+        part_1.renderParts(node, node.classes, class_1.renderClass, class_1.removeClass);
+        part_1.renderParts(node, node.events, event_1.renderEvent, event_1.removeEvent);
+        part_1.renderParts(node, node.nodes, renderNode, removeNode);
+        appendNativeNode(node);
     }
     exports_1("renderNode", renderNode);
     function teardownNode(node) {

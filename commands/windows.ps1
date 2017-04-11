@@ -28,4 +28,6 @@ $env:Path = $env:Path + ";C:\Program Files (x86)\Microsoft Visual Studio 14.0\Co
 Get-ChildItem "C:\Projects\ZvdZ\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web" -force -recurse | 
 Where-Object {$_.Extension -eq ".html"} | Select-Object FullName | Ft -autosize | out-string -width 4096
 
+# Create file
+new-item -type file test.txt
 

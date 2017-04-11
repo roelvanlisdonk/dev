@@ -1,5 +1,5 @@
 import { INode } from "../../virtual.dom/node";
-import { createClass, IClass } from "../../virtual.dom/class";
+import { IClass } from "../../virtual.dom/class";
 import { container } from "../../components/styles";
 
 
@@ -12,14 +12,14 @@ export const defaultInput: IIconInput = {
     width: 24
 }
 
-export const iconClass: IClass = createClass(tagName,
-    container,
-    {
+export const iconClass: IClass = Object.assign({}, container, 
+{   name: tagName,
+    style: {
         display: "block",
         fill: "currentColor",
         margin: "auto"
     }
-);
+});
 
 function path(input: IIconInput): INode {
     const node: INode = {

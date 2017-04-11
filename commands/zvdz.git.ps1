@@ -49,37 +49,34 @@ git pull
 
 
 
-# Switch branches
-# Master: "master"
-# Choco: "release/20161223-ChocoladeGlas"
 
+# Switch to "Himaliya"
+cls
+cd "C:\Projects\ZvdZ\businessservice\ZvdZ.BS.Service"
+git checkout "master"
+git pull
+git clean -f
+devenv "C:\Projects\ZvdZ\businessservice\ZvdZBusinessService.sln" /Clean
+devenv "C:\Projects\ZvdZ\businessservice\ZvdZBusinessService.sln" /Build "Debug"
 
-# Switch to a branch release/????
+# Switch to "release/himaliya"
 cls
 cd "C:\Projects\ZvdZ\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web"
-git checkout "release/????"
+git checkout "release/himaliya"
 git pull
-git clean -d -x -f
+git clean -f
 npm install
 npm run gulp apply-theming
 devenv "C:\Projects\ZvdZ\zvdzonline\ZvdZOnline.sln" /Clean
 devenv "C:\Projects\ZvdZ\zvdzonline\ZvdZOnline.sln" /Build "Debug"
 
 
-# Switch to master
-cls
-cd "C:\Projects\ZvdZ\businessservice\ZvdZ.BS.Service"
-git checkout "master"
-git pull
-git clean -d -x -f
-devenv "C:\Projects\ZvdZ\businessservice\ZvdZBusinessService.sln" /Clean
-devenv "C:\Projects\ZvdZ\businessservice\ZvdZBusinessService.sln" /Build "Debug"
 
 cls
 cd "C:\Projects\ZvdZ\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web"
 git checkout "master"
 git pull
-git clean -d -x -f
+git clean
 npm install
 devenv "C:\Projects\ZvdZ\zvdzonline\ZvdZOnline.sln" /Clean
 devenv "C:\Projects\ZvdZ\zvdzonline\ZvdZOnline.sln" /Build "Debug"
@@ -87,7 +84,7 @@ npm run gulp apply-theming
 
 cd "C:\Projects\ZvdZ\mijnzvdz\Web"
 git checkout "master"
-git clean -d -x -f
+git clean -f
 npm install
 devenv "C:\Projects\ZvdZ\mijnzvdz\MijnZvdZ.sln" /Clean
 devenv "C:\Projects\ZvdZ\mijnzvdz\MijnZvdZ.sln" /Build "Debug"

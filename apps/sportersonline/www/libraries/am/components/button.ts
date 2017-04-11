@@ -1,15 +1,14 @@
-import { INode, INodeRenderer } from "../virtual.dom/node";
-import { createClass, IClass } from "../virtual.dom/class";
+import { IClass } from "../virtual.dom/class";
 import { IEvent } from "../virtual.dom/event";
+import { INode } from "../virtual.dom/node";
 import { container } from "../components/styles";
 import { text, Text } from "./text";
 
 const tagName: string = "button";
 
-export const buttonClass:IClass = createClass(
-    tagName,
-    container,
-    {
+export const buttonClass:IClass = Object.assign({}, container, 
+{   name: tagName,
+    style: {
         borderColor: "#8F8E93",
         borderStyle: "solid",
         borderWidth: "1px",
@@ -18,7 +17,7 @@ export const buttonClass:IClass = createClass(
         padding: "10px",
         textAlign: "center"
     }
-);
+});
 
 export function button(input: IButtonInput): INode {
     if (!input) { throw new Error("Please provide input."); }

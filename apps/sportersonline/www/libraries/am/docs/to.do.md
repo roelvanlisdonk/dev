@@ -36,18 +36,18 @@ interface INode {
     media: Array<IMedia | IPartRenderer<IMedia> | IPartsRenderer<IMedia>>;
     name: string;
     nativeNode?: any;
-    nodes: Array<INode | INodesRenderer | IPartsRenderer<INode>>;
-    rules: Array<IRules | IPartRenderer<IRules> | IPartsRenderer<IRules>>;
+    nodes: Array<INode | INodeRenderer | IPartsRenderer<INode>>;
+    rules: Array<IRule | IPartRenderer<IRule> | IPartsRenderer<IRule>>;
     styles: Array<IStyle | IPartRenderer<IStyle> | IPartsRenderer<IStyle>>;
 }
 
-interface INodeRenderer extends  IPartRenderer<INode> {
-    attributes: Array<IAttribute | IAttributesRenderer>;    // Will be merged with the rendered node.
-    classes: Array<IClass | IClassesRenderer>;              // Will be merged with the rendered node.
-    events: Array<IEvent | IEventsRenderer>;                // Will be merged with the rendered node.
-    media: Array<IMedia | IMediaRenderer>;                  // Will be merged with the rendered node.
-    rules: Array<IRules | IRulesRenderer>;                  // Will be merged with the rendered node.
-    styles: Array<IStyle | IStylesRenderer>;                // Will be merged with the rendered node.
+interface INodeRenderer extends IPartRenderer<INode> {
+    attributes: Array<IAttribute | IPartRenderer<IAttribute> | IPartsRenderer<IAttribute>>;     // Will be merged with the rendered node.
+    classes: Array<IClass | IPartRenderer<IClass> | IPartsRenderer<IClass>>;                    // Will be merged with the rendered node.
+    events: Array<IEvent | IPartRenderer<IEvent> | IPartsRenderer<IEvent>>;                     // Will be merged with the rendered node.
+    media: Array<IMedia | IPartRenderer<IMedia> | IPartsRenderer<IMedia>>;                      // Will be merged with the rendered node.
+    rules: Array<IRule | IPartRenderer<IRule> | IPartsRenderer<IRule>>;                      // Will be merged with the rendered node.
+    styles: Array<IStyle | IPartRenderer<IStyle> | IPartsRenderer<IStyle>>;                     // Will be merged with the rendered node.
 }
 
 type IWhen = IObservableField<boolean> | IObservableNotField<boolean> | IObservableFn<any, boolean> | IObservable;
@@ -59,9 +59,9 @@ interface IPartRenderer<T> {
 }
 
 interface IPartsRenderer<T> {
-    render: Array<T> | fn(input:IWhen): Array<T>;
+    render: Array<T | IPartRenderer<T> | IPartsRenderer<T>> | fn(input:IWhen): Array<T | IPartRenderer<T> | IPartsRenderer<T>>;
     rendered?: Array<T>; // When the parts are rendered, they are stored in this property, so when the parts are re-rendered, the previous parts can be removed.
-    when: IObservableField<boolean> | IObservableNotField<boolean> | IObservableFn<any, boolean> | IObservable;
+    when: IWhen;
 }
 
 const node: INode = {
@@ -109,8 +109,8 @@ const node: INode = {
     ],
     styles: [
         // The same as "attributes", only use IStyle:
-        // Note that value: string | IObservableField<string> | IObservableFn<any, string>;
-        {name: "", value: any}  
+        // Note that value of each attribute on an IStyle can be string |IObservableField<string> | IObservableFn<any, string>
+        {paddingLeft: "10px"}  
     ]
     name: tagName
 };
@@ -274,78 +274,4 @@ Note: In dev hotreloading is not that important, because all state is stored loc
 # Temp
 
 
-
-## Tables based one size
-SELECT 
-    t.NAME AS TableName,
-    s.Name AS SchemaName,
-    p.rows AS RowCounts,
-    SUM(a.total_pages) * 8 AS TotalSpaceKB, 
-    SUM(a.used_pages) * 8 AS UsedSpaceKB, 
-    (SUM(a.total_pages) - SUM(a.used_pages)) * 8 AS UnusedSpaceKB
-FROM 
-    sys.tables t
-INNER JOIN      
-    sys.indexes i ON t.OBJECT_ID = i.object_id
-INNER JOIN 
-    sys.partitions p ON i.object_id = p.OBJECT_ID AND i.index_id = p.index_id
-INNER JOIN 
-    sys.allocation_units a ON p.partition_id = a.container_id
-LEFT OUTER JOIN 
-    sys.schemas s ON t.schema_id = s.schema_id
-WHERE 
-    t.NAME NOT LIKE 'dt%' 
-    AND t.is_ms_shipped = 0
-    AND i.OBJECT_ID > 255 
-GROUP BY 
-    t.Name, s.Name, p.Rows
-ORDER BY 
-    t.Name
-
-
-
-## Tables without foreignkeys
-SELECT tbl.name 
-FROM sys.tables AS tbl
-    LEFT JOIN sys.foreign_key_columns AS fKey 
-        ON tbl.object_id = fKey.parent_object_id
-    LEFT JOIN sys.foreign_key_columns AS rKey 
-        ON tbl.object_id = rKey.referenced_object_id
-WHERE fKey.parent_object_id IS NULL 
-    AND rKey.referenced_object_id IS NULL;
-
-
-database: 
-applicationname: ZvdZORLI
-
-#Tabellen
-Access
-Conversatie
-DIENSTVERBAND
-FeatureFlag
-Login
-LoginRolScope
-Logintype
-LoginVergeten
-medewerker
-Organisatie
-PERSOON
-Reclame
-Rol
-ScopeDienstverband
-TwoFactorAuthentication
-ViewUsage
-zvdzoApplicatieLog
-ZvdZOModuleAanschaf
-zvdzoMelding
-zvdzoSettings
-zvdzoToegangOrganisatieProtocolTaken
-
-# Sprocs
-pCalcScopeDienstverband
-pGetOrganisatieIds
-pGetRolListByLoginAndDienstverbandId
-pGetTaken
-pGetTfaBeleid
-pGetVervanging
-pZvdZGetMijnVerzuimendeWerknemers
+zvdz.views.administratie.werknemer.werknemerInfo.openPdfViewer = zvdz.views.administratie.werknemer.werknemerInfo.openPdfViewer.bind(self);

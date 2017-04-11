@@ -2,10 +2,10 @@ import { isArray } from "../../common/validation/is.array";
 import { isFunction } from "../../common/validation/is.function";
 import { isObject } from "../../common/validation/is.object";
 import { addListener, IChangeEvent, IListener, IObservableField, IObservableFn } from "../../common/observable";
-import { IPart, IPartFactory, IPartRenderer } from "../../virtual.dom/part";
+import { IPartRenderer, IPartsRenderer } from "../../virtual.dom/part";
 import { INode, INodeRenderer } from "../../virtual.dom/node";
 
-function getListener(part:IPart, node: INode, render: (node:INode, part:IPart) => void, remove: (node:INode, part:IPart) => void): IListener {
+function getListener(part:any, node: INode, render: (node:INode, part:any) => void, remove: (node:INode, part:any) => void): IListener {
     const state: IRerenderState = { 
         part,
         node,
@@ -40,24 +40,24 @@ function getListener(part:IPart, node: INode, render: (node:INode, part:IPart) =
 
 
 
-function renderPart(node:INode, part:IPart | IPartRenderer, render: (node:INode, part:IPart) => void, remove: (node:INode, part:IPart) => void) {
+function renderPart(node:INode, part:any | IPartRenderer<any>, render: (node:INode, part:any) => void, remove: (node:INode, part:any) => void) {
     let partToRender = part;
-    const renderer: IPartRenderer = part as IPartRenderer;
+    const renderer: IPartRenderer<any> = part as IPartRenderer<any>;
     const hasRenderProperty: boolean = isObject(renderer.render);
     if(hasRenderProperty) {
         if(isFunction(renderer.render)) {
-            const factory: IPartFactory = renderer.render as IPartFactory;
-            const factoryResult: IPart | Array<IPart> = factory(renderer.when);
+            const factory: any = renderer.render as any;
+            const factoryResult: any | Array<any> = factory(renderer.when);
             if(isArray(factoryResult)) {
                 // TODO: loop items, when item is an INode, 
             } else {
                 // TODO: if partToRender isAnINode merge factoryResult and node into partToRender.
-                partToRender = factoryResult as IPart;
+                partToRender = factoryResult as any;
 
             }
         } else {
             // TODO: if partToRender is and INode merge factoryResult and node into partToRender.
-            partToRender = renderer.render as IPart;
+            partToRender = renderer.render as any;
         }
     }
 
@@ -67,7 +67,7 @@ function renderPart(node:INode, part:IPart | IPartRenderer, render: (node:INode,
     }
 }
 
-export function renderParts(node: INode, parts: Array<IPart>, render: (node:INode, part:IPart) => void, remove: (node:INode, part:IPart) => void) {
+export function renderParts(node: INode, parts: Array<any>, render: (node:INode, part:any) => void, remove: (node:INode, part:any) => void) {
     if(!node) { throw new Error("Please provide node."); }
 
     // Attributes, Classes, Events, Media, Nodes, Rules etc. can be null to preserve memory.
@@ -84,7 +84,7 @@ function rerenderPart(evt: IChangeEvent) {
     const state: IRerenderState = evt.listener.state;
     const node = state.node;
 
-    const part: IPart = (state.part as any);
+    const part: any = (state.part as any);
     if ((evt.source as IObservableField<any>).value) {
         state.render(node, part);
     } else {
@@ -95,7 +95,7 @@ function rerenderPart(evt: IChangeEvent) {
 /** 
  * Setup's rerendering if needed, returns true when part should be rendered, else false.
  */
-function setupRerendering(part: IPart, node: INode, render: (node:INode, part:IPart) => void, remove: (node:INode, part:IPart) => void): boolean {
+function setupRerendering(part: any, node: INode, render: (node:INode, part:any) => void, remove: (node:INode, part:any) => void): boolean {
     
     // Render when display is not supplied.
     if(part.display === undefined || part.display === null) { 
@@ -145,8 +145,8 @@ function setupRerendering(part: IPart, node: INode, render: (node:INode, part:IP
 }
 
 interface IRerenderState {
-    part: IPart;
+    part: any;
     node: INode;
-    remove: (node:INode, part:IPart) => void;
-    render: (node:INode, part:IPart) => void;
+    remove: (node:INode, part:any) => void;
+    render: (node:INode, part:any) => void;
 }
