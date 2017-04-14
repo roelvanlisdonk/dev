@@ -116,5 +116,5 @@ https.createServer(options, function (request: any, response: any) {
         // });
     });
 }).listen(port, function () {
-    console.log(`Stub service listing on ${port}`);
+    console.log(`Stub service listing on https://am.dev:${port}`);
 });

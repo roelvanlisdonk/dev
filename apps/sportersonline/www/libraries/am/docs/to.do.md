@@ -275,3 +275,7 @@ Note: In dev hotreloading is not that important, because all state is stored loc
 
 
 zvdz.views.administratie.werknemer.werknemerInfo.openPdfViewer = zvdz.views.administratie.werknemer.werknemerInfo.openPdfViewer.bind(self);
+rgb(126,33,109)
+
+
+roze:  rgb(231,0,125)

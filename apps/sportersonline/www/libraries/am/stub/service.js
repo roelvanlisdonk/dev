@@ -62,6 +62,6 @@ https.createServer(options, function (request, response) {
         }
     });
 }).listen(port, function () {
-    console.log("Stub service listing on " + port);
+    console.log("Stub service listing on https://am.dev:" + port);
 });
 //# sourceMappingURL=service.js.map
