@@ -7,10 +7,11 @@
 
 
 const fs = require("fs");
-const https = require("https"); // To use http2 use "http2"
+const http = require("http");
 const path = require('path');
 const url = require('url');
 const zlib = require('zlib');
+const livereload = require('livereload');
 
 // To create the key.pem and cert.pem files for dev, use opensll:
 // openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem
@@ -26,7 +27,7 @@ const options = {
 // you can pass the parameter in the command line. e.g. node service.js 4433
 const port: number = parseInt(process.argv[2]) || 4433;
 
-https.createServer(options, function (request: any, response: any) {
+http.createServer(function (request: any, response: any) {
     // Allow calls from all domains, for all methods ans request headers.
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Credentials", true);
@@ -102,6 +103,7 @@ https.createServer(options, function (request: any, response: any) {
         }
 
         // read file from file system
+        // Because all javascripts are loaded by the module loader, we don't directly read files from filesystem.
         // fs.readFile(pathname, function (err: any, data: any) {
         //     if (err) {
         //         res.statusCode = 500;
@@ -116,5 +118,11 @@ https.createServer(options, function (request: any, response: any) {
         // });
     });
 }).listen(port, function () {
-    console.log(`Stub service listing on https://am.dev:${port}`);
+    console.log(`Stub service listing on http://am.dev:${port}`);
 });
+
+const wwwDir = path.resolve(__dirname + "/../../../../www");
+console.log(wwwDir);
+
+const liveReloadServer = livereload.createServer();
+liveReloadServer.watch(wwwDir);

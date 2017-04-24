@@ -1,6 +1,22 @@
 System.register([], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
+    function spec(title) {
+        var specInfo = {
+            input: null,
+            it: null,
+            result: null,
+            subject: null
+        };
+        function given(input) {
+        }
+        function it(subject) {
+        }
+        function shouldReturn(data) {
+        }
+        var result;
+    }
+    exports_1("spec", spec);
     function run() {
         console.log("Test runner started, realy.");
         window.setTimeout(logMessage, 2000);
@@ -16,4 +32,4 @@ System.register([], function (exports_1, context_1) {
         }
     };
 });
-//# sourceMappingURL=runner.js.map
+//# sourceMappingURL=core.js.map

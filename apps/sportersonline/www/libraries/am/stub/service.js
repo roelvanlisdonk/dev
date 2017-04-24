@@ -1,15 +1,16 @@
 "use strict";
 var fs = require("fs");
-var https = require("https");
+var http = require("http");
 var path = require('path');
 var url = require('url');
 var zlib = require('zlib');
+var livereload = require('livereload');
 var options = {
     key: fs.readFileSync("./www/libraries/am/stub/key.pem"),
     cert: fs.readFileSync("./www/libraries/am/stub/cert.pem")
 };
 var port = parseInt(process.argv[2]) || 4433;
-https.createServer(options, function (request, response) {
+http.createServer(function (request, response) {
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Credentials", true);
     response.setHeader("Access-Control-Allow-Methods", "*");
@@ -62,6 +63,10 @@ https.createServer(options, function (request, response) {
         }
     });
 }).listen(port, function () {
-    console.log("Stub service listing on https://am.dev:" + port);
+    console.log("Stub service listing on http://am.dev:" + port);
 });
+var wwwDir = path.resolve(__dirname + "/../../../../www");
+console.log(wwwDir);
+var liveReloadServer = livereload.createServer();
+liveReloadServer.watch(wwwDir);
 //# sourceMappingURL=service.js.map
