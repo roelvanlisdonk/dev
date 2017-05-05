@@ -279,3 +279,26 @@ rgb(126,33,109)
 
 
 roze:  rgb(231,0,125)
+
+
+<tr>
+                                                <td class="TextBoxAbsoluteWidthCol1">
+                                                    <span id="lblPO" class="UCLabel ellipsis" title="<%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_PO)%>">
+                                                        <%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_PO)%></span>
+                                                </td>
+                                                <td>
+                                                    <asp:TextBox ID="txtPO" runat="server" CssClass="usualTextBox" MaxLength="50"></asp:TextBox>
+                                                </td>
+                                            </tr>
+
+
+
+Verwijderen:
+<tr>
+                            <td>
+                                <span id="lblTextForAgenda" class="UCLabel ellipsis" title="<%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_TEXT_FOR_AGENDA)%>">
+                                    <%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_TEXT_FOR_AGENDA)%></span>
+                                <br />
+                                <UC:ProGIMDRemarkBoxUC runat="server" ID="txtAgendaText" ShowBorder="true" CssWidth="96%"  MaxLength="50" />
+                            </td>
+                        </tr>
