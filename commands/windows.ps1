@@ -1,4 +1,6 @@
 
+# Microsoft Outlook - Start outlook in safe mode
+& "C:\Program Files\Microsoft Office\root\Office16\OUTLOOK.EXE" /safe
 
 # Devolutions - Remote Dekstop Manager - Run as specific user
 runas /netonly /user:ada-ict\rlisdonk "C:\Program Files (x86)\Devolutions\Remote Desktop Manager\RemoteDesktopManager.exe"
@@ -8,8 +10,6 @@ runas /netonly /user:ada-ict\rlisdonk "C:\Program Files (x86)\Devolutions\Remote
 iisreset
 
 
-# Microsoft Outlook - Start outlook in safe mode
-& "C:\Program Files\Microsoft Office\root\Office16\OUTLOOK.EXE" /safe
 
 
 # Microsoft SQL Server 2016 - Management Studio - Run as specific user

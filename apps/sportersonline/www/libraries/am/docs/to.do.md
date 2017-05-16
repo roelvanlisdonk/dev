@@ -259,6 +259,8 @@ Note: In dev hotreloading is not that important, because all state is stored loc
 * When a change takes place, that involves multiple users, a backend funtion will add these changes to the involved users change event arrays.
 
 
+6W7S5Q
+
 
 
 ### Backend
@@ -273,32 +275,42 @@ Note: In dev hotreloading is not that important, because all state is stored loc
 
 # Temp
 
-
-zvdz.views.administratie.werknemer.werknemerInfo.openPdfViewer = zvdz.views.administratie.werknemer.werknemerInfo.openPdfViewer.bind(self);
-rgb(126,33,109)
-
-
-roze:  rgb(231,0,125)
+                          
+                            
+<div action-button="vm.buttonToonAlleOptions" ng-click="toonAlle()"></div>  
+332 item.Equals("TextForAgenda") || 
 
 
-<tr>
-                                                <td class="TextBoxAbsoluteWidthCol1">
-                                                    <span id="lblPO" class="UCLabel ellipsis" title="<%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_PO)%>">
-                                                        <%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_PO)%></span>
-                                                </td>
-                                                <td>
-                                                    <asp:TextBox ID="txtPO" runat="server" CssClass="usualTextBox" MaxLength="50"></asp:TextBox>
-                                                </td>
-                                            </tr>
+Deze moeten we donderdag bespreken, want ik krijg hem niet gereproduceerd, de bedragen in het voorbeeld lijken ook niet te kloppen, want in de ene screendump staat contractbedrag 931,30 en in het andere 1003,15.
+In dev krijg ik hem iig niet gereproduceerd.
+
+ContractOrInternalActivityOutsidePeriod
+
+ActivitiesAreNotAvailable
+txtEditUsername
+txtUserName
+Inloggen met CBergsma - test
+Employersname - 's Heeren Loo
+Text for bill - Olofsen Dhr. L.E.O. Kostenplaats 21577 Regio Zuidwest Nederland 1
+Christine Bergsma, C.P.W.
 
 
 
-Verwijderen:
-<tr>
-                            <td>
-                                <span id="lblTextForAgenda" class="UCLabel ellipsis" title="<%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_TEXT_FOR_AGENDA)%>">
-                                    <%=AppContext.Translate(AppDefs.CONTRACTS_APPOINTMENTS_TEXT_FOR_AGENDA)%></span>
-                                <br />
-                                <UC:ProGIMDRemarkBoxUC runat="server" ID="txtAgendaText" ShowBorder="true" CssWidth="96%"  MaxLength="50" />
-                            </td>
-                        </tr>
+http://shop.oreilly.com/product/0636920028253.do
+
+
+TextForBill
+TextForAgenda
+
+if
+
+const string sQuery = @"
+                    SELECT TOP 1 Start FROM dbo.Appointments WHERE ContractID = :contractId AND IsDeleted = 0 ORDER BY Start ASC";
+
+                var query = new ScalarQuery<DateTime?>(typeof(ContractsDAO), QueryLanguage.Sql, sQuery);
+                query.SetParameterList("contractId", new[] { contractId }.ToList());
+                return (DateTime?)(ActiveRecordMediator.ExecuteQuery(query));
+            }
+
+
+       

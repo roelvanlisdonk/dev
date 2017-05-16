@@ -1,34 +1,35 @@
 System.register([], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
-    function spec(title) {
-        var specInfo = {
-            input: null,
-            it: null,
-            result: null,
-            subject: null
-        };
-        function given(input) {
-        }
-        function it(subject) {
-        }
-        function shouldReturn(data) {
-        }
-        var result;
+    function myCoolNewFn() {
     }
-    exports_1("spec", spec);
     function run() {
-        console.log("Test runner started, realy.");
-        window.setTimeout(logMessage, 2000);
+        console.log("Dit is een test");
     }
-    exports_1("run", run);
-    function logMessage() {
-        console.log("That was really slow!");
+    function renderToDom(testcase) {
+        var element = document.querySelector(renderer.selector);
     }
+    function assert(testcase, check) {
+        if (!check) {
+            check = isEqualTo;
+        }
+        testcase.result = check(testcase);
+        renderer.render(testcase);
+    }
+    exports_1("assert", assert);
+    function isEqualTo(testcase) {
+        return true;
+    }
+    exports_1("isEqualTo", isEqualTo);
+    var renderer;
     return {
         setters: [],
         execute: function () {
             run();
+            exports_1("renderer", renderer = {
+                render: renderToDom,
+                selector: "body"
+            });
         }
     };
 });

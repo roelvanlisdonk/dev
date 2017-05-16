@@ -1,147 +1,123 @@
 
-interface ITestCase {
-    description: string;
-    input: any;
-    result: any;
-    subject: any;
-}
-
-export interface ISpecResult {
-    give: (...inputs: any[]) => any;
-}
-
-export function test(description: string, spec:(verify:any) => void): void {
-    const testDescription = description;
-
-    const testCase: ITestCase = {
-        input: null,
-        result: null,
-        subject: null,
-        testDescription: null,
-        verifyDescription: null
-    };
-
-}
-
- function verify(description?: string): ISpecResult {
+function myCoolNewFn() {
     
-    
-
-    function given(input: any): any {
-        
-    }
-
-    function subject(fn: (...inputs: any[]) => any) {
-        
-    }
-
-    function shouldReturn(data: any) {
-
-    }
-
-    return specInfo;
 }
 
-
-
-export function run() {
-    console.log("Test runner started, realy.");
-
-    window.setTimeout(logMessage, 2000);
-}
-
-function logMessage() {
-  console.log("That was really slow!");
-}
-
-
-
-export interface IObservable {
-    actions: Array<(x:any) => any>;
+function run() {
+    console.log("Dit is een test");
 }
 
 run();
 
 
 
+/**
+ *  TODO: use AM rendering instead of direct DOM manupilation.
+ */
+function renderToDom(testcase: ITestcase): void {
+    const element = document.querySelector(renderer.selector);
+
+}
+
+/**
+ * Can be set to any rendering function so, test framework can be used in the browser and node.
+ * By default is set to browser rendering.
+ * In the future it wil return an observable.
+ */
+export let renderer: IRenderer = {
+    render: renderToDom,
+    selector: "body"
+};
+
+
+export interface IRenderer {
+    render: (testcase: ITestcase) => void;
+    selector?: string; // Only used for dom rendering.
+}
+
+export interface ITest {
+    rendered?: boolean;
+    subject: string;
+    testcases?: Array<ITestcase>;
+}
+
+export interface ITestcase {
+    actual: any;
+    expected: any;
+    result?: boolean;
+    test: ITest;
+    title?: string;
+}
+
+/**
+ * Show the results of asserting a given testcase to the user.
+ */
+export function assert(testcase: ITestcase, check?: (testcase:ITestcase) => boolean) {
+    if(!check) {
+        check = isEqualTo;
+    }
+    testcase.result = check(testcase);
+    renderer.render(testcase);
+}
+
+export function isEqualTo(testcase:ITestcase): boolean {
+
+    return true;
+}
 
 /*
 
-import { test } from '../test/test'
+import { test } from '../test/core'
 
+const test: ITest = {
+    subject: "am.helpers.setAllPropertiesToSpecificValue"
+};
 
-interface IMergeInput {
-    a: any;
-    b: any;
-}
+const testcase1: ITestcase = {
+    actual: setAllPropertiesToSpecificValue("some input"),
+    expected: "some input"
+    test: test
+};
+assert(testcase1); // By default checks if actual is equal to expected == assert(testcase1, isEqualTo); 
+assert(testcase1, someFunction(testcase:ITestcase):boolean { return true; }); e.g.
+assert(testcase1, isGreaterThen(testcase:ITestcase):boolean { return true; }); // check if actual is greater then expected.
+assert(testcase1, isLessThen(testcase:ITestcase):boolean { return true; }); // check if actual is greater then expected.
 
-
-function merge(input: IMergeInput): any {
-
-}
-
-test("am.helpers.setAllPropertiesToSpecificValue", (verify) => {
-    const input = {
-        subject: { c: "value for c", d: "value for d"},
-        value: "test"
-    };
-
-    verify("Test case 1") // When empty only the "assert text will be used"
-    .given(input)
-    .subject(setAllPropertiesToSpecificValue)
-    .shouldReturn({ c: "test", d: "test"});
-
-    verify("Test case 2")
-    .given(input)
-    .subject(setAllPropertiesToSpecificValue);
-    .executesCorrectly((input, result, thisForSubject) => {
-        return true; // assert changes to input, result and the "this" of the test subject.
-    });      
-
-    verify("Test case 3")
-    .given(input)
-    .subject(setAllPropertiesToSpecificValue);
-    .changesInputTo((input, result, thisForSubject) => boolean);      // Assert input changes
-});
-
-
-test("am.helpers.merge", (verify) => {
-    // spec is an object containing only one function "given"
-    // given will be a function expecting input for the "function under test" and will return an object containing only one function "it".
-    // The function "it" expects an function as input and return an object containing multiple "assert" functions that can be extended.
-    // The input for the .it function can be a normal function or a function returning an observable,
-    // So we can test sync and async function.
-    
-    // Call to spec starts a new testcase
-    verify("Case 1") // When empty only the "assert text will be used"
-    .given(input)
-    .it(merge);                                         // The input for the ".it" function, can be an async function, when it is an async function, the "should" functions, will subsribe to the observable.
-    .shouldReturn({ c: "test", d: "test"});             // Assert result
-
-    verify("Case 2")
-    .given(input)
-    .it(merge);
-    .shouldChangeInputTo({ c: "test", d: "test"});      // Assert input changes
-
-    verify("Case 3")
-    .given(input)
-    .it(merge);
-    .shouldBe(lessThen994);                               // Custom assert. 
-});
-
-
-
-
-function lessThen994(result): IAssertResult {
-    const assertResult: IAssertResult = {
-        errorMessage: "Expected result to be less then 994, but was [4545].",
-        succesMessage: "Result was less then 994",
-        value: result result < 994 // result should be  "994"
-    };
-    return assertResult;
-}
 
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
@@ -265,6 +241,35 @@ var observerCreate = Observer.create = function (onNext, onError, onCompleted) {
 
 
 
+
+// Asserts are sync, but 
+
+- assert has a this with a property title === test.title
+- assert can be used inside async observable tasks
+- helper function can be used to do the assertion.
+- assert only except the second parameter to be a function that returns true or false.
+- test result can be async rendered to the screen.
+test("am.helpers.setAllPropertiesToSpecificValue", (assert) => {
+    
+    let c
+    const task = GetData();
+    task.subscribe((data)=>{
+        assert("Test case 1", () => {
+            return data === expected;
+        });
+    });
+    
+    
+    let actual = 200;
+    let expected = 300;
+    assert("Test case 2", () => { return actual === expected; });
+
+    actu
+    assert("Test case 3", () => { return actual === expected; });
+    assert("Test case 4", () => { return actual === expected; });
+    assert("Test case 5", () => { return actual === expected; });
+
+});
 
 
 */
