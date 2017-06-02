@@ -21,7 +21,7 @@ nuget update -self
 choco upgrade chocolatey -y
 choco upgrade nodejs -y
 
-# TO DO investigate which of the following to lines should be used.
+# TO DO investigate which of the following two lines should be used.
 npm i -g npm
 npm install -g npm@latest
 

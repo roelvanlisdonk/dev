@@ -7,98 +7,58 @@
     <meta name="viewport" content="width=device-width">
     <style>
         html,
-        body,
-        page {
-            border-width: 0;
+        body
+        {
             color: #262626;
             font-family: 'Open Sans', sans-serif;
             height: 100%;
-            margin: 0;
-            outline-style: none;
-            overflow: hidden;
-            padding: 0;
         }
 
-
-        page {
-            display: block;
-            position: relative;
+        .my-table {
+            display: table;
+            table-layout: fixed;
         }
-
-        button-bar {
-            background-color: #F7F7F7;
-            border-width: 0;
-            border-top: 1px solid #B3B3B3;
-            bottom: 0;
-            display: block;
-            font-size: 0;
-            margin: 0;
-            outline-style: none;
-            padding: 0;
-            position: absolute;
-            text-align: center;
-            width: 100%;
+        .my-cell {
+            display: table-cell
         }
-
-        button {
-            background-color: transparent;
-            border-width: 0;
-            box-sizing: border-box;
-            color: #595959;
-            cursor: pointer;
-            display: inline-block;
-            outline-style: none;
-            padding: 8px 10px 4px 10px;
-            text-align: center;
-            user-select: none;
-        }
-
-        icon {
-            border-width: 0;
-            cursor: pointer;
-            display: inline-block;
-            font-size: 16px;
-            height: 24px;
-            margin: 0 auto;
-            outline-style: none;
-            padding: 0;
-            user-select: none;
-            width: 24px;
-        }
-
-        header {
-            display: block;
-            font-size: 20px;
-            text-align: center;
-        }
-
-        text {
-            display: block;
-            font-size: 13px;
-        }
-
-        .active {
-            color: rgb(0, 122, 255);
+        .glowing-border {
+            border: 2px solid #dadada;
+            border-radius: 7px;
+            outline: none;
+            border-color: #9ecaed;
+            box-shadow: 0 0 40px #9ecaed;
         }
     </style>
 </head>
 <body>
-    <page>
-        <header>Welcome to the styling proof-of-concept!</header>
-        <button-bar>
-            <button type="button">
-                <icon>x</icon>
-                <text>Feed</text>
-            </button>
-            <button type="button">
-                <icon>x</icon>
-                <text>Favorites</text>
-            </button>
-            <button type="button" class="active">
-                <icon>x</icon>
-                <text>Settings</text>
-            </button>
-        </button-bar>
-    </page>
+    <div style="display: table;width: 100%; margin-bottom: 20px;">
+        <div style="display: table-cell;width: 25%; background-color: aliceblue;">
+        Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful. Gross but sometimes useful.
+        </div>
+        <div style="display: table-cell;width: 75%; background-color: antiquewhite;vertical-align:middle">
+        Gross but sometimes useful.
+        <button style="height: 40px;">This is a test</button>
+        </div>
+    </div>
+    <div style="display: table;width: 100%;margin-bottom: 20px;">
+        <div style="display: table-cell;width: 25%;">
+        <input type="text" style="height: 50px;" class="glowing-border">
+        </div>
+        <div style="display:table-cell;width:75%;">
+        Gross but sometimes useful.
+        </div>
+    </div>
+    <div style="display: table;width: 100%;margin-bottom: 20px;">
+        <div style="display: table-cell;width: 25%;">
+        <input type="text" style="height: 50px;" class="glowing-border">
+        </div>
+        <div style="display:table-cell;width:75%;">
+        Gross but sometimes useful.
+        </div>
+    </div>
+    <script>
+    document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
+    ':35729/livereload.js?snipver=1"></' + 'script>')
+    </script>
 </body>
 </html>

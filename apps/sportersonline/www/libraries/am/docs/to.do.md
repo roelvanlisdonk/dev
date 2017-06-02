@@ -64,23 +64,22 @@ interface IPartsRenderer<T> {
     when: IWhen;
 }
 
+NOTE
+- A render function can return a task, to do async rendering (e.g. hot reloading, dynamic loading etc.)
+- When a node is rendered, add render function to dom element, so we can see in the dom, which function rendered the dom element.
+- Add if ObservableField.guid === '' in the store.save methode, so we can easily break, when a specific field changes, so we can see which function called the save method.
+
+
 const node: INode = {
     attributes: [
         // No rerendering
         {name: "attr1", value: "This is the description"}
 
-        // When "myObservableFieldValue" changes, the attribute value will be rerendered.
+        // Rerendering
         {name: "attr1", value: myObservableFieldValue}
-         // When one of the "user" properties changes, the attribute value will be rerendered.
-        {name: "attr1", value: { fn: getAttr1Value, input: user}}
-
-        // When "user.isAuthenticated" changes, the attribute will be rerendered.
         {render:{name: "attr1", value: "This is the description"}, when:user.isAuthenticated},
-        // When "myObservableFieldValue" changes, the attribute value will be rerendered.
-        // When "user.isAuthenticated" changes, the attribute will be rerendered.
-        {render:{name: "attr2", value: myObservableFieldValue}, when:{not: user.isAuthenticated}},
-        // When one of the "user" properties changes, the attributes will be rerendered.
-        {render: getAttributes, when: user}         
+        {render:{name: "attr2", value: myObservableFieldValue},    when:{not: user.isAuthenticated}},
+        {render: getAttribute1,                                    when: user,                       state?: {}}         
     ],
     classes: [
         // The same as "attributes", only use IClass:
@@ -314,3 +313,35 @@ const string sQuery = @"
 
 
        
+Opmerkingen
+- Bij rendering van een html element een property toevoegen am deze heeft een property render, deze bevat de functie die verantwoordelijk was voor de rendering van het element.
+- Wanneer er iets niet goed is in de UI kun je snel de functie vinden die verantwoordelijk was voor het renderen van het element of van de parent.
+- In de functie kun je dan bekijken, waar een bepaald attribuut van afhankelijk is. 
+- Vaak wil je dan weten welke functie een specifiek observable field heeft gewijzigd.
+- Eerst kun je dan een breakpoint zetten in de functie zodat je kunt zien wat de originele waarde en guid van het field is.
+- Je kunt dan een breakpoint
+- 
+- Het render proces start met am.render(myApp, rootDomNode);
+- Elk item in an array van een node is een virtual.dom/IPart<T>
+    - output: "The rendered output"
+    - render: T | fn(input, state?): T,
+    - state: any,
+    - when: IWhen
+const node: INode = {
+    attributes:[
+        {render: {name: "", value: ""}}, when:{}}
+        {render: {name: "", value: myObservableField}}, when:{}}
+        {render: myAttribute, when:{}}
+        {render: myAttributeFn, when:{}}
+    ]
+    classes:[
+        {render: myClass, when:{}}
+        {render: myClassFn, when:{}}
+    ],
+    nodes:[
+        {render: myNode, when:{}}
+        {render: myNodeFn, when:{}}
+    ]
+};
+
+
