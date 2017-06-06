@@ -61,20 +61,29 @@ var am;
             return result;
         }
         function executeModule(mod) {
-            var deps = mod.registration.deps;
-            var depCount = deps.length;
-            for (var i = 0; i < depCount; i++) {
-                var pathToModule = deps[i];
-                var mod_1 = _moduleMap[pathToModule];
-                if (!mod_1.executed) {
-                    executeModule(mod_1);
+            var registration = mod.registration;
+            var hasDeps = registration && registration.deps;
+            if (hasDeps) {
+                var deps = registration.deps;
+                var depCount = deps.length;
+                for (var i = 0; i < depCount; i++) {
+                    var pathToModule = deps[i];
+                    var mod_1 = _moduleMap[pathToModule];
+                    if (!mod_1.executed) {
+                        executeModule(mod_1);
+                    }
                 }
             }
-            mod.registrationInfo = mod.registration.fn(function (name, code) {
-                mod.exports[name] = code;
-            }, {});
+            var hasExports = registration && registration.fn;
+            if (hasExports) {
+                mod.registrationInfo = registration.fn(function (name, code) {
+                    mod.exports[name] = code;
+                }, {});
+            }
             setImports(mod);
-            mod.registrationInfo.execute();
+            if (mod.registrationInfo) {
+                mod.registrationInfo.execute();
+            }
             mod.executed = true;
         }
         function executeModules() {
@@ -196,15 +205,18 @@ var am;
             _registrationList.push(registration);
         }
         function setImports(mod) {
-            var setters = mod.registrationInfo.setters;
-            var deps = mod.registration.deps;
-            var folderPath = getPathToModuleFolder(mod.pathToModule);
-            for (var i = 0, length_5 = deps.length; i < length_5; i++) {
-                var pathToDep = deps[i];
-                var depAsMod = _moduleMap[pathToDep];
-                var depCode = depAsMod.exports;
-                var setter = setters[i];
-                setter(depCode);
+            var hasSetters = mod.registrationInfo && mod.registrationInfo.setters;
+            if (hasSetters) {
+                var setters = mod.registrationInfo.setters;
+                var deps = mod.registration.deps;
+                var folderPath = getPathToModuleFolder(mod.pathToModule);
+                for (var i = 0, length_5 = deps.length; i < length_5; i++) {
+                    var pathToDep = deps[i];
+                    var depAsMod = _moduleMap[pathToDep];
+                    var depCode = depAsMod.exports;
+                    var setter = setters[i];
+                    setter(depCode);
+                }
             }
         }
         function setRegistration(src) {
@@ -213,13 +225,16 @@ var am;
             var mod = _moduleMap[pathToModule];
             var registration = _registrationList.shift();
             mod.registration = registration;
-            var deps = mod.registration.deps;
-            var folderPath = getPathToModuleFolder(pathToModule);
-            for (var i = 0, length_6 = deps.length; i < length_6; i++) {
-                var relativePath = deps[i];
-                var pathToDep = resolve(relativePath, folderPath);
-                deps[i] = pathToDep;
-                System['import'](pathToDep);
+            var hasDeps = mod.registration && mod.registration.deps;
+            if (hasDeps) {
+                var deps = mod.registration.deps;
+                var folderPath = getPathToModuleFolder(pathToModule);
+                for (var i = 0, length_6 = deps.length; i < length_6; i++) {
+                    var relativePath = deps[i];
+                    var pathToDep = resolve(relativePath, folderPath);
+                    deps[i] = pathToDep;
+                    System['import'](pathToDep);
+                }
             }
             var allModulesLoaded = determineIfAllModuleAreLoaded();
             if (allModulesLoaded) {

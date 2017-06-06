@@ -329,10 +329,10 @@ Opmerkingen
     - when: IWhen
 const node: INode = {
     attributes:[
-        {render: {name: "", value: ""}}, when:{}}
-        {render: {name: "", value: myObservableField}}, when:{}}
-        {render: myAttribute, when:{}}
-        {render: myAttributeFn, when:{}}
+        // Render once attribute
+        {name: "", value: ""}
+        // Renders attribute that will update, when one of the properties of when change, note it's a shallow check.        
+        {render: myAttributeFn, when:{}, state: {}}
     ]
     classes:[
         {render: myClass, when:{}}
@@ -344,4 +344,14 @@ const node: INode = {
     ]
 };
 
+interface IAttribute {
+    name: string;
+    value: string;
+}
+
+interface IDynamicAttribute {
+    render<W, S?>: (when: W, state?: S) => IAttribute;
+    state?: S;
+    when: W;
+}
 

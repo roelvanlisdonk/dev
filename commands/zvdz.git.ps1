@@ -4,22 +4,44 @@
 # Notes
 # - Close all visual studio instances before running this script
 #
-cls
+Clear-Host
 $MsBuild = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"
 $RootFolder = "C:\Projects\ZvdZ"
-$Branch = "ACC"
+$Branch = "sprints/genesis"
 
-cd "$RootFolder\businessservice\ZvdZ.BS.Service"
-git pull
+
+
 $BusinessServiceSolutionPath="$RootFolder\businessservice\ZvdZBusinessService.sln"
+Set-Location "$RootFolder\businessservice\ZvdZ.BS.Service"
+git checkout "$Branch"
+git pull
+git clean -f
+& $MsBuild "$BusinessServiceSolutionPath" /t:restore /p:Configuration=Release /verbosity:quiet
 & $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration=Release /verbosity:quiet
 & $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration=Release /verbosity:quiet
 
+
+
+$ZvdZOSolutionPath="$RootFolder\zvdzonline\ZvdZOnline.sln"
+Set-Location "$RootFolder\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web"
+git checkout "$Branch"
+git pull
+git clean -f
+npm install
+& $MsBuild "$ZvdZOSolutionPath" /t:restore /p:Configuration=Release /verbosity:quiet
+& $MsBuild "$ZvdZOSolutionPath" /t:Clean /p:Configuration=Release /verbosity:quiet
+& $MsBuild "$ZvdZOSolutionPath" /t:Build /p:Configuration=Release /verbosity:quiet
+& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:detailed
+& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:detailed /t:AfterPublish
+
+
+
+
+
 # on locale dev machine
+# use a seperate build folder for building
 
 # cd
-# ask git branch
-# git stash
 # git checkout branch
 # git clean
 # git pull
@@ -29,27 +51,21 @@ $BusinessServiceSolutionPath="$RootFolder\businessservice\ZvdZBusinessService.sl
 # msbuild build
 # msbuild publish
 # msbuild after publish
-# git checkout branch
-# git stash apply
+# create zip
+# call deploy agent passing zip en configuration (welke omgeving etc.)
+# toon pagina dat "t1" in gebruik is.
+# warmup site
+
 
 
 # on test workstation
-# copy fiel
+# c
 
 
 
 
 
-cd "$RootFolder\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web"
-git pull
-$ZvdZOSolutionPath="$RootFolder\zvdzonline\ZvdZOnline.sln"
-$ZvdZOPublishProfilePath="$RootFolder\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web\Properties\PublishProfiles\Deploy.pubxml"
-& $MsBuild "$ZvdZOSolutionPath" /t:Clean /p:Configuration=Release /verbosity:quiet
-& $MsBuild "$ZvdZOSolutionPath" /t:Build /p:Configuration=Release /verbosity:quiet
-& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:detailed
 
-# Los  
-& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:detailed /t:AfterPublish
 #& $MsBuild "$ZvdZOSolutionPath" /t:Build /p:Configuration=Release /p:PublishProfile=$ZvdZOPublishProfilePath /verbosity:quiet
 
 #/p:PublishProfile=$ZvdZOPublishProfilePath

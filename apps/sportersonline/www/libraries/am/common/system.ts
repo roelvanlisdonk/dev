@@ -93,33 +93,44 @@ namespace am.system {
     }
 
     function executeModule(mod: IModule) {
-        // Execute dependencies
-        const deps = mod.registration.deps;
-        const depCount = deps.length;
-        for (let i = 0; i < depCount; i++) {
-            const pathToModule = deps[i];
-            const mod = _moduleMap[pathToModule];
-            
-            if(!mod.executed) {
-                executeModule(mod);
+        const registration = mod.registration;
+        const hasDeps = registration && registration.deps;
+        if(hasDeps) {
+            // Execute dependencies
+            const deps = registration.deps;
+            const depCount = deps.length;
+            for (let i = 0; i < depCount; i++) {
+                const pathToModule = deps[i];
+                const mod = _moduleMap[pathToModule];
+                
+                if(!mod.executed) {
+                    executeModule(mod);
+                }
             }
         }
+        
         // First set the dependencies in the module
-        // Door het uitvoeren van de mod.registration.fn worden de volgende zaken geregeld:
+        // Door het uitvoeren van de registration.fn worden de volgende zaken geregeld:
         // - exports
         // - imports
         // - returns a object that contains a execute function that should be executed.
         // Execute the module.
         
-        // Store exports
-        mod.registrationInfo = mod.registration.fn((name: string, code: any) => {
-            mod.exports[name] = code;
-        }, {});
-
+        const hasExports = registration && registration.fn;
+        if(hasExports) {
+            // Store exports
+            mod.registrationInfo = registration.fn((name: string, code: any) => {
+                mod.exports[name] = code;
+            }, {});
+        }
+        
         setImports(mod);
 
         // execute
-        mod.registrationInfo.execute();
+        if(mod.registrationInfo) {
+            mod.registrationInfo.execute();
+        }
+        
         mod.executed = true;
     }
 
@@ -278,15 +289,18 @@ namespace am.system {
     }
 
     function setImports(mod: IModule) {
-        const setters =  mod.registrationInfo.setters;
-        const deps = mod.registration.deps;
-        const folderPath = getPathToModuleFolder(mod.pathToModule);
-        for (let i = 0, length = deps.length; i < length; i++) {
-            const pathToDep = deps[i];
-            const depAsMod = _moduleMap[pathToDep];
-            const depCode = depAsMod.exports;
-            const setter = setters[i];
-            setter(depCode);
+        const hasSetters = mod.registrationInfo && mod.registrationInfo.setters;
+        if(hasSetters) {
+            const setters =  mod.registrationInfo.setters;
+            const deps = mod.registration.deps;
+            const folderPath = getPathToModuleFolder(mod.pathToModule);
+            for (let i = 0, length = deps.length; i < length; i++) {
+                const pathToDep = deps[i];
+                const depAsMod = _moduleMap[pathToDep];
+                const depCode = depAsMod.exports;
+                const setter = setters[i];
+                setter(depCode);
+            }
         }
     }
 
@@ -302,18 +316,21 @@ namespace am.system {
 
         // Now the file is downloaded and evaled, we must first download, eval and execute the dependencies,
         // Before we can execute this module.
-        const deps = mod.registration.deps;
-        const folderPath = getPathToModuleFolder(pathToModule);
-        for (let i = 0, length = deps.length; i < length; i++) {
-            const relativePath = deps[i];
-            const pathToDep = resolve(relativePath, folderPath);
+        const hasDeps = mod.registration && mod.registration.deps;
+        if(hasDeps) {
+            const deps = mod.registration.deps;
+            const folderPath = getPathToModuleFolder(pathToModule);
+            for (let i = 0, length = deps.length; i < length; i++) {
+                const relativePath = deps[i];
+                const pathToDep = resolve(relativePath, folderPath);
 
-            // Update relative path to absolute path.
-            deps[i] = pathToDep;
+                // Update relative path to absolute path.
+                deps[i] = pathToDep;
 
-            System['import'](pathToDep);
+                System['import'](pathToDep);
+            }
         }
-
+        
         const allModulesLoaded = determineIfAllModuleAreLoaded();
         if(allModulesLoaded) {
             executeModules();
