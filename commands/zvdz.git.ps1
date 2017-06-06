@@ -9,11 +9,11 @@ $MsBuild = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuil
 $RootFolder = "C:\Projects\ZvdZ"
 $Branch = "ACC"
 
-# cd "$RootFolder\businessservice\ZvdZ.BS.Service"
-# git pull
-# $BusinessServiceSolutionPath="$RootFolder\businessservice\ZvdZBusinessService.sln"
-# & $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration=Release /verbosity:quiet
-# & $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration=Release /verbosity:quiet
+cd "$RootFolder\businessservice\ZvdZ.BS.Service"
+git pull
+$BusinessServiceSolutionPath="$RootFolder\businessservice\ZvdZBusinessService.sln"
+& $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration=Release /verbosity:quiet
+& $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration=Release /verbosity:quiet
 
 # on locale dev machine
 
