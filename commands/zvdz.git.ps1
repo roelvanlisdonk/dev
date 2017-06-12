@@ -2,37 +2,75 @@
 # Create release ZvdZ-O only
 #
 # Notes
-# - Close all visual studio instances before running this script
+# - Close all debug sessions in visual studio, before running this script.
 #
+
+#########################################################  DEV #########################################################################
 Clear-Host
 $MsBuild = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"
 $RootFolder = "C:\Projects\ZvdZ"
+$Configuration = "Debug"
+
+#$Branch = "Himaliya"
 $Branch = "sprints/genesis"
-
-
-
 $BusinessServiceSolutionPath="$RootFolder\businessservice\ZvdZBusinessService.sln"
 Set-Location "$RootFolder\businessservice\ZvdZ.BS.Service"
 git checkout "$Branch"
 git pull
 git clean -f
-& $MsBuild "$BusinessServiceSolutionPath" /t:restore /p:Configuration=Release /verbosity:quiet
-& $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration=Release /verbosity:quiet
-& $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration=Release /verbosity:quiet
+& $MsBuild "$BusinessServiceSolutionPath" /t:restore /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration="$Configuration" /verbosity:minimal
 
 
-
+#$Branch = "release/himaliya"
+$Branch = "sprints/genesis"
 $ZvdZOSolutionPath="$RootFolder\zvdzonline\ZvdZOnline.sln"
 Set-Location "$RootFolder\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web"
 git checkout "$Branch"
 git pull
 git clean -f
 npm install
-& $MsBuild "$ZvdZOSolutionPath" /t:restore /p:Configuration=Release /verbosity:quiet
-& $MsBuild "$ZvdZOSolutionPath" /t:Clean /p:Configuration=Release /verbosity:quiet
-& $MsBuild "$ZvdZOSolutionPath" /t:Build /p:Configuration=Release /verbosity:quiet
-& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:detailed
-& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:detailed /t:AfterPublish
+& $MsBuild "$ZvdZOSolutionPath" /t:restore /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$ZvdZOSolutionPath" /t:Clean /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$ZvdZOSolutionPath" /t:Build /p:Configuration="$Configuration" /verbosity:minimal
+
+
+
+
+####################################################  Deployment #########################################################################
+Clear-Host
+$MsBuild = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"
+$RootFolder = "C:\Projects\ZvdZ"
+$Configuration = "Release"
+
+#$Branch = "Himaliya"
+$Branch = "sprints/genesis"
+$BusinessServiceSolutionPath="$RootFolder\businessservice\ZvdZBusinessService.sln"
+Set-Location "$RootFolder\businessservice\ZvdZ.BS.Service"
+git checkout "$Branch"
+git pull
+git clean -f
+& $MsBuild "$BusinessServiceSolutionPath" /t:restore /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration="$Configuration" /verbosity:minimal
+
+
+#$Branch = "release/himaliya"
+$Branch = "sprints/genesis"
+$ZvdZOSolutionPath="$RootFolder\zvdzonline\ZvdZOnline.sln"
+Set-Location "$RootFolder\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web"
+git checkout "$Branch"
+git pull
+git clean -f
+npm install
+& $MsBuild "$ZvdZOSolutionPath" /t:restore /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$ZvdZOSolutionPath" /t:Clean /p:Configuration="$Configuration" /verbosity:minimal
+& $MsBuild "$ZvdZOSolutionPath" /t:Build /p:Configuration="$Configuration" /verbosity:minimal
+
+# Create release
+& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:minimal
+& $MsBuild "$ZvdZOSolutionPath" /p:DeployOnBuild=true /p:PublishProfile=Deploy /verbosity:minimal /t:AfterPublish
 
 
 

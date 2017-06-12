@@ -39,14 +39,16 @@ interface IWSNode<W, S> extends IWNode<W> {
     when: W;
 }
 
-// Each action added to the pipeline will get fired when the previous is done.
-// When an action does not return an ITask the next action in the pipeline will directly be called,
-// else the return task wil be executed
-// The task can be excuted by running async.run(task); 
-interface ITask<S> {
-    state: S;
-    actions: Array<(state: S) => void | ITask<S>>;
-}
+// A ITask is just a function with 3 parameters
+// - input (the initial input or the result of the previous task)
+// - state (some state that is passed from task to taks, contains error message en cancelation tokens)
+// - next (the next task to execute)
+// Task kan be executed by using the run or runInParallel functions
+// run(tasks, input, state)
+// runOnFirst(tasks, input, state, fn)
+
+
+
 
 function app(): INode {
     const node = {

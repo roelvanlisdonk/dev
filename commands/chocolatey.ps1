@@ -10,10 +10,9 @@ choco install nodejs
 choco install openssl.light --force -y
 
 
-# check current version
+# check versions
 node -v
 npm -version
-
 
 # Update installed programs
 # DO NOT: choco upgrade npm, it is deprecated.
@@ -22,17 +21,11 @@ choco upgrade chocolatey -y
 choco upgrade nodejs -y
 
 # Update npm.
-npm install -g npm@latest
+npm install -g npm
 
 # Update npm global packages
 npm outdated -g --depth=0
 npm update -g
-
-
-# check versions
-node -v
-npm -version
-
 
 # Uninstall programs
 choco uninstall npm -y --remove-dependencies

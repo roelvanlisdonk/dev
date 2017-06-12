@@ -263,19 +263,87 @@ Note: In dev hotreloading is not that important, because all state is stored loc
 
 
 ### Backend
-* Has an append only array per user of all change events.
-* A change event can contain multiple object and field changes.
+* NOTE: The dataflow described below is optimized for app performance not for a general API.
+* Data is never updated or deleted only appended, a delete is always an append status "deleted".
+    * Some azure function, can "offline" cleanup data.
+* A query is first send to the client store, then to the server store.
+    * Data from the client is first shown to the user, after the server request returns, data in the store is updated, this wil update the client ui.
+* Data is stored in a user entity, the structure of the user entity can be seen as an index.
+* User.Feed can be requested as get('guid of User.Feed',[{guid of field1 to cap, cap}, {guid of field2 to cap, cap}]) => { specific: User.Feed, general: "some changed data on the server that must be sent to the client" }
+* Some general data, like all current users online can be sent with each "get" when this data is changed.
+* In v1 we don't use web sockets just pull the data at requested interval when needed.
+* Data shared by all users or some users are just referenced as entity / fields in the user object, so when the value for "all online users" changes, the value in user is updated automaticaly.
+* Show offline content first, do a request to the server
+* "Change events" are first processed locally, then sent to the server, when done, data is sent back to the client, to update the local store.
+* A change event  can contain multiple object and field changes.
     * Creating an object will be one change event.
-* Has an key value store containing an entry per StoreObject / StoreField.
+* Data is stored per Field. So User.DateOfBirth is stored as a seperate object, containing a append only array for all changes made to the User.DateOfBirth.
+* Entities are stored in an index, each entity contains only guids referencing the Fields
+*
+
+schema
+
+interface IEntity {
+    guid: string; // 'guid' fields are generated foreach instance
+    typeGuid: string; // 'typeGuid' fields are generated only once
+}
+
+
+inteface IField<T> extends IEntity {
+    value: T;
+    history: Array<T>
+}
+
+inteface IArrayField<T> extends IEntity {
+    value: Array<IField<T>>; // The value field contains the history itself, because items are appended only and the history of the items is stored in the items themself.
+}
+
+interface ISystem extends IEntity {
+    totalUsersOnline: IField<number>;
+}
+
+interface IStore {
+
+}
+
+
+
+interface IUser: {
+    guid: string; // 'guid' fields are generated foreach instance
+    typeGuid: string; // 'typeGuid' fields are generated only once
+    system: ISystem;
+    feed: IFeed;
+}
+
+interface IFeed extends IEntity {
+    items: IArrayField<IActivity>; // NOTE when the activity is from an other user, the array on the server will only contain the guid from the Activity, data is send to the client but we can add a experation time, so the data will be deleted after the experation time, only guid is kept. Then the user must go online to see the data again.
+}
+
+interface IActivity extends IEntity {
+    title: IField<string>;
+}
+
+Server store:
+{
+    'a user guid':
+}
+
+
+
+NOTES
+- Data is stored on the user who created it, then the guid is copied to other users.
+- Because data is stored per field, we can share only the data by which the users has rights.
+- Security is based on the fact that data from other users is never available on the user object only guids and when the data of other users is requested the security is checked based on the given guid and user guid.
+- Data requests are always send based on typeGuid's and guid's never on Entity / Field names. So we can always change a fields name.
+- Data for a user is always retrieved from the store based on the user guid, then "graph ql" is used to query this object.
+- Because of the append only nature of the stores, reader do not block writers.
+- BIG data like images are returned based on the client cache, when not available user must go online to get image.
 
 
 
 
 
-# Temp
-
-                          
-                            
+# Temp                           
 <div action-button="vm.buttonToonAlleOptions" ng-click="toonAlle()"></div>  
 332 item.Equals("TextForAgenda") || 
 
