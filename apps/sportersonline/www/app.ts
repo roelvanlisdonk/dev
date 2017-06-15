@@ -40,15 +40,23 @@ interface IWSNode<W, S> extends IWNode<W> {
 }
 
 // A ITask is just a function with 3 parameters
+// task1(next, input?)
+// - next (the next task to execute) // Will be called onerror or on completion
 // - input (the initial input or the result of the previous task)
 // - state (some state that is passed from task to taks, contains error message en cancelation tokens)
-// - next (the next task to execute)
+// It returns an IRunInfo
+// - cancel token
+// - cancel function
+
 // Task kan be executed by using the run or runInParallel functions
-// run(tasks, input, state)
-// runOnFirst(tasks, input, state, fn)
+// runTask(task, next, input?, state?): IRunInfo
+// runTasks(tasks, next, input?, state?): IRunInfo
+// runOnFirst(tasks, next, input?, state?): IRunInfo
 
-
-
+// Render
+// Result of a render function can be an IVirtualDomPart or an task
+// The task should call next() supplying the generated virtual dom task
+// This way components can load data or load components asynchronous
 
 function app(): INode {
     const node = {

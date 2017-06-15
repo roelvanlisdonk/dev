@@ -22,7 +22,6 @@ git clean -f
 & $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration="$Configuration" /verbosity:minimal
 & $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration="$Configuration" /verbosity:minimal
 
-
 #$Branch = "release/himaliya"
 $Branch = "sprints/genesis"
 $ZvdZOSolutionPath="$RootFolder\zvdzonline\ZvdZOnline.sln"
@@ -34,6 +33,7 @@ npm install
 & $MsBuild "$ZvdZOSolutionPath" /t:restore /p:Configuration="$Configuration" /verbosity:minimal
 & $MsBuild "$ZvdZOSolutionPath" /t:Clean /p:Configuration="$Configuration" /verbosity:minimal
 & $MsBuild "$ZvdZOSolutionPath" /t:Build /p:Configuration="$Configuration" /verbosity:minimal
+npm run gulp -- apply-theming
 
 ####################################################  Deployment #########################################################################
 Clear-Host
@@ -41,8 +41,8 @@ $MsBuild = "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuil
 $RootFolder = "C:\Projects\ZvdZ"
 $Configuration = "Release"
 
-#$Branch = "Himaliya"
-$Branch = "sprints/genesis"
+$Branch = "Himaliya"
+#$Branch = "sprints/genesis"
 $BusinessServiceSolutionPath="$RootFolder\businessservice\ZvdZBusinessService.sln"
 Set-Location "$RootFolder\businessservice\ZvdZ.BS.Service"
 git checkout "$Branch"
@@ -52,9 +52,10 @@ git clean -f
 & $MsBuild "$BusinessServiceSolutionPath" /t:Clean /p:Configuration="$Configuration" /verbosity:minimal
 & $MsBuild "$BusinessServiceSolutionPath" /t:Build /p:Configuration="$Configuration" /verbosity:minimal
 
+# TODO: voeg hier het runnen van de "apply-theming" taak toe.
 
-#$Branch = "release/himaliya"
-$Branch = "sprints/genesis"
+$Branch = "release/himaliya"
+#$Branch = "sprints/genesis"
 $ZvdZOSolutionPath="$RootFolder\zvdzonline\ZvdZOnline.sln"
 Set-Location "$RootFolder\zvdzonline\Source\ZvdZOnline\ZvdZOnline.Web"
 git checkout "$Branch"
