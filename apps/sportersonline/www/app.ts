@@ -39,19 +39,50 @@ interface IWSNode<W, S> extends IWNode<W> {
     when: W;
 }
 
-// A ITask is just a function with 3 parameters
-// task1(next, input?)
-// - next (the next task to execute) // Will be called onerror or on completion
-// - input (the initial input or the result of the previous task)
-// - state (some state that is passed from task to taks, contains error message en cancelation tokens)
-// It returns an IRunInfo
-// - cancel token
-// - cancel function
 
-// Task kan be executed by using the run or runInParallel functions
-// runTask(task, next, input?, state?): IRunInfo
-// runTasks(tasks, next, input?, state?): IRunInfo
-// runOnFirst(tasks, next, input?, state?): IRunInfo
+// Pipeline
+// A pipeline is an class of a specific type
+// This type resambles the type of the input of the next register call.
+
+class Pipeline {
+
+}
+
+// 53 euro oplader
+// 
+
+
+// class Pipeline<T> {
+//     constructor(pipeline?: any) {
+
+//     }
+
+//     register(next: any) {
+
+//     }
+
+
+//     registerWithInput<T>(next: any, input?: any) {
+
+//     }
+// }
+
+// const pipeline = new Pipeline();
+// pipeline
+//  .register(httpget, httpOptions)
+//  .register(map, mapper) // mapper has a mapper.fn and a mapper.additionalInput, passed to mapper.fn
+//  .subscribe(showresult, additionalInput?)
+
+//  .unsubscrive(showresult)
+//  .destroy
+
+// Because each register call returns a new pipeline, the types of the next register, subscribe, unsubscribe methods are known.
+// Second parameter is always some extra input that is passed to the function
+// Allow multiple subscriptions
+// Allow mulitple unsubscriptions
+// .destroy - cancels all events en unsubscribes all events.
+
+
 
 // Render
 // Result of a render function can be an IVirtualDomPart or an task

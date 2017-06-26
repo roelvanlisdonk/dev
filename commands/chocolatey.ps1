@@ -8,6 +8,7 @@ iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex
 choco install nuget.commandline
 choco install nodejs
 choco install openssl.light --force -y
+choco install typescript-vs2017 -y
 
 
 # check versions
@@ -19,6 +20,7 @@ npm -version
 nuget update -self
 choco upgrade chocolatey -y
 choco upgrade nodejs -y
+# choco upgrade typescript-vs2017 -y
 
 # Update npm.
 npm install -g npm
@@ -30,4 +32,5 @@ npm update -g
 # Uninstall programs
 choco uninstall npm -y --remove-dependencies
 choco uninstall nodejs -y --remove-dependencies
+
 

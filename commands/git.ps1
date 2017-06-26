@@ -23,3 +23,6 @@ git status
 # clean working folder
 # Note: this will remove the complete "node_modules" folder, so be carefull, when using it.
 git clean -f -x -d
+
+
+
