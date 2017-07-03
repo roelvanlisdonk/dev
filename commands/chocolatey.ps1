@@ -2,14 +2,12 @@
 # Install chocolatey
 iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex
 
-
 # install
 # DO NOT: choco install npm, it is deprecated.
 choco install nuget.commandline
 choco install nodejs
 choco install openssl.light --force -y
 choco install typescript-vs2017 -y
-
 
 # check versions
 node -v

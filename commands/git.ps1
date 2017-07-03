@@ -25,4 +25,7 @@ git status
 git clean -f -x -d
 
 
+# SSL uitschakelen
+git config --global http.sslVerify false
+
 
