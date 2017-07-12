@@ -1,4 +1,13 @@
 
+# 
+git add -A
+
+git commit -m "test adding a file to git"
+
+
+
+
+
 # clone
 git clone https://github.com/roelvanlisdonk/apps.git
 git clone https://github.com/After-Midnight/am.git
