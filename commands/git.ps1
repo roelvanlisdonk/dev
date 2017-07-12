@@ -1,8 +1,9 @@
 
-# 
+# Stage all changes, including adding or deleting of files and folders.
 git add -A
 
-git commit -m "test adding a file to git"
+# 
+git commit -m "Only change one file"
 
 
 
