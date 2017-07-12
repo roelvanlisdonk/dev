@@ -1,4 +1,0 @@
-
-Test adding a file to git.
-
-git commit -a -m "test adding a file to git"
