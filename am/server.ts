@@ -4,16 +4,25 @@ import * as fs from "fs";
 import * as path from "path";
 import * as livereload from "livereload";
 
-http.createServer(function (request, response) {
-    console.log('request ', request.url);
+http.createServer(function handleRequest(request, response) {
+    let url = request.url || "/";
+    console.log(`handleRequest - url [${url}]`);
 
-    var filePath = '.' + request.url;
-    if (filePath == './')
+    if(url[0] === '~') {
+        url = url.substring(1) || "/";
+    }
+
+    if(url.length >= 2 &&  url[0] === '/' && url[1] === '~') {
+        url = url.substring(2) || "/";
+    }
+    
+    let filePath = '.' + url;
+    if (filePath == './') {
         filePath = './index.html';
+    }
 
-    var extname = String(path.extname(filePath)).toLowerCase();
-    var contentType = 'text/html';
-    var mimeTypes: any = {
+    const extname = String(path.extname(filePath)).toLowerCase();
+    const mimeTypes: any = {
         '.html': 'text/html',
         '.js': 'text/javascript',
         '.css': 'text/css',
@@ -29,8 +38,7 @@ http.createServer(function (request, response) {
         '.otf': 'application/font-otf',
         '.svg': 'application/image/svg+xml'
     };
-
-    contentType = mimeTypes[extname] || 'application/octet-stream';
+    const contentType = mimeTypes[extname] || 'application/octet-stream';
 
     fs.readFile(filePath, function(error, content) {
         if (error) {
@@ -56,6 +64,6 @@ http.createServer(function (request, response) {
 console.log('Server running at http://127.0.0.1:8125/');
 
 
-var lrserver = livereload.createServer();
+const lrserver = livereload.createServer();
 lrserver.watch(__dirname);
 console.log('Livereload server running at port: 35729');
