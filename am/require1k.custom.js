@@ -1,3 +1,8 @@
+/**
+ * This is require1k with some minor modifications:
+ * - Catched exceptions will be rethrown in function R.
+ */
+
 /*jshint node:false, -W082, -W017 */
 R = (function (document, undefined) {
     // Each module has the following properties (shorted to one letter to aid compression)

@@ -6,30 +6,21 @@ window.addEventListener('unhandledrejection', function handlUnhandledrejection(e
     }
 });
 /**
- * Some comments 2
+ * Some comments
+ * document.getElementsByName("Thing")[0].addEventListener('change', doThing);
  */
 function test() {
+    const element = document.getElementsByName("Thing")[0];
 }
 function start() {
     console.log("start application");
-    //render.render();
-    const throwError = true;
-    later(throwError)
-        .then(function handleLater(data) {
-        // Don't add catch to test unhandled exceptions
-    });
+    // boot(nativeNode, componentFn: IComponentFn, options: IComponentOptions): void;
+    // Components can do ajax calls be should only save data to store
+    // (store module).getItem(id: string): IStoreItem
+    // (store module).getField(id: string): IStoreField
+    // Given data (options) execute a component function to create virtual dom.
+    // When value changes on an input change the value of the binded value
 }
 exports.start = start;
-function later(throwError) {
-    return new Promise(function (resolve) {
-        setTimeout(function () {
-            if (throwError) {
-                //throw "test";
-                throw new Error("Some error occured.");
-            }
-            resolve("theValue");
-        }, 200);
-    });
-}
 start();
 //# sourceMappingURL=app.js.map
