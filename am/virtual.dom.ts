@@ -1,15 +1,9 @@
 import * as store from './store';
 
+export type IVirtualDomAttribute = string | store.IStoreField<string> | IVirtualDomAttributeWithOptions;
 
-export interface IVirtualDomCssClassWithOptions {
-    options: any;
-    render: (options: any) => boolean;
-}
-
-export type IVirtualDomCssClass = boolean | store.IStoreField<boolean> | IVirtualDomCssClassWithOptions;
-
-export interface IVirtualDomCssClasss {
-    [index: string]: IVirtualDomCssClass;
+export interface IVirtualDomAttributes {
+    [index: string]: IVirtualDomAttribute;
 }
 
 export interface IVirtualDomAttributeWithOptions {
@@ -17,10 +11,31 @@ export interface IVirtualDomAttributeWithOptions {
     render: (options: any) => string;
 }
 
-export type IVirtualDomAttribute = string | store.IStoreField<string> | IVirtualDomAttributeWithOptions;
+export type IVirtualDomClass = string | IVirtualDomClassWithOptions;
 
-export interface IVirtualDomAttributes {
-    [index: string]: IVirtualDomAttribute;
+export interface IVirtualDomClassWithOptions {
+    options: any;
+    render: (options: any) => string;
+}
+
+export interface IVirtualDomEvent {
+    listener(event: any): void;
+    useCapture?: boolean;
+}
+
+export interface IVirtualDomEvents {
+    [index: string]: IVirtualDomEvent;
+}
+
+export interface IVirtualDomNode {
+    attributes?: IVirtualDomAttributes;
+    classes?: Array<IVirtualDomClass>;
+    events?: IVirtualDomEvents;
+    nodes?: IVirtualDomNodes;
+}
+
+export interface IVirtualDomNodes {
+    [index: string]: IVirtualDomNode | IVirtualDomTextNodeWithOptions | string;
 }
 
 export interface IVirtualDomNodeWithOptions extends IVirtualDomNode {
@@ -28,20 +43,7 @@ export interface IVirtualDomNodeWithOptions extends IVirtualDomNode {
     render: (options: any) => IVirtualDomNode;
 }
 
-export interface IVirtualDomNodes {
-    [index: string]: IVirtualDomNode;
-}
-
-export interface IVirtualDomNode {
-    attributes: IVirtualDomAttributes;
-    events: IVirtualDomEvents;
-    nodes: IVirtualDomNodes;
-}
-
-export interface IVirtualDomEvents {
-    [index: string]: IVirtualDomEvent;
-}
-
-export interface IVirtualDomEvent {
-    (event: any): void;
+export interface IVirtualDomTextNodeWithOptions {
+    options: any;
+    render: (options: any) => string;
 }

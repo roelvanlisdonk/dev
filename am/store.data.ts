@@ -5,21 +5,32 @@
  */
 
 export type IBasicType = boolean | Date | number | string;
-export type IStoreFieldValue = Array<IBasicType> | IBasicType;
-
-export interface IStoreField<T extends IStoreFieldValue> extends IStoreItem {
-    value: T; 
-}
 
 interface IFields {
     [index: string]: IStoreField<IStoreFieldValue>;
 }
 export const fields: IFields = {};
 
-export interface IStoreItem {
-    id: string;
-}
 interface IItems {
     [index: string]: IStoreItem;
 }
+
+export interface IStoreField<T extends IStoreFieldValue> extends IStoreItem {
+    subscribers: Array<ISubscriber>,
+    value: T;
+}
+
+export type IStoreFieldValue = Array<IBasicType> | IBasicType;
+
+export interface IStoreItem {
+    id: string;
+}
+
+export interface ISubscriber {
+    fn: (field: IStoreField<IStoreFieldValue>) => void;
+    token: number;
+}
+
 export const items: IItems = {};
+
+export const subscribeCounter = 0;

@@ -7,4 +7,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fields = {};
 exports.items = {};
+exports.subscribeCounter = 0;
 //# sourceMappingURL=store.data.js.map
