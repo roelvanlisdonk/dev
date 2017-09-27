@@ -22,6 +22,32 @@ function start() {
     // (store module).getField(id: string): IStoreField
     // Given data (options) execute a component function to create virtual dom.
     // When value changes on an input change the value of the binded value.
+    const myStoreField = {};
+    const attributeRenderer = {};
+    function hideWhen(options) {
+    }
+    function myInput(options) {
+    }
+    function onclick() {
+    }
+    const someJson = {
+        tag: "my-app",
+        attributes: {
+            hidden: false,
+            hidden2: myStoreField,
+            hidden3: hideWhen({})
+        },
+        attributes2: [],
+        nodes: [
+            { tag: "input", attributesvalue: "safddsaf" },
+            myInput({ value: myStoreField }),
+            myInput({ value: myStoreField })
+        ],
+        events: {
+            onclick: function (e, capture) {
+            }
+        }
+    };
     var element = document.getElementById("my-input");
     element.addEventListener('input', function (e) {
         debugger;
