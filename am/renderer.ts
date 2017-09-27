@@ -1,4 +1,4 @@
-import { IVirtualDomNode } from './virtual.dom'
+import { INode } from './virtual.dom'
 
 // This value will be used to store the root virtual dom node in the store.
 export const RootVirtualDomNodeStoreKey = "RootVirtualDomNode";
@@ -6,13 +6,13 @@ export const RootVirtualDomNodeStoreKey = "RootVirtualDomNode";
 export interface IRenderer {
     addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLDListElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    boot(nativeNode: any, fn: (options: any) => IVirtualDomNode, options: any): void;
+    boot(nativeNode: any, fn: (options: any) => INode, options: any): void;
     render:() => void;
 }
 
 // For now use html renderer as default.
 
-function boot(nativeNode: HTMLElement, fn: (options: any) => IVirtualDomNode, options: any): void {
+function boot(nativeNode: HTMLElement, fn: (options: any) => INode, options: any): void {
     // In this version, just:
 
     // Create root virtualdom node, by executing the "fn" function.

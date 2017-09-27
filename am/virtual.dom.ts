@@ -1,49 +1,49 @@
 import * as store from './store';
 
-export type IVirtualDomAttribute = string | store.IStoreField<string> | IVirtualDomAttributeWithOptions;
+export type IAttribute = string | store.IStoreField<string> | IAttributeRenderer;
 
-export interface IVirtualDomAttributes {
-    [index: string]: IVirtualDomAttribute;
+export interface IAttributes {
+    [index: string]: IAttribute;
 }
 
-export interface IVirtualDomAttributeWithOptions {
+export interface IAttributeRenderer {
     options: any;
     render: (options: any) => string;
 }
 
-export type IVirtualDomClass = string | IVirtualDomClassWithOptions;
+export type IClass = string | IClassRenderer;
 
-export interface IVirtualDomClassWithOptions {
+export interface IClassRenderer {
     options: any;
     render: (options: any) => string;
 }
 
-export interface IVirtualDomEvent {
-    listener(event: any): void;
+export interface IEvent {
+    listener(event: any, useCapture?: boolean): void;
     useCapture?: boolean;
 }
 
-export interface IVirtualDomEvents {
-    [index: string]: IVirtualDomEvent;
-}
-
-export interface IVirtualDomNode {
-    attributes?: IVirtualDomAttributes;
-    classes?: Array<IVirtualDomClass>;
-    events?: IVirtualDomEvents;
-    nodes?: IVirtualDomNodes;
-}
-
-export interface IVirtualDomNodes {
-    [index: string]: IVirtualDomNode | IVirtualDomTextNodeWithOptions | string;
-}
-
-export interface IVirtualDomNodeWithOptions extends IVirtualDomNode {
+export interface IEventRenderer {
     options: any;
-    render: (options: any) => IVirtualDomNode;
+    render: (options: any) => IEvent;
 }
 
-export interface IVirtualDomTextNodeWithOptions {
+export interface IEvents {
+    [index: string]: IEvent | IEventRenderer;
+}
+
+export interface INode {
+    attributes?: IAttributes;
+    classes?: Array<IClass>;
+    events?: IEvents;
+    nodes?: INodes;
+}
+
+export interface INodes {
+    [index: string]: INode | string | store.IStoreField<string>;
+}
+
+export interface INodeRenderer extends INode {
     options: any;
-    render: (options: any) => string;
+    render: (options: any) => INode | string;
 }

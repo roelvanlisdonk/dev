@@ -1,9 +1,9 @@
 import * as vd from '.././virtual.dom';
 import * as store from '.././store';
 
-export function input(field: store.IStoreField<store.IStoreFieldValue>): vd.IVirtualDomNode {
+export function input(field: store.IStoreField<store.IStoreFieldValue>): vd.INode {
     
-    const node: vd.IVirtualDomNode = {
+    const node: vd.INode = {
         events: {
             "input": {
                 listener: onInputChange,
