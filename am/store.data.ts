@@ -16,14 +16,13 @@ interface IItems {
 }
 
 export interface IStoreField<T extends IStoreFieldValue> extends IStoreItem {
-    subscribers: Array<ISubscriber>,
     value: T;
 }
 
 export type IStoreFieldValue = Array<IBasicType> | IBasicType;
 
 export interface IStoreItem {
-    id: string;
+    storeId?: string;
 }
 
 export interface ISubscriber {
@@ -33,4 +32,10 @@ export interface ISubscriber {
 
 export const items: IItems = {};
 
-export const subscribeCounter = 0;
+export const root: IStoreItem = {
+    storeId: ""
+};
+
+export const counters = {
+    storeId: 0
+} 

@@ -1,30 +1,53 @@
-import { INode } from './virtual.dom'
+import { IAttribute, IClass, IEvent, INode } from './virtual.dom'
 
 // This value will be used to store the root virtual dom node in the store.
 export const RootVirtualDomNodeStoreKey = "RootVirtualDomNode";
 
+export function getRenderer(): IRenderer {
+    return renderer;
+}
+
 export interface IRenderer {
     addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLDListElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
-    boot(nativeNode: any, fn: (options: any) => INode, options: any): void;
-    render:() => void;
+    renderAttribue: (attribute: IAttribute) => void;
+    renderClass: (cssClass: IClass) => void;
+    renderEvent: (event: IEvent) => void;
+    renderNode: (node: INode) => void;
 }
 
 // For now use html renderer as default.
+export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promise<INode>, deps: any): Promise<INode> {
+    renderer = {
+        addEventListener: addEventListener,
+        renderAttribue: renderAttribue,
+        renderClass: renderClass,
+        renderEvent: renderEvent,
+        renderNode: renderNode
+    }
 
-function boot(nativeNode: HTMLElement, fn: (options: any) => INode, options: any): void {
-    // In this version, just:
+    // Generate the virtual dom
+    const node: INode = await fn(deps);
+    
+    // Travese the virtual dom and sync it with the given native dom.
 
-    // Create root virtualdom node, by executing the "fn" function.
-
-    // Save root virtualdom node in the store.
-
-    // Traverse root virtualdom node
-    //  - Setup store listeners / these will rerender ui, when data in the store changes. 
-    //  - Setup event listeners
-    //  - Note: A render function takes one parameter "options"
-    //          When one of the root properties on "options" changes the render function will be eecuted
-    //          You can manually trigger rerender by exectuing the rerender function.
-    //  - When nativenode has no childnodes, replace nativenode content at once.
-    //  - When nativenode has childnodes (e.g. server side rendered html), adjust html as we traverse the root virtualdom node.
+    return node;
 }
+
+function renderAttribue(attribute: IAttribute): void {
+
+}
+
+function renderClass(cssClass: IClass): void {
+
+}
+
+function renderEvent(event: IEvent): void {
+    
+}
+
+function renderNode(node: INode): void {
+    // Trek de gegeven node gelijk met de node.nativenode.
+}
+
+
+let renderer: IRenderer;

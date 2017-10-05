@@ -7,5 +7,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fields = {};
 exports.items = {};
-exports.subscribeCounter = 0;
+exports.root = {
+    storeId: ""
+};
+exports.counters = {
+    storeId: 0
+};
 //# sourceMappingURL=store.data.js.map

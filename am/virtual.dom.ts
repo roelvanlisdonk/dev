@@ -1,49 +1,45 @@
-import * as store from './store';
+import { IStoreField } from './store';
+import { IStyle } from './style';
 
-export type IAttribute = string | store.IStoreField<string> | IAttributeRenderer;
+// In this version, change detection is based on IStoreField changes.
 
-export interface IAttributes {
-    [index: string]: IAttribute;
+export interface IAttribute extends IVirtualDomPart {
+    refresh?: (deps: any) => IAttribute;
+    value: string | null;
 }
 
-export interface IAttributeRenderer {
-    options: any;
-    render: (options: any) => string;
+export interface IClass extends IVirtualDomPart {
+    refresh?: (deps: any) => IClass;
+    style: IStyle | null;
 }
 
-export type IClass = string | IClassRenderer;
-
-export interface IClassRenderer {
-    options: any;
-    render: (options: any) => string;
-}
-
-export interface IEvent {
-    listener(event: any, useCapture?: boolean): void;
+export interface IEvent extends IVirtualDomPart {
+    listener: (event: any, useCapture?: boolean) => void | null;
+    refresh?: (deps: any) => IEvent;
     useCapture?: boolean;
 }
 
-export interface IEventRenderer {
-    options: any;
-    render: (options: any) => IEvent;
-}
-
-export interface IEvents {
-    [index: string]: IEvent | IEventRenderer;
-}
-
-export interface INode {
-    attributes?: IAttributes;
+export interface INode extends IVirtualDomPart {
+    attributes?: Array<IAttribute>;
     classes?: Array<IClass>;
-    events?: IEvents;
-    nodes?: INodes;
+    events?: Array<IEvent>;
+    nativeNode?: any;
+    nodes?: Array<INode | string | IStoreField<string>> | INodes;
 }
 
-export interface INodes {
-    [index: string]: INode | string | store.IStoreField<string>;
+/**
+ * Can be used, when you want to only change the child nodes, when some data changes.
+ */
+export interface INodes extends IVirtualDomPart
+{
+    nodes?: Array<INode | string | IStoreField<string>>;
+    refresh?: (deps: any) => INodes;
 }
 
-export interface INodeRenderer extends INode {
-    options: any;
-    render: (options: any) => INode | string;
+export interface IVirtualDomPart {
+    deps?: any;
+    name: string;
+    parent?: INode;
+    refresh?: (deps: any) => any;
+    shouldNotRender?: boolean;
 }

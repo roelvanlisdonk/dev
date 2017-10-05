@@ -1,20 +1,16 @@
-import * as vd from '.././virtual.dom';
-import * as store from '.././store';
+import { INode } from '.././virtual.dom';
+import { IStoreField, IStoreFieldValue, saveField } from '.././store';
 
-export function input(field: store.IStoreField<store.IStoreFieldValue>): vd.INode {
+export function input(field: IStoreField<IStoreFieldValue>): INode {
     
-    const node: vd.INode = {
-        events: {
-            "input": {
-                listener: onInputChange,
-                useCapture: false
-            }
-        }
+    const node: INode = {
+        events: [{ name: "input", listener: onInputChange,useCapture: false }],
+        name: "input"
     }
 
     function onInputChange(e: any): void {
         field.value = e.data;
-        store.saveField(field);
+        saveField(field);
     }
 
     return node;
