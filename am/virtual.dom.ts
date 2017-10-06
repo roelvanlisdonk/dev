@@ -3,6 +3,18 @@ import { IStyle } from './style';
 
 // In this version, change detection is based on IStoreField changes.
 
+
+export function getRefreshedVirtualDomPart(part: IVirtualDomPart): IVirtualDomPart {
+    const deps = part.deps;
+    const refresh = part.refresh;
+
+    if(deps && refresh) {
+        return refresh(part.deps);
+    }
+    
+    return part;
+}
+
 export interface IAttribute extends IVirtualDomPart {
     refresh?: (deps: any) => IAttribute;
     value: string | null;
@@ -10,13 +22,14 @@ export interface IAttribute extends IVirtualDomPart {
 
 export interface IClass extends IVirtualDomPart {
     refresh?: (deps: any) => IClass;
+    rendered?: boolean;
     style: IStyle | null;
 }
 
 export interface IEvent extends IVirtualDomPart {
-    listener: (event: any, useCapture?: boolean) => void | null;
+    listener: (event: any, options?: boolean) => void | null;
     refresh?: (deps: any) => IEvent;
-    useCapture?: boolean;
+    options?: boolean;
 }
 
 export interface INode extends IVirtualDomPart {
@@ -36,10 +49,16 @@ export interface INodes extends IVirtualDomPart
     refresh?: (deps: any) => INodes;
 }
 
+export interface IRule {
+    rendered?: boolean;
+    selector: string;
+    style: IStyle;
+}
+
 export interface IVirtualDomPart {
     deps?: any;
     name?: string;
     parent?: INode;
-    refresh?: (deps: any) => any;
+    refresh?: (deps: any) => IVirtualDomPart;
     shouldNotRender?: boolean;
 }

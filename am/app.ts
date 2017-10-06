@@ -1,29 +1,32 @@
-import {IAppData, IAccount} from './data'
-import { IStoreField, IStoreItem } from './store';
-import { boot } from './renderer';
-import { INode } from './virtual.dom';
+import {IAppData, IAccount} from "./data"
+import { IStoreField, IStoreItem } from "./store";
+import { boot } from "./renderer";
+import { INode } from "./virtual.dom";
+import { block } from "./components/styles";
 
-window.addEventListener('unhandledrejection', function handlUnhandledrejection (event) {
+window.addEventListener("unhandledrejection", function handlUnhandledrejection (event) {
     if(console) {
         console.log(event);
     }
 });
 
-export async function body(appData:IAppData): Promise<INode> {
+export async function app(appData:IAppData): Promise<INode> {
     const nodes: Array<INode> = [];
     const node: INode = {
+        attributes:[{name:"title", value: "This is an AM app."}],
+        classes:[block],
         deps: appData.account.isAuthenticated,
-        name: "body",
+        name: "my-app",
         nodes: nodes,
-        refresh: body
+        refresh: app
     };
 
     if(appData.account.isAuthenticated.value === true) {
-        const mod = await import('./components/feed');
+        const mod = await import("./components/feed");
         const feedNode = await mod.feed(appData);
         nodes.push(feedNode);
     } else {
-        const mod = await import('./components/login')
+        const mod = await import("./components/login")
         const loginNode = await mod.login(appData.account);
         nodes.push(loginNode);
     }
@@ -42,7 +45,8 @@ export function start() {
         }
     };
 
-    boot(document.body, body, appData);      
+    const appElement = <HTMLElement>document.body.getElementsByTagName("my-app")[0];
+    boot(appElement, app, appData);      
 }
 
 start();

@@ -9,34 +9,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const renderer_1 = require("./renderer");
-window.addEventListener('unhandledrejection', function handlUnhandledrejection(event) {
+const styles_1 = require("./components/styles");
+window.addEventListener("unhandledrejection", function handlUnhandledrejection(event) {
     if (console) {
         console.log(event);
     }
 });
-function body(appData) {
+function app(appData) {
     return __awaiter(this, void 0, void 0, function* () {
         const nodes = [];
         const node = {
+            attributes: [{ name: "title", value: "This is an AM app." }],
+            classes: [styles_1.block],
             deps: appData.account.isAuthenticated,
-            name: "body",
+            name: "my-app",
             nodes: nodes,
-            refresh: body
+            refresh: app
         };
         if (appData.account.isAuthenticated.value === true) {
-            const mod = yield Promise.resolve().then(function () { return require('./components/feed'); });
+            const mod = yield Promise.resolve().then(function () { return require("./components/feed"); });
             const feedNode = yield mod.feed(appData);
             nodes.push(feedNode);
         }
         else {
-            const mod = yield Promise.resolve().then(function () { return require('./components/login'); });
+            const mod = yield Promise.resolve().then(function () { return require("./components/login"); });
             const loginNode = yield mod.login(appData.account);
             nodes.push(loginNode);
         }
         return node;
     });
 }
-exports.body = body;
+exports.app = app;
 function start() {
     console.log("start application");
     const appData = {
@@ -46,7 +49,8 @@ function start() {
             password: { value: null }
         }
     };
-    renderer_1.boot(document.body, body, appData);
+    const appElement = document.body.getElementsByTagName("my-app")[0];
+    renderer_1.boot(appElement, app, appData);
 }
 exports.start = start;
 start();

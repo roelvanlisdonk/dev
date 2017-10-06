@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const store_1 = require(".././store");
 function input(field) {
     const node = {
-        events: [{ name: "input", listener: onInputChange, useCapture: false }],
+        events: [{ name: "input", listener: onInputChange, options: false }],
         name: "input"
     };
     function onInputChange(e) {

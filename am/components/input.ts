@@ -4,7 +4,7 @@ import { IStoreField, IStoreFieldValue, saveField } from '.././store';
 export function input(field: IStoreField<IStoreFieldValue>): INode {
     
     const node: INode = {
-        events: [{ name: "input", listener: onInputChange,useCapture: false }],
+        events: [{ name: "input", listener: onInputChange, options: false }],
         name: "input"
     }
 
