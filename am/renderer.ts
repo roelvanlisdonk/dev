@@ -1,4 +1,4 @@
-import { IAttribute, IClass, IEvent, INode, IRule } from "./virtual.dom";
+import { getRefreshedVirtualDomPart, IAttribute, IClass, IEvent, INode, IRule } from "./virtual.dom";
 import { addClassToStyleSheet } from "./stylesheet";
 
 let _renderer: IRenderer;
@@ -36,11 +36,13 @@ export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promis
     return node;
 }
 
-
 function renderAttribute(attr: IAttribute): void {
-    const attrName = attr.name;
-    const nativeNode = attr.parent.nativeNode;
-    const value = attr.value;
+    const refreshedAttr = <IAttribute>getRefreshedVirtualDomPart(attr);
+    const attrName = refreshedAttr.name;
+    const nativeNode = refreshedAttr.parent.nativeNode;
+
+
+    const value = refreshedAttr.value;
 
     const nativeValue: any = nativeNode[attrName];
     if(nativeValue != value) {
@@ -49,63 +51,66 @@ function renderAttribute(attr: IAttribute): void {
 }
 
 function renderClass(cssClass: IClass): void {
-    if(cssClass.shouldNotRender === false) {
-        removeClass(cssClass.parent.nativeNode, cssClass.name);
+    const refreshedClass = <IClass>getRefreshedVirtualDomPart(cssClass);
+    if(refreshedClass.shouldNotRender === false) {
+        removeClass(refreshedClass.parent.nativeNode, refreshedClass.name);
     } else {
-        addClass(cssClass.parent.nativeNode, cssClass.name);
+        addClass(refreshedClass.parent.nativeNode, refreshedClass.name);
     }
 
-    if(cssClass.rendered !== true) {
-        addClassToStyleSheet(cssClass);
+    if(refreshedClass.rendered !== true) {
+        addClassToStyleSheet(refreshedClass);
     }
 }
 
 function renderEvent(evt: IEvent): void {
-    const evtName = evt.name;
-    const nativeNode = <HTMLElement>evt.parent.nativeNode;
+    const refreshedEvent = <IEvent>getRefreshedVirtualDomPart(evt);
+    const evtName = refreshedEvent.name;
+    const nativeNode = <HTMLElement>refreshedEvent.parent.nativeNode;
     
-    if(evt.shouldNotRender === true) {
-        nativeNode.removeEventListener(evtName, evt.listener, evt.options);
+    if(refreshedEvent.shouldNotRender === true) {
+        nativeNode.removeEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
     } else {
-        nativeNode.addEventListener(evtName, evt.listener, evt.options);
+        nativeNode.addEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
     }
 }
 
-async function renderNode(node: INode): Promise<any> {
-    const nativeNode: any = node.nativeNode;
+async function renderNode(node2: INode): Promise<any> {
+    const refreshedNode = <INode>getRefreshedVirtualDomPart(node);
+    const nativeNode: any = refreshedNode.nativeNode;
 
     // Attributes
-    const attrs = node.attributes;
+    const attrs = refreshedNode.attributes;
     if(attrs && attrs.length && attrs.length > 0) {
         for(let i = 0, length = attrs.length; i < length; i++) {
             const attr = attrs[i];
-            attr.parent = node;
+            attr.parent = refreshedNode;
             _renderer.renderAttribue(attr);
         }
     }
 
     // Classes
-    const classes = node.classes;
+    const classes = refreshedNode.classes;
     if(classes && classes.length && classes.length > 0) {
         for(let i = 0, length = classes.length; i < length; i++) {
             const cssClass = classes[i];
-            cssClass.parent = node;
+            cssClass.parent = refreshedNode;
             _renderer.renderClass(cssClass);
         }
     }
 
     // Events
-    const evts = node.events;
+    const evts = refreshedNode.events;
     if(evts && evts.length && evts.length > 0) {
         for(let i = 0, length = evts.length; i < length; i++) {
             const evt = evts[i];
-            evt.parent = node;
+            evt.parent = refreshedNode;
             _renderer.renderEvent(evt);
         }
     }
 
     // Nodes
-    const nodes: any = node.nodes;
+    const nodes: any = refreshedNode.nodes;
     if(nodes && nodes.length && nodes.length > 0) {
         for(let i = 0, length = nodes.length; i < length; i++) {
             // const childNode = nodes[i];

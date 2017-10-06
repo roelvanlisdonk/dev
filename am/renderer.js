@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const virtual_dom_1 = require("./virtual.dom");
 const stylesheet_1 = require("./stylesheet");
 let _renderer;
 // This value will be used to store the root virtual dom node in the store.
@@ -35,67 +36,71 @@ function boot(nativeNode, fn, deps) {
 }
 exports.boot = boot;
 function renderAttribute(attr) {
-    const attrName = attr.name;
-    const nativeNode = attr.parent.nativeNode;
-    const value = attr.value;
+    const refreshedAttr = virtual_dom_1.getRefreshedVirtualDomPart(attr);
+    const attrName = refreshedAttr.name;
+    const nativeNode = refreshedAttr.parent.nativeNode;
+    const value = refreshedAttr.value;
     const nativeValue = nativeNode[attrName];
     if (nativeValue != value) {
         nativeNode[attrName] = value;
     }
 }
 function renderClass(cssClass) {
-    if (cssClass.shouldNotRender === false) {
-        removeClass(cssClass.parent.nativeNode, cssClass.name);
+    const refreshedClass = virtual_dom_1.getRefreshedVirtualDomPart(cssClass);
+    if (refreshedClass.shouldNotRender === false) {
+        removeClass(refreshedClass.parent.nativeNode, refreshedClass.name);
     }
     else {
-        addClass(cssClass.parent.nativeNode, cssClass.name);
+        addClass(refreshedClass.parent.nativeNode, refreshedClass.name);
     }
-    if (cssClass.rendered !== true) {
-        stylesheet_1.addClassToStyleSheet(cssClass);
+    if (refreshedClass.rendered !== true) {
+        stylesheet_1.addClassToStyleSheet(refreshedClass);
     }
 }
 function renderEvent(evt) {
-    const evtName = evt.name;
-    const nativeNode = evt.parent.nativeNode;
-    if (evt.shouldNotRender === true) {
-        nativeNode.removeEventListener(evtName, evt.listener, evt.options);
+    const refreshedEvent = virtual_dom_1.getRefreshedVirtualDomPart(evt);
+    const evtName = refreshedEvent.name;
+    const nativeNode = refreshedEvent.parent.nativeNode;
+    if (refreshedEvent.shouldNotRender === true) {
+        nativeNode.removeEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
     }
     else {
-        nativeNode.addEventListener(evtName, evt.listener, evt.options);
+        nativeNode.addEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
     }
 }
-function renderNode(node) {
+function renderNode(node2) {
     return __awaiter(this, void 0, void 0, function* () {
-        const nativeNode = node.nativeNode;
+        const refreshedNode = virtual_dom_1.getRefreshedVirtualDomPart(node);
+        const nativeNode = refreshedNode.nativeNode;
         // Attributes
-        const attrs = node.attributes;
+        const attrs = refreshedNode.attributes;
         if (attrs && attrs.length && attrs.length > 0) {
             for (let i = 0, length = attrs.length; i < length; i++) {
                 const attr = attrs[i];
-                attr.parent = node;
+                attr.parent = refreshedNode;
                 _renderer.renderAttribue(attr);
             }
         }
         // Classes
-        const classes = node.classes;
+        const classes = refreshedNode.classes;
         if (classes && classes.length && classes.length > 0) {
             for (let i = 0, length = classes.length; i < length; i++) {
                 const cssClass = classes[i];
-                cssClass.parent = node;
+                cssClass.parent = refreshedNode;
                 _renderer.renderClass(cssClass);
             }
         }
         // Events
-        const evts = node.events;
+        const evts = refreshedNode.events;
         if (evts && evts.length && evts.length > 0) {
             for (let i = 0, length = evts.length; i < length; i++) {
                 const evt = evts[i];
-                evt.parent = node;
+                evt.parent = refreshedNode;
                 _renderer.renderEvent(evt);
             }
         }
         // Nodes
-        const nodes = node.nodes;
+        const nodes = refreshedNode.nodes;
         if (nodes && nodes.length && nodes.length > 0) {
             for (let i = 0, length = nodes.length; i < length; i++) {
                 // const childNode = nodes[i];
