@@ -9,23 +9,32 @@ window.addEventListener('unhandledrejection', function handlUnhandledrejection (
     }
 });
 
-export async function app(appData:IAppData): Promise<INode> {
-    let node = null;
+export async function body(appData:IAppData): Promise<INode> {
+    const nodes: Array<INode> = [];
+    const node: INode = {
+        deps: appData.account.isAuthenticated,
+        name: "body",
+        nodes: nodes,
+        refresh: body
+    };
+
     if(appData.account.isAuthenticated.value === true) {
-        console.log("loaded feed.");
         const mod = await import('./components/feed');
-        node = await mod.feed(appData);
+        const feedNode = await mod.feed(appData);
+        nodes.push(feedNode);
     } else {
         const mod = await import('./components/login')
-        node = await mod.login(appData.account);
+        const loginNode = await mod.login(appData.account);
+        nodes.push(loginNode);
     }
+    
     return node;
 }
 
 export function start() {
     console.log("start application");
 
-    const data: IAppData = {
+    const appData: IAppData = {
         account: {
             isAuthenticated: { value: null },
             name: { value: null },
@@ -33,7 +42,7 @@ export function start() {
         }
     };
 
-    boot(document.body, app, data);          
+    boot(document.body, body, appData);      
 }
 
 start();

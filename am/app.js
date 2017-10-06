@@ -14,32 +14,39 @@ window.addEventListener('unhandledrejection', function handlUnhandledrejection(e
         console.log(event);
     }
 });
-function app(appData) {
+function body(appData) {
     return __awaiter(this, void 0, void 0, function* () {
-        let node = null;
+        const nodes = [];
+        const node = {
+            deps: appData.account.isAuthenticated,
+            name: "body",
+            nodes: nodes,
+            refresh: body
+        };
         if (appData.account.isAuthenticated.value === true) {
-            console.log("loaded feed.");
             const mod = yield Promise.resolve().then(function () { return require('./components/feed'); });
-            node = yield mod.feed(appData);
+            const feedNode = yield mod.feed(appData);
+            nodes.push(feedNode);
         }
         else {
             const mod = yield Promise.resolve().then(function () { return require('./components/login'); });
-            node = yield mod.login(appData.account);
+            const loginNode = yield mod.login(appData.account);
+            nodes.push(loginNode);
         }
         return node;
     });
 }
-exports.app = app;
+exports.body = body;
 function start() {
     console.log("start application");
-    const data = {
+    const appData = {
         account: {
             isAuthenticated: { value: null },
             name: { value: null },
             password: { value: null }
         }
     };
-    renderer_1.boot(document.body, app, data);
+    renderer_1.boot(document.body, body, appData);
 }
 exports.start = start;
 start();

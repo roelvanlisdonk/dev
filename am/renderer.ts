@@ -1,10 +1,12 @@
 import { IAttribute, IClass, IEvent, INode } from './virtual.dom'
 
+let _renderer: IRenderer;
+
 // This value will be used to store the root virtual dom node in the store.
 export const RootVirtualDomNodeStoreKey = "RootVirtualDomNode";
 
 export function getRenderer(): IRenderer {
-    return renderer;
+    return _renderer;
 }
 
 export interface IRenderer {
@@ -17,7 +19,7 @@ export interface IRenderer {
 
 // For now use html renderer as default.
 export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promise<INode>, deps: any): Promise<INode> {
-    renderer = {
+    _renderer = {
         addEventListener: addEventListener,
         renderAttribue: renderAttribue,
         renderClass: renderClass,
@@ -27,8 +29,10 @@ export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promis
 
     // Generate the virtual dom
     const node: INode = await fn(deps);
+    node.nativeNode = nativeNode;
     
     // Travese the virtual dom and sync it with the given native dom.
+    _renderer.renderNode(node);
 
     return node;
 }
@@ -48,6 +52,3 @@ function renderEvent(event: IEvent): void {
 function renderNode(node: INode): void {
     // Trek de gegeven node gelijk met de node.nativenode.
 }
-
-
-let renderer: IRenderer;

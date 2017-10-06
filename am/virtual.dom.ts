@@ -38,7 +38,7 @@ export interface INodes extends IVirtualDomPart
 
 export interface IVirtualDomPart {
     deps?: any;
-    name: string;
+    name?: string;
     parent?: INode;
     refresh?: (deps: any) => any;
     shouldNotRender?: boolean;

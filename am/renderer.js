@@ -8,16 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+let _renderer;
 // This value will be used to store the root virtual dom node in the store.
 exports.RootVirtualDomNodeStoreKey = "RootVirtualDomNode";
 function getRenderer() {
-    return renderer;
+    return _renderer;
 }
 exports.getRenderer = getRenderer;
 // For now use html renderer as default.
 function boot(nativeNode, fn, deps) {
     return __awaiter(this, void 0, void 0, function* () {
-        renderer = {
+        _renderer = {
             addEventListener: addEventListener,
             renderAttribue: renderAttribue,
             renderClass: renderClass,
@@ -26,7 +27,9 @@ function boot(nativeNode, fn, deps) {
         };
         // Generate the virtual dom
         const node = yield fn(deps);
+        node.nativeNode = nativeNode;
         // Travese the virtual dom and sync it with the given native dom.
+        _renderer.renderNode(node);
         return node;
     });
 }
@@ -40,5 +43,4 @@ function renderEvent(event) {
 function renderNode(node) {
     // Trek de gegeven node gelijk met de node.nativenode.
 }
-let renderer;
 //# sourceMappingURL=renderer.js.map
