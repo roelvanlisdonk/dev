@@ -6,9 +6,9 @@ import { INode } from '../virtual.dom';
 export async function login(account:IAccount): Promise<INode> {
     const node: INode = {
         nodes: [
-            "Gebruikersnaam",
+            {text: "Gebruikersnaam"},
             input(account.name),
-            "Wachtwoord",
+            {text: "Wachtwoord"},
             input(account.password)
         ],
         name: "login"

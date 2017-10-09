@@ -1,4 +1,4 @@
-import { getRefreshedVirtualDomPart, IAttribute, IClass, IEvent, INode, IRule } from "./virtual.dom";
+import { IAttribute, IClass, IEvent, INode, IRule } from "./virtual.dom";
 import { addClassToStyleSheet } from "./stylesheet";
 
 let _renderer: IRenderer;
@@ -11,10 +11,10 @@ export function getRenderer(): IRenderer {
 }
 
 export interface IRenderer {
-    renderAttribue: (attribute: IAttribute) => void;
-    renderClass: (cssClass: IClass) => void;
-    renderEvent: (event: IEvent) => void;
-    renderNode: (node: INode) => Promise<INode>;
+    renderAttribue: (attribute: IAttribute, isNew: boolean) => void;
+    renderClass: (cssClass: IClass, isNew: boolean) => void;
+    renderEvent: (event: IEvent, isNew: boolean) => void;
+    renderNode: (node: INode, isNew: boolean) => Promise<INode>;
 }
 
 // For now use html renderer as default.
@@ -31,17 +31,23 @@ export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promis
     node.nativeNode = nativeNode;
     
     // Travese the virtual dom and sync it with the given native dom.
-    _renderer.renderNode(node);
+    _renderer.renderNode(node, true);
 
     return node;
 }
 
-function renderAttribute(attr: IAttribute): void {
-    const refreshedAttr = <IAttribute>getRefreshedVirtualDomPart(attr);
+function renderAttribute(attr: IAttribute, isNew: boolean): void {
+    let refreshedAttr = attr;
+
+    // If attr.value is a IStoreField, set refresh method.
+    // Check if deps changed
+    // Check if refresh exists
+    if(!isNew) {
+        attr = attr.refresh(attr.deps);
+    }
+
     const attrName = refreshedAttr.name;
     const nativeNode = refreshedAttr.parent.nativeNode;
-
-
     const value = refreshedAttr.value;
 
     const nativeValue: any = nativeNode[attrName];
@@ -50,8 +56,15 @@ function renderAttribute(attr: IAttribute): void {
     }
 }
 
-function renderClass(cssClass: IClass): void {
-    const refreshedClass = <IClass>getRefreshedVirtualDomPart(cssClass);
+function renderClass(cssClass: IClass, isNew: boolean): void {
+    let refreshedClass = cssClass;
+
+    // Check if deps changed
+    // Check if refresh exists
+    if(!isNew) {
+        cssClass = cssClass.refresh(cssClass.deps);
+    }
+
     if(refreshedClass.shouldNotRender === false) {
         removeClass(refreshedClass.parent.nativeNode, refreshedClass.name);
     } else {
@@ -63,8 +76,15 @@ function renderClass(cssClass: IClass): void {
     }
 }
 
-function renderEvent(evt: IEvent): void {
-    const refreshedEvent = <IEvent>getRefreshedVirtualDomPart(evt);
+function renderEvent(evt: IEvent, isNew: boolean): void {
+    let refreshedEvent = evt;
+
+    // Check if deps changed
+    // Check if refresh exists
+    if(!isNew) {
+        evt = evt.refresh(evt.deps);
+    }
+
     const evtName = refreshedEvent.name;
     const nativeNode = <HTMLElement>refreshedEvent.parent.nativeNode;
     
@@ -75,8 +95,12 @@ function renderEvent(evt: IEvent): void {
     }
 }
 
-async function renderNode(node2: INode): Promise<any> {
-    const refreshedNode = <INode>getRefreshedVirtualDomPart(node);
+async function renderNode(node: INode, isNew: boolean): Promise<any> {
+    let refreshedNode = node;
+    if(!isNew) {
+        refreshedNode = await node.refresh(node.deps);
+    }
+    
     const nativeNode: any = refreshedNode.nativeNode;
 
     // Attributes
@@ -85,7 +109,7 @@ async function renderNode(node2: INode): Promise<any> {
         for(let i = 0, length = attrs.length; i < length; i++) {
             const attr = attrs[i];
             attr.parent = refreshedNode;
-            _renderer.renderAttribue(attr);
+            _renderer.renderAttribue(attr, isNew);
         }
     }
 
@@ -95,7 +119,7 @@ async function renderNode(node2: INode): Promise<any> {
         for(let i = 0, length = classes.length; i < length; i++) {
             const cssClass = classes[i];
             cssClass.parent = refreshedNode;
-            _renderer.renderClass(cssClass);
+            _renderer.renderClass(cssClass, isNew);
         }
     }
 
@@ -105,21 +129,37 @@ async function renderNode(node2: INode): Promise<any> {
         for(let i = 0, length = evts.length; i < length; i++) {
             const evt = evts[i];
             evt.parent = refreshedNode;
-            _renderer.renderEvent(evt);
+            _renderer.renderEvent(evt, isNew);
         }
     }
 
     // Nodes
-    const nodes: any = refreshedNode.nodes;
-    if(nodes && nodes.length && nodes.length > 0) {
-        for(let i = 0, length = nodes.length; i < length; i++) {
-            // const childNode = nodes[i];
-            // childNode.parent = node;
-            // _renderer.renderNode(childNode);
-        }
-    }
-}
+    if(isNew) {
+        const frag = document.createDocumentFragment();
+         const nodes: INode[] = refreshedNode.nodes;
+         if(nodes && nodes.length && nodes.length > 0) {
+             for(let i = 0, length = nodes.length; i < length; i++) {
+                const childNode = nodes[i];
+                childNode.parent = node;
+                
+                if(childNode.text) {
+                    childNode.nativeNode = document.createTextNode(childNode.text);
+                    frag.appendChild(childNode.nativeNode);
+                }
 
+                if(childNode.name) {
+                    childNode.nativeNode = document.createElement(childNode.name);
+                    frag.appendChild(childNode.nativeNode);
+                    _renderer.renderNode(childNode, isNew);
+                    
+                }
+             }
+             node.nativeNode.appendChild(frag);
+         }
+    }
+
+    return node;
+}
 
 function addClass(element: HTMLElement, className: string): void {
     if (element.classList) {

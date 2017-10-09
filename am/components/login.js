@@ -13,9 +13,9 @@ function login(account) {
     return __awaiter(this, void 0, void 0, function* () {
         const node = {
             nodes: [
-                "Gebruikersnaam",
+                { text: "Gebruikersnaam" },
                 input_1.input(account.name),
-                "Wachtwoord",
+                { text: "Wachtwoord" },
                 input_1.input(account.password)
             ],
             name: "login"

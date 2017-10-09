@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const virtual_dom_1 = require("./virtual.dom");
 const stylesheet_1 = require("./stylesheet");
 let _renderer;
 // This value will be used to store the root virtual dom node in the store.
@@ -30,13 +29,19 @@ function boot(nativeNode, fn, deps) {
         const node = yield fn(deps);
         node.nativeNode = nativeNode;
         // Travese the virtual dom and sync it with the given native dom.
-        _renderer.renderNode(node);
+        _renderer.renderNode(node, true);
         return node;
     });
 }
 exports.boot = boot;
-function renderAttribute(attr) {
-    const refreshedAttr = virtual_dom_1.getRefreshedVirtualDomPart(attr);
+function renderAttribute(attr, isNew) {
+    let refreshedAttr = attr;
+    // If attr.value is a IStoreField, set refresh method.
+    // Check if deps changed
+    // Check if refresh exists
+    if (!isNew) {
+        attr = attr.refresh(attr.deps);
+    }
     const attrName = refreshedAttr.name;
     const nativeNode = refreshedAttr.parent.nativeNode;
     const value = refreshedAttr.value;
@@ -45,8 +50,13 @@ function renderAttribute(attr) {
         nativeNode[attrName] = value;
     }
 }
-function renderClass(cssClass) {
-    const refreshedClass = virtual_dom_1.getRefreshedVirtualDomPart(cssClass);
+function renderClass(cssClass, isNew) {
+    let refreshedClass = cssClass;
+    // Check if deps changed
+    // Check if refresh exists
+    if (!isNew) {
+        cssClass = cssClass.refresh(cssClass.deps);
+    }
     if (refreshedClass.shouldNotRender === false) {
         removeClass(refreshedClass.parent.nativeNode, refreshedClass.name);
     }
@@ -57,8 +67,13 @@ function renderClass(cssClass) {
         stylesheet_1.addClassToStyleSheet(refreshedClass);
     }
 }
-function renderEvent(evt) {
-    const refreshedEvent = virtual_dom_1.getRefreshedVirtualDomPart(evt);
+function renderEvent(evt, isNew) {
+    let refreshedEvent = evt;
+    // Check if deps changed
+    // Check if refresh exists
+    if (!isNew) {
+        evt = evt.refresh(evt.deps);
+    }
     const evtName = refreshedEvent.name;
     const nativeNode = refreshedEvent.parent.nativeNode;
     if (refreshedEvent.shouldNotRender === true) {
@@ -68,9 +83,12 @@ function renderEvent(evt) {
         nativeNode.addEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
     }
 }
-function renderNode(node2) {
+function renderNode(node, isNew) {
     return __awaiter(this, void 0, void 0, function* () {
-        const refreshedNode = virtual_dom_1.getRefreshedVirtualDomPart(node);
+        let refreshedNode = node;
+        if (!isNew) {
+            refreshedNode = yield node.refresh(node.deps);
+        }
         const nativeNode = refreshedNode.nativeNode;
         // Attributes
         const attrs = refreshedNode.attributes;
@@ -78,7 +96,7 @@ function renderNode(node2) {
             for (let i = 0, length = attrs.length; i < length; i++) {
                 const attr = attrs[i];
                 attr.parent = refreshedNode;
-                _renderer.renderAttribue(attr);
+                _renderer.renderAttribue(attr, isNew);
             }
         }
         // Classes
@@ -87,7 +105,7 @@ function renderNode(node2) {
             for (let i = 0, length = classes.length; i < length; i++) {
                 const cssClass = classes[i];
                 cssClass.parent = refreshedNode;
-                _renderer.renderClass(cssClass);
+                _renderer.renderClass(cssClass, isNew);
             }
         }
         // Events
@@ -96,18 +114,31 @@ function renderNode(node2) {
             for (let i = 0, length = evts.length; i < length; i++) {
                 const evt = evts[i];
                 evt.parent = refreshedNode;
-                _renderer.renderEvent(evt);
+                _renderer.renderEvent(evt, isNew);
             }
         }
         // Nodes
-        const nodes = refreshedNode.nodes;
-        if (nodes && nodes.length && nodes.length > 0) {
-            for (let i = 0, length = nodes.length; i < length; i++) {
-                // const childNode = nodes[i];
-                // childNode.parent = node;
-                // _renderer.renderNode(childNode);
+        if (isNew) {
+            const frag = document.createDocumentFragment();
+            const nodes = refreshedNode.nodes;
+            if (nodes && nodes.length && nodes.length > 0) {
+                for (let i = 0, length = nodes.length; i < length; i++) {
+                    const childNode = nodes[i];
+                    childNode.parent = node;
+                    if (childNode.text) {
+                        childNode.nativeNode = document.createTextNode(childNode.text);
+                        frag.appendChild(childNode.nativeNode);
+                    }
+                    if (childNode.name) {
+                        childNode.nativeNode = document.createElement(childNode.name);
+                        frag.appendChild(childNode.nativeNode);
+                        _renderer.renderNode(childNode, isNew);
+                    }
+                }
+                node.nativeNode.appendChild(frag);
             }
         }
+        return node;
     });
 }
 function addClass(element, className) {

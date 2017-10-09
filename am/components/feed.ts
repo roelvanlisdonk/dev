@@ -7,7 +7,7 @@ export async function feed(appData:IAppData): Promise<INode> {
     const node: INode = {
         name: "feed",
         nodes:[
-            "Het feed component"
+            {text: "Het feed component"}
         ]
     };
     

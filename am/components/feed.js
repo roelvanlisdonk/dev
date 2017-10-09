@@ -13,7 +13,7 @@ function feed(appData) {
         const node = {
             name: "feed",
             nodes: [
-                "Het feed component"
+                { text: "Het feed component" }
             ]
         };
         return node;
