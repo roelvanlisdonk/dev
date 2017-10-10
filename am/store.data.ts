@@ -16,6 +16,7 @@ interface IItems {
 }
 
 export interface IStoreField<T extends IStoreFieldValue> extends IStoreItem {
+    previousValue?: T;
     value: T;
 }
 

@@ -6,6 +6,6 @@ export interface IAccount extends IStoreItem {
     password: IStoreField<string>;
 }
 
-export interface IAppData {
+export interface IAppData extends IStoreItem {
     account: IAccount;
 }

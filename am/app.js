@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const store_1 = require("./store");
 const renderer_1 = require("./renderer");
 const styles_1 = require("./components/styles");
 window.addEventListener("unhandledrejection", function handlUnhandledrejection(event) {
@@ -42,13 +43,13 @@ function app(appData) {
 exports.app = app;
 function start() {
     console.log("start application");
-    const appData = {
+    const appData = store_1.saveItem({
         account: {
-            isAuthenticated: { value: null },
+            isAuthenticated: { value: false },
             name: { value: null },
             password: { value: null }
         }
-    };
+    });
     const appElement = document.body.getElementsByTagName("my-app")[0];
     renderer_1.boot(appElement, app, appData);
 }

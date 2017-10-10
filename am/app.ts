@@ -1,5 +1,5 @@
 import {IAppData, IAccount} from "./data"
-import { IStoreField, IStoreItem } from "./store";
+import { IStoreField, IStoreItem, saveItem } from "./store";
 import { boot } from "./renderer";
 import { INode } from "./virtual.dom";
 import { block } from "./components/styles";
@@ -37,13 +37,13 @@ export async function app(appData:IAppData): Promise<INode> {
 export function start() {
     console.log("start application");
 
-    const appData: IAppData = {
+    const appData = saveItem(<IAppData>{
         account: {
-            isAuthenticated: { value: null },
+            isAuthenticated: { value: false },
             name: { value: null },
             password: { value: null }
         }
-    };
+    });
 
     const appElement = <HTMLElement>document.body.getElementsByTagName("my-app")[0];
     boot(appElement, app, appData);      
