@@ -24,7 +24,6 @@ export function button(options: IButtonOptions): INode {
         node.nodes.push({text: options.text});
     }
 
-    
     return node;
 }
 

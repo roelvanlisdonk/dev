@@ -24,6 +24,13 @@ export type IStoreFieldValue = Array<IBasicType> | IBasicType;
 
 export interface IStoreItem {
     storeId?: string;
+    /**
+     * off = function store.hasChanged will always return false.
+     * rootOnly = Only check root level StoreFields, when checking for changes.  This is the default value.
+     * skipArrays = Traverse the tree, but skip items in arrays, when checking for changes.
+     * full = Traverse the tree, include every item, including items in arrays, when checking for changes.
+     */
+    detectChanges?: "off" | "rootOnly" | "skipArrays" | "full";
 }
 
 export interface ISubscriber {

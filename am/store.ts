@@ -9,12 +9,52 @@ export function endWatch(token: string): void {
     
 }
 
+
+
 export function getField(id: string): IStoreField<IStoreFieldValue> {
     return fields[id];
 }
 
 export function getItem(id: string): IStoreItem {
     return items[id];
+}
+
+export function hasChanged(obj: object): boolean {
+    const result = false;
+
+    if(isField(obj)){
+        const field = <IStoreField<IStoreFieldValue>>obj;
+        return (field.value !== field.previousValue);
+    }
+
+    for (let attrName in obj) {
+        if (obj.hasOwnProperty(attrName)) {
+            const attrValue = (<any>obj)[attrName];
+
+            if(isField(attrValue)){
+                const field = <IStoreField<IStoreFieldValue>>obj;
+                if (field.value !== field.previousValue) {
+                    return true;
+                }
+            }
+
+            if(isItem(attrValue) && hasChanged(attrValue)) {
+                return true;
+            }
+        }
+    }
+
+    return result;
+}
+
+export function isField(obj: object): boolean {
+    const field = <IStoreField<IStoreFieldValue>>obj || <any>{};
+    return (field.value !== undefined && Boolean(field.storeId));
+}
+
+export function isItem(obj: object): boolean {
+    const item = <IStoreField<IStoreFieldValue>>obj || <any>{};
+    return Boolean(item.storeId);
 }
 
 export function newCuid(): string {
