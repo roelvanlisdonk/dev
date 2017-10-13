@@ -1,4 +1,4 @@
-import { assert } from './test';
+import { given } from './test.framework';
 import { hasChanged } from './store';
 
 const test: any = {

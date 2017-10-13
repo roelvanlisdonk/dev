@@ -16,6 +16,39 @@ function getItem(id) {
     return store_data_1.items[id];
 }
 exports.getItem = getItem;
+function hasChanged(obj) {
+    const result = false;
+    if (isField(obj)) {
+        const field = obj;
+        return (field.value !== field.previousValue);
+    }
+    for (let attrName in obj) {
+        if (obj.hasOwnProperty(attrName)) {
+            const attrValue = obj[attrName];
+            if (isField(attrValue)) {
+                const field = obj;
+                if (field.value !== field.previousValue) {
+                    return true;
+                }
+            }
+            if (isItem(attrValue) && hasChanged(attrValue)) {
+                return true;
+            }
+        }
+    }
+    return result;
+}
+exports.hasChanged = hasChanged;
+function isField(obj) {
+    const field = obj || {};
+    return (field.value !== undefined && Boolean(field.storeId));
+}
+exports.isField = isField;
+function isItem(obj) {
+    const item = obj || {};
+    return Boolean(item.storeId);
+}
+exports.isItem = isItem;
 function newCuid() {
     cuidCounter = cuidCounter + 1;
     return `${rootCuid}-${cuidCounter}`;
