@@ -14,9 +14,6 @@ interface ITest {
     givenInput: () => Promise<ITestCase>;
 }
 
-
-
-
 export function areEqual(test: ITestCase): boolean {
     return (test.actual !== test.expected);
 }
@@ -47,3 +44,7 @@ export interface ITestCase {
     expected: any;
     title: string;
 }
+
+// given(1,2,3).it(sum).shouldReturn(6); // This will only register a test.
+// given(1,2,3,4).it(sum).shouldReturn(6); // Test on the same function will be grouped.
+// given(input: () => args).it(sum).shouldPass(assertRule: (case: ITestCase) => boolean).
