@@ -45,6 +45,11 @@ export interface ITestCase {
     title: string;
 }
 
+// Examples:
 // given(1,2,3).it(sum).shouldReturn(6); // This will only register a test.
 // given(1,2,3,4).it(sum).shouldReturn(6); // Test on the same function will be grouped.
-// given(input: () => args).it(sum).shouldPass(assertRule: (case: ITestCase) => boolean).
+// given(input: () => args).it(sum).should(assertRule: (input: [], expected: value) => boolean, expected: value | fn).
+// given(1,2,3,4).it(sum).should(beGreatherThen, 6); // Test on the same function will be grouped.
+// given(1,2,3,4).it(sum).should(beGreatherThen, ()=> { return 6;}); // Test on the same function will be grouped.
+// given(1,2,3,4).it(sum).should(setCorrectProperties, { name: '', value: 6}); // Test on the same function will be grouped.
+
