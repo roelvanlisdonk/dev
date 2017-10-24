@@ -3,6 +3,7 @@ import { IStoreField, IStoreItem, saveItem } from "./store";
 import { boot } from "./renderer";
 import { INode } from "./virtual.dom";
 import { block } from "./components/styles";
+import { execute } from "./test.framework";
 
 window.addEventListener("unhandledrejection", function handlUnhandledrejection (event) {
     if(console) {
@@ -46,7 +47,10 @@ export function start() {
     });
 
     const appElement = <HTMLElement>document.body.getElementsByTagName("my-app")[0];
-    boot(appElement, app, appData);      
+    boot(appElement, app, appData);
+
+    // Run tests
+    execute();
 }
 
 start();

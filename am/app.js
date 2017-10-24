@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const store_1 = require("./store");
 const renderer_1 = require("./renderer");
 const styles_1 = require("./components/styles");
+const test_framework_1 = require("./test.framework");
 window.addEventListener("unhandledrejection", function handlUnhandledrejection(event) {
     if (console) {
         console.log(event);
@@ -52,6 +53,8 @@ function start() {
     });
     const appElement = document.body.getElementsByTagName("my-app")[0];
     renderer_1.boot(appElement, app, appData);
+    // Run tests
+    test_framework_1.execute();
 }
 exports.start = start;
 start();
