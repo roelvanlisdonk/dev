@@ -50,18 +50,19 @@ interface ITest extends IGivenResult, IItResult {
 }
 
 function executeTest(test: ITest) {
-    const input = JSON.stringify(test.input);
-    const expected = JSON.stringify(test.expected);
+    const inputAsString = JSON.stringify(test.input);
+    const expectedAsString = JSON.stringify(test.expected);
     const subject = test.subject;
     const assert = test.assert;
-
-    const actual = subject.apply(null, input);
-    const assertResult = test.assert.apply(test, [actual, expected]);
+    const actual = subject.apply(null, test.input);
+    const actualAsString = JSON.stringify(actual);
+    
+    const assertResult = test.assert.apply(test, [actualAsString, expectedAsString]);
     if(assertResult) {
-        console.log(`Success: Given input [${input}], it [${subject.name}] should [${assert.name}] expected [${expected}].`)
+        console.log(`Success: Given input [${inputAsString}], it [${subject.name}] should [${assert.name}] expected [${expectedAsString}].`)
     }
     else {
-        console.log(`Failure: Given input [${input}] it [${subject.name}] should [${assert.name}] expected [${expected}], but was [${actual}].`)
+        console.log(`Failure: Given input [${inputAsString}] it [${subject.name}] should [${assert.name}] expected [${expectedAsString}], but was [${actual}].`)
     }
 }
 
@@ -77,24 +78,3 @@ function should(this: ITest, fn:(this: ITest, actual: any, expected: any) => boo
     self.expected = expected;
     _tests.push(self);
 }
-
-function sum(...args: number[]): number {
-    let result = 0;
-    for(let i=0, length = args.length;i<length;i++) {
-        result = result + args[i];
-    }
-    return result;
-}
-
-
-// Examples:
-// given(1,2,3).it(sum).shouldReturn(6); // This will only register a test.
-// given(1,2,3,4).it(sum).shouldReturn(6); // Test on the same function will be grouped.
-// given(input: () => args).it(sum).should(assertRule: (input: [], expected: value) => boolean, expected: value | fn).
-// given(1,2,3,4).it(sum).should(beGreatherThen, 6); // Test on the same function will be grouped.
-// given(1,2,3,4).it(sum).should(beGreatherThen, ()=> { return 6;}); // Test on the same function will be grouped.
-// given(1,2,3,4).it(sum).should(setCorrectProperties, { name: '', value: 6}); // Test on the same function will be grouped.
-//given(1,2,3,4).it(sum).should(beEqualTo, 6); // Test on the same function will be grouped.
-given(1,2,3,4).it(sum).should(beEqualTo, 6);
-execute();
-

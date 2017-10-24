@@ -3,7 +3,7 @@ import { IStoreField, IStoreItem, saveItem } from "./store";
 import { boot } from "./renderer";
 import { INode } from "./virtual.dom";
 import { block } from "./components/styles";
-import { execute } from "./test.framework";
+import { beEqualTo, execute, given } from "./test.framework";
 
 window.addEventListener("unhandledrejection", function handlUnhandledrejection (event) {
     if(console) {
@@ -34,6 +34,18 @@ export async function app(appData:IAppData): Promise<INode> {
     
     return node;
 }
+
+
+function sum(...args: number[]): number {
+    let result = 0;
+    for(let i=0, length = args.length;i<length;i++) {
+        result = result + args[i];
+    }
+    return result;
+}
+
+// Examples:
+given(1,2,3,4).it(sum).should(beEqualTo, 10);
 
 export function start() {
     console.log("start application");
