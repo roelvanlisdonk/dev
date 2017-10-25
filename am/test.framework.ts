@@ -1,6 +1,5 @@
-const _tests: ITest[] = [];
 let _idCounter: number = 0;
-
+let _tests: ITest[] = [];
 
 export function beEqualTo(actual: any, expected: any) {
     return actual === expected;
@@ -9,6 +8,12 @@ export function beEqualTo(actual: any, expected: any) {
 export function execute() {
     for(let i = 0, length = _tests.length;i < length;i++) {
         executeTest(_tests[i]);
+    }
+
+    _tests = _tests.sort(byResult);
+
+    for(let i = 0, length = _tests.length;i < length;i++) {
+        showTestResult(_tests[i]);
     }
 }
 
@@ -38,15 +43,31 @@ export interface IItResult {
     should: (this: IItResult, assertFn:(actual: any, expected: any) => boolean, expected: any) => void;
 }
 
-
 // Each test will be stored as an ITest object.
 // It will be kept private, to guide developers when using the fluent interface, choosing the correct functions.
 interface ITest extends IGivenResult, IItResult {
     assert?: (this: ITest, actual: any, expected: any) => boolean;
     id: number;
     input: any[];
+    result?: boolean;
     subject?: (...args: any[]) => any;
     expected?: any;
+}
+
+function byResult(a:ITest, b:ITest): number {
+    if(a.result === b.result) {
+        return 0;
+    }
+
+    // Failure tests should be at the bottom.
+    if(a.result === false && b.result === true){
+        return 1;
+    }
+    
+    // Success tests should be on top.
+    if(a.result === true && b.result === false){
+        return -1;
+    }
 }
 
 function executeTest(test: ITest) {
@@ -57,13 +78,7 @@ function executeTest(test: ITest) {
     const actual = subject.apply(null, test.input);
     const actualAsString = JSON.stringify(actual);
     
-    const assertResult = test.assert.apply(test, [actualAsString, expectedAsString]);
-    if(assertResult) {
-        console.log(`Success: Given input [${inputAsString}], it [${subject.name}] should [${assert.name}] expected [${expectedAsString}].`)
-    }
-    else {
-        console.log(`Failure: Given input [${inputAsString}] it [${subject.name}] should [${assert.name}] expected [${expectedAsString}], but was [${actual}].`)
-    }
+    test.result = test.assert.apply(test, [actualAsString, expectedAsString]);
 }
 
 function it(this: IGivenResult, fn: (...args: any[]) => any): IItResult {
@@ -77,4 +92,20 @@ function should(this: ITest, fn:(this: ITest, actual: any, expected: any) => boo
     self.assert = fn;
     self.expected = expected;
     _tests.push(self);
+}
+
+function showTestResult(test: ITest): void {
+    const inputAsString = JSON.stringify(test.input);
+    const expectedAsString = JSON.stringify(test.expected);
+    const subject = test.subject;
+    const assert = test.assert;
+    const actual = subject.apply(null, test.input);
+    const actualAsString = JSON.stringify(actual);
+
+    if(test.result) {
+        console.log(`Success: Given input ${inputAsString} it [${subject.name}] should [${assert.name}] expected [${expectedAsString}].`)
+    }
+    else {
+        console.log(`Failure: Given input ${inputAsString} it [${subject.name}] should [${assert.name}] expected [${expectedAsString}], but was [${actual}].`)
+    }
 }

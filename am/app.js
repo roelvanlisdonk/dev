@@ -42,15 +42,14 @@ function app(appData) {
     });
 }
 exports.app = app;
-function sum(...args) {
-    let result = 0;
-    for (let i = 0, length = args.length; i < length; i++) {
-        result = result + args[i];
-    }
-    return result;
+function runTests() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const mod = yield Promise.resolve().then(function () { return require("./common/validation/is.function.test"); });
+        // TODO
+        // Run tests
+        test_framework_1.execute();
+    });
 }
-// Examples:
-test_framework_1.given(1, 2, 3, 4).it(sum).should(test_framework_1.beEqualTo, 10);
 function start() {
     console.log("start application");
     const appData = store_1.saveItem({
@@ -62,8 +61,7 @@ function start() {
     });
     const appElement = document.body.getElementsByTagName("my-app")[0];
     renderer_1.boot(appElement, app, appData);
-    // Run tests
-    test_framework_1.execute();
+    runTests();
 }
 exports.start = start;
 start();

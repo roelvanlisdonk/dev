@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const _tests = [];
 let _idCounter = 0;
+let _tests = [];
 function beEqualTo(actual, expected) {
     return actual === expected;
 }
@@ -9,6 +9,10 @@ exports.beEqualTo = beEqualTo;
 function execute() {
     for (let i = 0, length = _tests.length; i < length; i++) {
         executeTest(_tests[i]);
+    }
+    _tests = _tests.sort(byResult);
+    for (let i = 0, length = _tests.length; i < length; i++) {
+        showTestResult(_tests[i]);
     }
 }
 exports.execute = execute;
@@ -27,6 +31,19 @@ function given(...input) {
     return test;
 }
 exports.given = given;
+function byResult(a, b) {
+    if (a.result === b.result) {
+        return 0;
+    }
+    // Failure tests should be at the bottom.
+    if (a.result === false && b.result === true) {
+        return 1;
+    }
+    // Success tests should be on top.
+    if (a.result === true && b.result === false) {
+        return -1;
+    }
+}
 function executeTest(test) {
     const inputAsString = JSON.stringify(test.input);
     const expectedAsString = JSON.stringify(test.expected);
@@ -34,13 +51,7 @@ function executeTest(test) {
     const assert = test.assert;
     const actual = subject.apply(null, test.input);
     const actualAsString = JSON.stringify(actual);
-    const assertResult = test.assert.apply(test, [actualAsString, expectedAsString]);
-    if (assertResult) {
-        console.log(`Success: Given input [${inputAsString}], it [${subject.name}] should [${assert.name}] expected [${expectedAsString}].`);
-    }
-    else {
-        console.log(`Failure: Given input [${inputAsString}] it [${subject.name}] should [${assert.name}] expected [${expectedAsString}], but was [${actual}].`);
-    }
+    test.result = test.assert.apply(test, [actualAsString, expectedAsString]);
 }
 function it(fn) {
     const self = this;
@@ -52,5 +63,19 @@ function should(fn, expected) {
     self.assert = fn;
     self.expected = expected;
     _tests.push(self);
+}
+function showTestResult(test) {
+    const inputAsString = JSON.stringify(test.input);
+    const expectedAsString = JSON.stringify(test.expected);
+    const subject = test.subject;
+    const assert = test.assert;
+    const actual = subject.apply(null, test.input);
+    const actualAsString = JSON.stringify(actual);
+    if (test.result) {
+        console.log(`Success: Given input ${inputAsString} it [${subject.name}] should [${assert.name}] expected [${expectedAsString}].`);
+    }
+    else {
+        console.log(`Failure: Given input ${inputAsString} it [${subject.name}] should [${assert.name}] expected [${expectedAsString}], but was [${actual}].`);
+    }
 }
 //# sourceMappingURL=test.framework.js.map
