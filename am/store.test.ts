@@ -1,15 +1,16 @@
 import { beEqualTo, given } from "./test.framework";
-import { hasChanged } from './store';
+import { hasChanged, IStoreField } from './store';
 
+// TODO: 
 
+given({})
+.it(hasChanged)
+.should(beEqualTo, false);
 
-function sum(...args: number[]): number {
-    let result = 0;
-    for(let i=0, length = args.length;i<length;i++) {
-        result = result + args[i];
-    }
-    return result;
-}
+given({description: "Not a StoreField", items: ["Not a StoreField", "Not a StoreField"]})
+.it(hasChanged)
+.should(beEqualTo, false);
 
-// Examples:
-given(1,2,3,4).it(sum).should(beEqualTo, 10);
+given({description: <IStoreField<string>>{storeId: "1", value: "My second description", previousValue: null}, items: ["Not a StoreField", "Not a StoreField"]})
+.it(hasChanged)
+.should(beEqualTo, true);

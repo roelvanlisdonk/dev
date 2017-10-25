@@ -44,8 +44,8 @@ function app(appData) {
 exports.app = app;
 function runTests() {
     return __awaiter(this, void 0, void 0, function* () {
-        const mod = yield Promise.resolve().then(function () { return require("./common/validation/is.function.test"); });
-        // TODO
+        let mod = yield Promise.resolve().then(function () { return require("./common/validation/is.function.test"); });
+        mod = yield Promise.resolve().then(function () { return require("./store.test"); });
         // Run tests
         test_framework_1.execute();
     });

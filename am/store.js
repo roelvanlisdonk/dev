@@ -26,7 +26,7 @@ function hasChanged(obj) {
         if (obj.hasOwnProperty(attrName)) {
             const attrValue = obj[attrName];
             if (isField(attrValue)) {
-                const field = obj;
+                const field = attrValue;
                 if (field.value !== field.previousValue) {
                     return true;
                 }

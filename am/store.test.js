@@ -1,13 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const test_framework_1 = require("./test.framework");
-function sum(...args) {
-    let result = 0;
-    for (let i = 0, length = args.length; i < length; i++) {
-        result = result + args[i];
-    }
-    return result;
-}
-// Examples:
-test_framework_1.given(1, 2, 3, 4).it(sum).should(test_framework_1.beEqualTo, 10);
+const store_1 = require("./store");
+// TODO: 
+test_framework_1.given({})
+    .it(store_1.hasChanged)
+    .should(test_framework_1.beEqualTo, false);
+test_framework_1.given({ description: "Not a StoreField", items: ["Not a StoreField", "Not a StoreField"] })
+    .it(store_1.hasChanged)
+    .should(test_framework_1.beEqualTo, false);
+test_framework_1.given({ description: { storeId: "1", value: "My second description", previousValue: null }, items: ["Not a StoreField", "Not a StoreField"] })
+    .it(store_1.hasChanged)
+    .should(test_framework_1.beEqualTo, true);
 //# sourceMappingURL=store.test.js.map

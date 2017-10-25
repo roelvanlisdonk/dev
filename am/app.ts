@@ -36,9 +36,8 @@ export async function app(appData:IAppData): Promise<INode> {
 }
 
 async function runTests(){
-    const mod = await import("./common/validation/is.function.test");
-
-    // TODO
+    let mod = await import("./common/validation/is.function.test");
+    mod = await import("./store.test");
 
     // Run tests
     execute();

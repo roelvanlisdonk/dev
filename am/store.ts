@@ -32,7 +32,7 @@ export function hasChanged(obj: object): boolean {
             const attrValue = (<any>obj)[attrName];
 
             if(isField(attrValue)){
-                const field = <IStoreField<IStoreFieldValue>>obj;
+                const field = <IStoreField<IStoreFieldValue>>attrValue;
                 if (field.value !== field.previousValue) {
                     return true;
                 }

@@ -49,8 +49,8 @@ function executeTest(test) {
     const expectedAsString = JSON.stringify(test.expected);
     const subject = test.subject;
     const assert = test.assert;
-    const actual = subject.apply(null, test.input);
-    const actualAsString = JSON.stringify(actual);
+    test.actual = subject.apply(null, test.input);
+    const actualAsString = JSON.stringify(test.actual);
     test.result = test.assert.apply(test, [actualAsString, expectedAsString]);
 }
 function it(fn) {
@@ -69,8 +69,7 @@ function showTestResult(test) {
     const expectedAsString = JSON.stringify(test.expected);
     const subject = test.subject;
     const assert = test.assert;
-    const actual = subject.apply(null, test.input);
-    const actualAsString = JSON.stringify(actual);
+    const actualAsString = JSON.stringify(test.actual);
     if (test.result) {
         console.log(`Success: Given input ${inputAsString} it [${subject.name}] should [${assert.name}] expected [${expectedAsString}].`);
     }

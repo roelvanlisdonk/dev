@@ -46,6 +46,7 @@ export interface IItResult {
 // Each test will be stored as an ITest object.
 // It will be kept private, to guide developers when using the fluent interface, choosing the correct functions.
 interface ITest extends IGivenResult, IItResult {
+    actual?: any;
     assert?: (this: ITest, actual: any, expected: any) => boolean;
     id: number;
     input: any[];
@@ -75,8 +76,8 @@ function executeTest(test: ITest) {
     const expectedAsString = JSON.stringify(test.expected);
     const subject = test.subject;
     const assert = test.assert;
-    const actual = subject.apply(null, test.input);
-    const actualAsString = JSON.stringify(actual);
+    test.actual = subject.apply(null, test.input);
+    const actualAsString = JSON.stringify(test.actual);
     
     test.result = test.assert.apply(test, [actualAsString, expectedAsString]);
 }
@@ -99,8 +100,7 @@ function showTestResult(test: ITest): void {
     const expectedAsString = JSON.stringify(test.expected);
     const subject = test.subject;
     const assert = test.assert;
-    const actual = subject.apply(null, test.input);
-    const actualAsString = JSON.stringify(actual);
+    const actualAsString = JSON.stringify(test.actual);
 
     if(test.result) {
         console.log(`Success: Given input ${inputAsString} it [${subject.name}] should [${assert.name}] expected [${expectedAsString}].`)
