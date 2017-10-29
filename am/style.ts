@@ -1,4 +1,3 @@
-
 export type BoxSizing =
 "content-box" |
 "border-box" |
@@ -107,7 +106,7 @@ export type TextAlign =
 "initial" |
 "unset";
 
-export interface IStyle {
+export interface Style {
 alignContent?: string | null;
 alignItems?: string | null;
 alignSelf?: string | null;

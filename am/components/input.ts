@@ -1,9 +1,9 @@
-import { INode } from '.././virtual.dom';
-import { IStoreField, IStoreFieldValue, saveField } from '.././store';
+import { VirtualDomNode } from '.././virtual.dom';
+import { saveField, StoreField, StoreFieldValue } from '.././store';
 
-export function input(field: IStoreField<IStoreFieldValue>): INode {
+export function input(field: StoreField<StoreFieldValue>): VirtualDomNode {
     
-    const node: INode = {
+    const node: VirtualDomNode = {
         events: [{ name: "input", listener: onInputChange, options: false }],
         name: "input"
     }

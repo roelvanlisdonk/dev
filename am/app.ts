@@ -1,7 +1,7 @@
-import {IAppData, IAccount} from "./data"
-import { IStoreField, IStoreItem, saveItem } from "./store";
+import {AppData, Account} from "./data"
+import { StoreField, StoreItem, saveItem } from "./store";
 import { boot } from "./renderer";
-import { INode } from "./virtual.dom";
+import { VirtualDomNode } from "./virtual.dom";
 import { block } from "./components/styles";
 import { execute } from "./test.framework";
 
@@ -11,9 +11,9 @@ window.addEventListener("unhandledrejection", function handlUnhandledrejection (
     }
 });
 
-export async function app(appData:IAppData): Promise<INode> {
-    const nodes: Array<INode> = [];
-    const node: INode = {
+export async function app(appData:AppData): Promise<VirtualDomNode> {
+    const nodes: Array<VirtualDomNode> = [];
+    const node: VirtualDomNode = {
         attributes:[{name:"title", value: "This is an AM app."}],
         classes:[block],
         deps: appData.account.isAuthenticated,
@@ -46,7 +46,7 @@ async function runTests(){
 export function start() {
     console.log("start application");
 
-    const appData = saveItem(<IAppData>{
+    const appData = saveItem(<AppData>{
         account: {
             isAuthenticated: { value: false },
             name: { value: null },

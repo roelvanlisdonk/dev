@@ -11,8 +11,8 @@ function button(options) {
     options.type = options.type || "button";
     node.attributes.push({ name: "type", value: options.type });
     // Events
-    if (options.onclick) {
-        node.events.push({ name: "onclick", listener: options.onclick });
+    if (options.onClick) {
+        node.events.push({ name: "click", listener: options.onClick });
     }
     // Nodes
     if (options.text) {

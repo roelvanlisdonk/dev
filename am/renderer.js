@@ -10,13 +10,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylesheet_1 = require("./stylesheet");
 let _renderer;
-// This value will be used to store the root virtual dom node in the store.
+/**
+ * This value will be used to store the root virtual dom node in the store.
+ */
 exports.RootVirtualDomNodeStoreKey = "RootVirtualDomNode";
-function getRenderer() {
-    return _renderer;
+function addClass(element, className) {
+    if (element.classList) {
+        element.classList.add(className);
+    }
+    else if (!hasClass(element, className)) {
+        var classes = element.className.split(" ");
+        classes.push(className);
+        element.className = classes.join(" ");
+    }
 }
-exports.getRenderer = getRenderer;
-// For now use html renderer as default.
+/**
+ * For now use html renderer as default.
+ */
 function boot(nativeNode, fn, deps) {
     return __awaiter(this, void 0, void 0, function* () {
         _renderer = {
@@ -34,6 +44,18 @@ function boot(nativeNode, fn, deps) {
     });
 }
 exports.boot = boot;
+function getRenderer() {
+    return _renderer;
+}
+exports.getRenderer = getRenderer;
+function hasClass(element, className) {
+    if (element.classList) {
+        return element.classList.contains(className);
+    }
+    else {
+        return (-1 < element.className.indexOf(className));
+    }
+}
 function renderAttribute(attr, isNew) {
     let refreshedAttr = attr;
     // If attr.value is a IStoreField, set refresh method.
@@ -140,24 +162,6 @@ function renderNode(node, isNew) {
         }
         return node;
     });
-}
-function addClass(element, className) {
-    if (element.classList) {
-        element.classList.add(className);
-    }
-    else if (!hasClass(element, className)) {
-        var classes = element.className.split(" ");
-        classes.push(className);
-        element.className = classes.join(" ");
-    }
-}
-function hasClass(element, className) {
-    if (element.classList) {
-        return element.classList.contains(className);
-    }
-    else {
-        return (-1 < element.className.indexOf(className));
-    }
 }
 function removeClass(element, className) {
     if (element.classList) {

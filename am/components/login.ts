@@ -1,17 +1,25 @@
-import {IAccount} from '../data'
-import { IStoreField, IStoreItem } from '../store';
+import {Account} from '../data'
+import { StoreField, StoreItem, saveField } from '../store';
 import { button } from './button';
 import { input } from './input';
-import { INode } from '../virtual.dom';
+import { VirtualDomNode } from '../virtual.dom';
 
-export async function login(account:IAccount): Promise<INode> {
-    const node: INode = {
+export async function login(account:Account): Promise<VirtualDomNode> {
+    
+    function inloggen(evt: any): void {
+        console.log("Inloggen!!!");
+        
+        account.isAuthenticated.value = true;
+        saveField(account.isAuthenticated);
+    }
+
+    const node: VirtualDomNode = {
         nodes: [
             {text: "Gebruikersnaam"},
             input(account.name),
             {text: "Wachtwoord"},
             input(account.password),
-            button({onclick: onInloggenClick, text: "Inloggen"})
+            button({onClick: inloggen, text: "Inloggen"})
         ],
         name: "login"
     };
@@ -19,6 +27,3 @@ export async function login(account:IAccount): Promise<INode> {
     return node;
 }
 
-function onInloggenClick(evt: any): void {
-    console.log("Inloggen!!!");
-}

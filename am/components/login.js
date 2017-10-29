@@ -8,17 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const store_1 = require("../store");
 const button_1 = require("./button");
 const input_1 = require("./input");
 function login(account) {
     return __awaiter(this, void 0, void 0, function* () {
+        function inloggen(evt) {
+            console.log("Inloggen!!!");
+            account.isAuthenticated.value = true;
+            store_1.saveField(account.isAuthenticated);
+        }
         const node = {
             nodes: [
                 { text: "Gebruikersnaam" },
                 input_1.input(account.name),
                 { text: "Wachtwoord" },
                 input_1.input(account.password),
-                button_1.button({ onclick: onInloggenClick, text: "Inloggen" })
+                button_1.button({ onClick: inloggen, text: "Inloggen" })
             ],
             name: "login"
         };
@@ -26,7 +32,4 @@ function login(account) {
     });
 }
 exports.login = login;
-function onInloggenClick(evt) {
-    console.log("Inloggen!!!");
-}
 //# sourceMappingURL=login.js.map

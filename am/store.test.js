@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const test_framework_1 = require("./test.framework");
 const store_1 = require("./store");
-// TODO: 
 test_framework_1.given({})
     .it(store_1.hasChanged)
     .should(test_framework_1.beEqualTo, false);

@@ -1,10 +1,10 @@
-import {IAppData} from '../data'
-import { IStoreField, IStoreItem } from '../store';
+import {AppData} from '../data'
+import { StoreField, StoreItem } from '../store';
 import { input } from './input';
-import { INode } from '../virtual.dom';
+import { VirtualDomNode } from '../virtual.dom';
 
-export async function feed(appData:IAppData): Promise<INode> {
-    const node: INode = {
+export async function feed(appData:AppData): Promise<VirtualDomNode> {
+    const node: VirtualDomNode = {
         name: "feed",
         nodes:[
             {text: "Het feed component"}

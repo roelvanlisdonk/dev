@@ -1,6 +1,6 @@
 import { toSnakeCase } from "./common/text/to.snake.case";
 import {} from "./store.data";
-import { IClass, IRule } from "./virtual.dom";
+import { VirtualDomCssClass, VirtualDomCssRule } from "./virtual.dom";
 
 const _rules: any = {};
 
@@ -9,14 +9,14 @@ const _rules: any = {};
  * IClass extends IRule
  * IClass will be added as a IRule by setting the IClass.selector based on IClass.name.
  */
-export function addClassToStyleSheet(cssClass: IClass): void {
+export function addClassToStyleSheet(cssClass: VirtualDomCssClass): void {
     if (!cssClass) { throw new Error("Please provide cssClass."); }
     if (!cssClass.name) { throw new Error("Please provide cssClass.name."); }
     if (!cssClass.style) { throw new Error("Please provide cssClass.style."); }
 
     const selector = `.${cssClass.name}`;
     if (!_rules[selector]) {
-        const rule: IRule = {
+        const rule: VirtualDomCssRule = {
             selector,
             style: cssClass.style
         };
@@ -28,7 +28,7 @@ export function addClassToStyleSheet(cssClass: IClass): void {
  * An am app contains only one app stylesheet.
  * IRules are added only once to the app stylesheet based on IRule.selector.
  */
-export function addRuleToStyleSheet(rule: IRule): void {
+export function addRuleToStyleSheet(rule: VirtualDomCssRule): void {
     if (!rule) { throw new Error("Please provide rule."); }
     if (!rule.selector) { throw new Error("Please provide rule.selector."); }
     if (!rule.style) { throw new Error("Please provide rule.style."); }

@@ -1,24 +1,28 @@
-import { IAttribute, IClass, IEvent, INode, IRule } from "./virtual.dom";
+import { VirtualDomAttribute, VirtualDomCssClass, VirtualDomEvent, VirtualDomNode, VirtualDomCssRule } from "./virtual.dom";
 import { addClassToStyleSheet } from "./stylesheet";
 
-let _renderer: IRenderer;
-
-// This value will be used to store the root virtual dom node in the store.
+let _renderer: Renderer;
+/**
+ * This value will be used to store the root virtual dom node in the store.
+ */
 export const RootVirtualDomNodeStoreKey = "RootVirtualDomNode";
 
-export function getRenderer(): IRenderer {
-    return _renderer;
+
+
+function addClass(element: HTMLElement, className: string): void {
+    if (element.classList) {
+        element.classList.add(className);
+    } else if (!hasClass(element, className)) {
+        var classes = element.className.split(" ");
+        classes.push(className);
+        element.className = classes.join(" ");
+    }
 }
 
-export interface IRenderer {
-    renderAttribue: (attribute: IAttribute, isNew: boolean) => void;
-    renderClass: (cssClass: IClass, isNew: boolean) => void;
-    renderEvent: (event: IEvent, isNew: boolean) => void;
-    renderNode: (node: INode, isNew: boolean) => Promise<INode>;
-}
-
-// For now use html renderer as default.
-export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promise<INode>, deps: any): Promise<INode> {
+/** 
+ * For now use html renderer as default. 
+ */
+export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promise<VirtualDomNode>, deps: any): Promise<VirtualDomNode> {
     _renderer = {
         renderAttribue: renderAttribute,
         renderClass: renderClass,
@@ -27,7 +31,7 @@ export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promis
     }
 
     // Generate the virtual dom
-    const node: INode = await fn(deps);
+    const node: VirtualDomNode = await fn(deps);
     node.nativeNode = nativeNode;
     
     // Travese the virtual dom and sync it with the given native dom.
@@ -36,7 +40,20 @@ export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promis
     return node;
 }
 
-function renderAttribute(attr: IAttribute, isNew: boolean): void {
+export function getRenderer(): Renderer {
+    return _renderer;
+}
+
+function hasClass(element: HTMLElement, className: string): boolean {
+    if (element.classList) {
+        return element.classList.contains(className);
+    } else {
+        return (-1 < element.className.indexOf(className));
+    }
+}
+
+
+function renderAttribute(attr: VirtualDomAttribute, isNew: boolean): void {
     let refreshedAttr = attr;
 
     // If attr.value is a IStoreField, set refresh method.
@@ -56,7 +73,7 @@ function renderAttribute(attr: IAttribute, isNew: boolean): void {
     }
 }
 
-function renderClass(cssClass: IClass, isNew: boolean): void {
+function renderClass(cssClass: VirtualDomCssClass, isNew: boolean): void {
     let refreshedClass = cssClass;
 
     // Check if deps changed
@@ -76,7 +93,7 @@ function renderClass(cssClass: IClass, isNew: boolean): void {
     }
 }
 
-function renderEvent(evt: IEvent, isNew: boolean): void {
+function renderEvent(evt: VirtualDomEvent, isNew: boolean): void {
     let refreshedEvent = evt;
 
     // Check if deps changed
@@ -95,7 +112,7 @@ function renderEvent(evt: IEvent, isNew: boolean): void {
     }
 }
 
-async function renderNode(node: INode, isNew: boolean): Promise<any> {
+async function renderNode(node: VirtualDomNode, isNew: boolean): Promise<any> {
     let refreshedNode = node;
     if(!isNew) {
         refreshedNode = await node.refresh(node.deps);
@@ -136,7 +153,7 @@ async function renderNode(node: INode, isNew: boolean): Promise<any> {
     // Nodes
     if(isNew) {
         const frag = document.createDocumentFragment();
-         const nodes: INode[] = refreshedNode.nodes;
+         const nodes: VirtualDomNode[] = refreshedNode.nodes;
          if(nodes && nodes.length && nodes.length > 0) {
              for(let i = 0, length = nodes.length; i < length; i++) {
                 const childNode = nodes[i];
@@ -161,24 +178,6 @@ async function renderNode(node: INode, isNew: boolean): Promise<any> {
     return node;
 }
 
-function addClass(element: HTMLElement, className: string): void {
-    if (element.classList) {
-        element.classList.add(className);
-    } else if (!hasClass(element, className)) {
-        var classes = element.className.split(" ");
-        classes.push(className);
-        element.className = classes.join(" ");
-    }
-}
-
-function hasClass(element: HTMLElement, className: string): boolean {
-    if (element.classList) {
-        return element.classList.contains(className);
-    } else {
-        return (-1 < element.className.indexOf(className));
-    }
-}
-
 function removeClass(element: HTMLElement, className: string): void {
     if (element.classList) {
         element.classList.remove(className);
@@ -187,4 +186,11 @@ function removeClass(element: HTMLElement, className: string): void {
         classes.splice(classes.indexOf(className), 1);
         element.className = classes.join(" ");
     }
+}
+
+export interface Renderer {
+    renderAttribue: (attribute: VirtualDomAttribute, isNew: boolean) => void;
+    renderClass: (cssClass: VirtualDomCssClass, isNew: boolean) => void;
+    renderEvent: (event: VirtualDomEvent, isNew: boolean) => void;
+    renderNode: (node: VirtualDomNode, isNew: boolean) => Promise<VirtualDomNode>;
 }

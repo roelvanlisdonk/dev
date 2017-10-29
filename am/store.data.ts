@@ -3,26 +3,32 @@
  * It will only be used by the store.
  * It is created as a seperate module, to allow for hot reloading.
  */
+export const counters = {
+    storeId: 0
+};
+export const fields: Fields = {};
+export const items: Items = {};
 
-export type IBasicType = boolean | Date | number | string;
 
-interface IFields {
-    [index: string]: IStoreField<IStoreFieldValue>;
+
+export type BasicType = boolean | Date | number | string;
+
+interface Fields {
+    [index: string]: StoreField<StoreFieldValue>;
 }
-export const fields: IFields = {};
 
-interface IItems {
-    [index: string]: IStoreItem;
+interface Items {
+    [index: string]: StoreItem;
 }
 
-export interface IStoreField<T extends IStoreFieldValue> extends IStoreItem {
+export interface StoreField<T extends StoreFieldValue> extends StoreItem {
     previousValue?: T;
     value: T;
 }
 
-export type IStoreFieldValue = Array<IBasicType> | IBasicType;
+export type StoreFieldValue = Array<BasicType> | BasicType;
 
-export interface IStoreItem {
+export interface StoreItem {
     storeId?: string;
     /**
      * off = Function store.hasChanged will always return false.
@@ -32,18 +38,3 @@ export interface IStoreItem {
      */
     detectChanges?: "off" | "rootOnly" | "skipArrays" | "full";
 }
-
-export interface ISubscriber {
-    fn: (field: IStoreField<IStoreFieldValue>) => void;
-    token: number;
-}
-
-export const items: IItems = {};
-
-export const root: IStoreItem = {
-    storeId: ""
-};
-
-export const counters = {
-    storeId: 0
-} 

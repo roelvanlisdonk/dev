@@ -1,11 +1,11 @@
-import { IStoreField, IStoreItem } from './store';
+import { StoreField, StoreItem } from './store';
 
-export interface IAccount extends IStoreItem {
-    isAuthenticated: IStoreField<boolean>;
-    name: IStoreField<string>;
-    password: IStoreField<string>;
+export interface Account extends StoreItem {
+    isAuthenticated: StoreField<boolean>;
+    name: StoreField<string>;
+    password: StoreField<string>;
 }
 
-export interface IAppData extends IStoreItem {
-    account: IAccount;
+export interface AppData extends StoreItem {
+    account: Account;
 }

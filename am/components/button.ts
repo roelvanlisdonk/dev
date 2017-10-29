@@ -1,9 +1,9 @@
-import { INode } from '.././virtual.dom';
-import { IStoreField, IStoreFieldValue, saveField } from '.././store';
+import { VirtualDomNode } from '.././virtual.dom';
+import { StoreField, StoreFieldValue, saveField } from '.././store';
 
-export function button(options: IButtonOptions): INode {
+export function button(options: ButtonOptions): VirtualDomNode {
     
-    const node: INode = {
+    const node: VirtualDomNode = {
         attributes: [],
         events: [],
         name: "button",
@@ -15,8 +15,8 @@ export function button(options: IButtonOptions): INode {
     node.attributes.push({name: "type", value: options.type});
 
     // Events
-    if(options.onclick) {
-        node.events.push({name: "onclick", listener: options.onclick});
+    if(options.onClick) {
+        node.events.push({name: "click", listener: options.onClick});
     }
 
     // Nodes
@@ -27,8 +27,8 @@ export function button(options: IButtonOptions): INode {
     return node;
 }
 
-export interface IButtonOptions {
-    onclick?: (evt: any) => void;
+export interface ButtonOptions {
+    onClick?: (evt: any) => void;
     text?: string;
     type?: "submit" | "reset" | "button";
 }

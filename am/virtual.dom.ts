@@ -1,44 +1,45 @@
-import { IStoreField } from './store';
-import { IStyle } from './style';
+import { StoreField } from './store';
+import { Style } from './style';
 
 // In this version, change detection is based on IStoreField changes.
 
-export interface IAttribute extends IVirtualDomPart {
-    refresh?: (deps: any) => IAttribute;
+export interface VirtualDomAttribute extends VirtualDomPart {
+    refresh?: (deps: any) => VirtualDomAttribute;
     value: string | null;
 }
 
-export interface IClass extends IVirtualDomPart {
-    refresh?: (deps: any) => IClass;
+export interface VirtualDomCssClass extends VirtualDomPart {
+    refresh?: (deps: any) => VirtualDomCssClass;
     rendered?: boolean;
-    style: IStyle | null;
+    style: Style | null;
 }
 
-export interface IEvent extends IVirtualDomPart {
+export interface VirtualDomCssRule {
+    rendered?: boolean;
+    selector: string;
+    style: Style;
+}
+
+export interface VirtualDomEvent extends VirtualDomPart {
+    name: "click" | "input";
     listener: (event: any, options?: boolean) => void | null;
-    refresh?: (deps: any) => IEvent;
+    refresh?: (deps: any) => VirtualDomEvent;
     options?: boolean;
 }
 
-export interface INode extends IVirtualDomPart {
-    attributes?: Array<IAttribute>;
-    classes?: Array<IClass>;
-    events?: Array<IEvent>;
+export interface VirtualDomNode extends VirtualDomPart {
+    attributes?: Array<VirtualDomAttribute>;
+    classes?: Array<VirtualDomCssClass>;
+    events?: Array<VirtualDomEvent>;
     nativeNode?: any;
-    nodes?: Array<INode>;
-    refresh?: (deps: any) => Promise<INode>;
+    nodes?: Array<VirtualDomNode>;
+    refresh?: (deps: any) => Promise<VirtualDomNode>;
     text?: string; // Used when Node is a text node.
 }
 
-export interface IRule {
-    rendered?: boolean;
-    selector: string;
-    style: IStyle;
-}
-
-export interface IVirtualDomPart {
+export interface VirtualDomPart {
     deps?: any;
     name?: string;
-    parent?: INode;
+    parent?: VirtualDomNode;
     shouldNotRender?: boolean;
 }
