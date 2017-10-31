@@ -19,6 +19,7 @@ function login(account) {
             store_1.saveField(account.isAuthenticated);
         }
         const node = {
+            deps: account,
             nodes: [
                 { text: "Gebruikersnaam" },
                 input_1.input(account.name),

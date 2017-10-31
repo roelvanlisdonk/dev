@@ -14,6 +14,7 @@ export async function login(account:Account): Promise<VirtualDomNode> {
     }
 
     const node: VirtualDomNode = {
+        deps: account,
         nodes: [
             {text: "Gebruikersnaam"},
             input(account.name),

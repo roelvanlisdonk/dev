@@ -23,10 +23,10 @@ function app(appData) {
         const node = {
             attributes: [{ name: "title", value: "This is an AM app." }],
             classes: [styles_1.block],
-            deps: appData.account.isAuthenticated,
+            deps: appData,
             name: "my-app",
             nodes: nodes,
-            refresh: app
+            render: app
         };
         if (appData.account.isAuthenticated.value === true) {
             const mod = yield Promise.resolve().then(function () { return require("./components/feed"); });
@@ -52,14 +52,18 @@ function runTests() {
 }
 function start() {
     console.log("start application");
-    const appData = store_1.saveItem({
+    // Save some initial data to the store.
+    const appData = {
         account: {
             isAuthenticated: { value: false },
             name: { value: null },
             password: { value: null }
         }
-    });
+    };
+    store_1.saveItem(appData);
+    // Get HTML root element.
     const appElement = document.body.getElementsByTagName("my-app")[0];
+    // First rendering of the application.
     renderer_1.boot(appElement, app, appData);
     runTests();
 }

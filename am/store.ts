@@ -5,7 +5,7 @@ import { publish } from "./services/event.service";
 // For performance reasons, we generate a cuid only once and use a counter to make storeId's generated in this session unique.
 const rootCuid = cuid();
 let cuidCounter = 0;
-export const storeChangedEvent = "store_changed";
+export const STORE_CHANGED_EVENT = "store_changed";
 
 export function getField(id: string): StoreField<StoreFieldValue> {
     return fields[id];
@@ -63,7 +63,7 @@ export function newCuid(): string {
  */
 function publishStoreChangedEvent(shouldPublish: boolean): void {
     if(shouldPublish) {
-        publish(storeChangedEvent);  
+        publish(STORE_CHANGED_EVENT);  
     }
 }
 
@@ -112,8 +112,8 @@ export function saveItem<T extends StoreItem>(item: T, skipStoreChangedEvent?: b
         skipStoreChangedEvent = true;
         saveItem(item, skipStoreChangedEvent);
 
-        const whenStoreChanged = !skipStoreChangedEvent;
-        publishStoreChangedEvent(whenStoreChanged);
+        const whenNeeded = !skipStoreChangedEvent;
+        publishStoreChangedEvent(whenNeeded);
         
         return {item: item, storeHasChanged: true};
     } 

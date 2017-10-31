@@ -6,7 +6,7 @@ const event_service_1 = require("./services/event.service");
 // For performance reasons, we generate a cuid only once and use a counter to make storeId's generated in this session unique.
 const rootCuid = cuid_1.cuid();
 let cuidCounter = 0;
-exports.storeChangedEvent = "store_changed";
+exports.STORE_CHANGED_EVENT = "store_changed";
 function getField(id) {
     return store_data_1.fields[id];
 }
@@ -58,7 +58,7 @@ exports.newCuid = newCuid;
  */
 function publishStoreChangedEvent(shouldPublish) {
     if (shouldPublish) {
-        event_service_1.publish(exports.storeChangedEvent);
+        event_service_1.publish(exports.STORE_CHANGED_EVENT);
     }
 }
 /**
@@ -97,8 +97,8 @@ function saveItem(item, skipStoreChangedEvent) {
         store_data_1.items[item.storeId] = item;
         skipStoreChangedEvent = true;
         saveItem(item, skipStoreChangedEvent);
-        const whenStoreChanged = !skipStoreChangedEvent;
-        publishStoreChangedEvent(whenStoreChanged);
+        const whenNeeded = !skipStoreChangedEvent;
+        publishStoreChangedEvent(whenNeeded);
         return { item: item, storeHasChanged: true };
     }
     // Existing item in store - save to store and publish storechangedevent only, when item has changed in the store.

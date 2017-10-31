@@ -16,10 +16,10 @@ export async function app(appData:AppData): Promise<VirtualDomNode> {
     const node: VirtualDomNode = {
         attributes:[{name:"title", value: "This is an AM app."}],
         classes:[block],
-        deps: appData.account.isAuthenticated,
+        deps: appData,
         name: "my-app",
         nodes: nodes,
-        refresh: app
+        render: app
     };
 
     if(appData.account.isAuthenticated.value === true) {
@@ -46,15 +46,20 @@ async function runTests(){
 export function start() {
     console.log("start application");
 
-    const appData = saveItem(<AppData>{
+    // Save some initial data to the store.
+    const appData: AppData = {
         account: {
             isAuthenticated: { value: false },
             name: { value: null },
             password: { value: null }
         }
-    });
+    };
+    saveItem(appData);
 
+    // Get HTML root element.
     const appElement = <HTMLElement>document.body.getElementsByTagName("my-app")[0];
+
+    // First rendering of the application.
     boot(appElement, app, appData);
 
     runTests();

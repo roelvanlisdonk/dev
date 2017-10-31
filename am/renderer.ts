@@ -1,5 +1,7 @@
 import { VirtualDomAttribute, VirtualDomCssClass, VirtualDomEvent, VirtualDomNode, VirtualDomCssRule } from "./virtual.dom";
 import { addClassToStyleSheet } from "./stylesheet";
+import { subscribe } from "./services/event.service";
+import { hasChanged, STORE_CHANGED_EVENT } from "./store";
 
 let _renderer: Renderer;
 /**
@@ -24,7 +26,7 @@ function addClass(element: HTMLElement, className: string): void {
  */
 export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promise<VirtualDomNode>, deps: any): Promise<VirtualDomNode> {
     _renderer = {
-        renderAttribue: renderAttribute,
+        renderAttribute: renderAttribute,
         renderClass: renderClass,
         renderEvent: renderEvent,
         renderNode: renderNode
@@ -34,8 +36,14 @@ export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promis
     const node: VirtualDomNode = await fn(deps);
     node.nativeNode = nativeNode;
     
-    // Travese the virtual dom and sync it with the given native dom.
-    _renderer.renderNode(node, true);
+    // Generate native dom.
+    await _renderer.renderNode(node, false);
+
+    // When store changes, rerender the UI.
+    subscribe(STORE_CHANGED_EVENT, async function rerender() {
+        // Update virtual dom and native dom, when deps changed.
+        await _renderer.renderNode(node, true);
+    });
 
     return node;
 }
@@ -52,110 +60,123 @@ function hasClass(element: HTMLElement, className: string): boolean {
     }
 }
 
+function renderAttribute(attr: VirtualDomAttribute, checkHaschanged: boolean): void {
+    const attrName = attr.name;
+    const nativeNode = attr.parent.nativeNode;
 
-function renderAttribute(attr: VirtualDomAttribute, isNew: boolean): void {
-    let refreshedAttr = attr;
-
-    // If attr.value is a IStoreField, set refresh method.
-    // Check if deps changed
-    // Check if refresh exists
-    if(!isNew) {
-        attr = attr.refresh(attr.deps);
-    }
-
-    const attrName = refreshedAttr.name;
-    const nativeNode = refreshedAttr.parent.nativeNode;
-    const value = refreshedAttr.value;
-
-    const nativeValue: any = nativeNode[attrName];
-    if(nativeValue != value) {
-        nativeNode[attrName] = value; 
-    }
-}
-
-function renderClass(cssClass: VirtualDomCssClass, isNew: boolean): void {
-    let refreshedClass = cssClass;
-
-    // Check if deps changed
-    // Check if refresh exists
-    if(!isNew) {
-        cssClass = cssClass.refresh(cssClass.deps);
-    }
-
-    if(refreshedClass.shouldNotRender === false) {
-        removeClass(refreshedClass.parent.nativeNode, refreshedClass.name);
-    } else {
-        addClass(refreshedClass.parent.nativeNode, refreshedClass.name);
-    }
-
-    if(refreshedClass.rendered !== true) {
-        addClassToStyleSheet(refreshedClass);
-    }
-}
-
-function renderEvent(evt: VirtualDomEvent, isNew: boolean): void {
-    let refreshedEvent = evt;
-
-    // Check if deps changed
-    // Check if refresh exists
-    if(!isNew) {
-        evt = evt.refresh(evt.deps);
-    }
-
-    const evtName = refreshedEvent.name;
-    const nativeNode = <HTMLElement>refreshedEvent.parent.nativeNode;
-    
-    if(refreshedEvent.shouldNotRender === true) {
-        nativeNode.removeEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
-    } else {
-        nativeNode.addEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
-    }
-}
-
-async function renderNode(node: VirtualDomNode, isNew: boolean): Promise<any> {
-    let refreshedNode = node;
-    if(!isNew) {
-        refreshedNode = await node.refresh(node.deps);
+    // Update virtual dom, when needed.
+    if(checkHaschanged && attr.deps && hasChanged(attr.deps))
+    {
+        if(Boolean(attr.render)){
+            attr = attr.render(attr.deps);
+        }
     }
     
-    const nativeNode: any = refreshedNode.nativeNode;
+    const shouldRender = !Boolean(attr.shouldNotRender);
+    if(shouldRender) {
+        // Only set attribute, when it virtual dom value, does not match dom value.
+        const value = attr.value;
+        const nativeValue: any = nativeNode[attrName];
+        if(nativeValue != value) {
+            nativeNode.setAttribute(attrName, value);
+        }
+    } else {
+        // removeAttribute can always be called, because it doesn't fail, when attribute doesn't exist.
+        nativeNode.removeAttribute(attrName);
+    }
+}
 
-    // Attributes
-    const attrs = refreshedNode.attributes;
-    if(attrs && attrs.length && attrs.length > 0) {
-        for(let i = 0, length = attrs.length; i < length; i++) {
-            const attr = attrs[i];
-            attr.parent = refreshedNode;
-            _renderer.renderAttribue(attr, isNew);
+function renderClass(cssClass: VirtualDomCssClass, checkHaschanged: boolean): void {
+    // Update virtual dom, when needed.
+    if(checkHaschanged && cssClass.deps && hasChanged(cssClass.deps))
+    {
+        if(Boolean(cssClass.render)){
+            cssClass = cssClass.render(cssClass.deps);
+        }
+    }
+    
+    const shouldRender = !Boolean(cssClass.shouldNotRender);
+    if(shouldRender) {
+        // Will only add css class, when it doesn't exist.
+        addClass(cssClass.parent.nativeNode, cssClass.name);
+    } else {
+        // Will only remove css class, when it exists.
+        removeClass(cssClass.parent.nativeNode, cssClass.name);
+    }
+
+    if(cssClass.rendered !== true) {
+        addClassToStyleSheet(cssClass);
+    }
+}
+
+function renderEvent(evt: VirtualDomEvent, checkHaschanged: boolean): void {
+    const evtName = evt.name;
+    const nativeNode = <HTMLElement>evt.parent.nativeNode;
+
+    // Update virtual dom, when needed.
+    if(checkHaschanged && evt.deps && hasChanged(evt.deps))
+    {
+        if(Boolean(evt.render)){
+            evt = evt.render(evt.deps);
+        }
+    }
+    
+    const shouldRender = !Boolean(evt.shouldNotRender);
+    if(shouldRender) {
+        nativeNode.addEventListener(evtName, evt.listener, evt.options);
+    } else {
+        nativeNode.removeEventListener(evtName, evt.listener, evt.options);
+    }
+}
+
+async function renderNode(node: VirtualDomNode, checkHaschanged: boolean): Promise<any> {
+    const nativeNode: any = node.nativeNode;
+
+    // Update virtual dom, when needed.
+    if(checkHaschanged && node.deps && hasChanged(node.deps))
+    {
+        if(Boolean(node.render)){
+            node = await node.render(node.deps);
         }
     }
 
-    // Classes
-    const classes = refreshedNode.classes;
-    if(classes && classes.length && classes.length > 0) {
-        for(let i = 0, length = classes.length; i < length; i++) {
-            const cssClass = classes[i];
-            cssClass.parent = refreshedNode;
-            _renderer.renderClass(cssClass, isNew);
+    const shouldRender = !Boolean(node.shouldNotRender);
+    if(shouldRender) {
+        // Attributes
+        const attrs = node.attributes;
+        if(attrs && attrs.length && attrs.length > 0) {
+            for(let i = 0, length = attrs.length; i < length; i++) {
+                const attr = attrs[i];
+                attr.parent = node;
+                _renderer.renderAttribute(attr, checkHaschanged);
+            }
         }
-    }
 
-    // Events
-    const evts = refreshedNode.events;
-    if(evts && evts.length && evts.length > 0) {
-        for(let i = 0, length = evts.length; i < length; i++) {
-            const evt = evts[i];
-            evt.parent = refreshedNode;
-            _renderer.renderEvent(evt, isNew);
+        // Classes
+        const classes = node.classes;
+        if(classes && classes.length && classes.length > 0) {
+            for(let i = 0, length = classes.length; i < length; i++) {
+                const cssClass = classes[i];
+                cssClass.parent = node;
+                _renderer.renderClass(cssClass, checkHaschanged);
+            }
         }
-    }
 
-    // Nodes
-    if(isNew) {
+        // Events
+        const evts = node.events;
+        if(evts && evts.length && evts.length > 0) {
+            for(let i = 0, length = evts.length; i < length; i++) {
+                const evt = evts[i];
+                evt.parent = node;
+                _renderer.renderEvent(evt, checkHaschanged);
+            }
+        }
+
+        // Nodes
         const frag = document.createDocumentFragment();
-         const nodes: VirtualDomNode[] = refreshedNode.nodes;
-         if(nodes && nodes.length && nodes.length > 0) {
-             for(let i = 0, length = nodes.length; i < length; i++) {
+        const nodes: VirtualDomNode[] = node.nodes;
+        if(nodes && nodes.length && nodes.length > 0) {
+            for(let i = 0, length = nodes.length; i < length; i++) {
                 const childNode = nodes[i];
                 childNode.parent = node;
                 
@@ -167,12 +188,13 @@ async function renderNode(node: VirtualDomNode, isNew: boolean): Promise<any> {
                 if(childNode.name) {
                     childNode.nativeNode = document.createElement(childNode.name);
                     frag.appendChild(childNode.nativeNode);
-                    _renderer.renderNode(childNode, isNew);
-                    
+                    await _renderer.renderNode(childNode, checkHaschanged);
                 }
-             }
-             node.nativeNode.appendChild(frag);
-         }
+            }
+
+            (<HTMLElement>node.nativeNode).innerHTML = "";
+            node.nativeNode.appendChild(frag);
+        }
     }
 
     return node;
@@ -189,8 +211,8 @@ function removeClass(element: HTMLElement, className: string): void {
 }
 
 export interface Renderer {
-    renderAttribue: (attribute: VirtualDomAttribute, isNew: boolean) => void;
-    renderClass: (cssClass: VirtualDomCssClass, isNew: boolean) => void;
-    renderEvent: (event: VirtualDomEvent, isNew: boolean) => void;
-    renderNode: (node: VirtualDomNode, isNew: boolean) => Promise<VirtualDomNode>;
+    renderAttribute: (attribute: VirtualDomAttribute, checkHaschanged: boolean) => void;
+    renderClass: (cssClass: VirtualDomCssClass, checkHaschanged: boolean) => void;
+    renderEvent: (event: VirtualDomEvent, checkHaschanged: boolean) => void;
+    renderNode: (node: VirtualDomNode, checkHaschanged: boolean) => Promise<VirtualDomNode>;
 }

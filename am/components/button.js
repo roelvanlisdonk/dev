@@ -1,22 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function button(options) {
+function button(deps) {
     const node = {
         attributes: [],
+        deps: deps,
         events: [],
         name: "button",
         nodes: []
     };
     // Attributes
-    options.type = options.type || "button";
-    node.attributes.push({ name: "type", value: options.type });
+    deps.type = deps.type || "button";
+    node.attributes.push({ name: "type", value: deps.type });
     // Events
-    if (options.onClick) {
-        node.events.push({ name: "click", listener: options.onClick });
+    if (deps.onClick) {
+        node.events.push({ name: "click", listener: deps.onClick });
     }
     // Nodes
-    if (options.text) {
-        node.nodes.push({ text: options.text });
+    if (deps.text) {
+        node.nodes.push({ text: deps.text });
     }
     return node;
 }

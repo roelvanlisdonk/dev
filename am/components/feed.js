@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function feed(appData) {
     return __awaiter(this, void 0, void 0, function* () {
         const node = {
+            deps: appData,
             name: "feed",
             nodes: [
                 { text: "Het feed component" }

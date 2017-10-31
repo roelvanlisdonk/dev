@@ -4,6 +4,7 @@ import { saveField, StoreField, StoreFieldValue } from '.././store';
 export function input(field: StoreField<StoreFieldValue>): VirtualDomNode {
     
     const node: VirtualDomNode = {
+        deps: field,
         events: [{ name: "input", listener: onInputChange, options: false }],
         name: "input"
     }

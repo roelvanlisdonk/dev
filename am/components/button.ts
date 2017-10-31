@@ -1,27 +1,28 @@
 import { VirtualDomNode } from '.././virtual.dom';
 import { StoreField, StoreFieldValue, saveField } from '.././store';
 
-export function button(options: ButtonOptions): VirtualDomNode {
+export function button(deps: ButtonOptions): VirtualDomNode {
     
     const node: VirtualDomNode = {
         attributes: [],
+        deps: deps,
         events: [],
         name: "button",
         nodes: []
     }
 
     // Attributes
-    options.type = options.type || "button";
-    node.attributes.push({name: "type", value: options.type});
+    deps.type = deps.type || "button";
+    node.attributes.push({name: "type", value: deps.type});
 
     // Events
-    if(options.onClick) {
-        node.events.push({name: "click", listener: options.onClick});
+    if(deps.onClick) {
+        node.events.push({name: "click", listener: deps.onClick});
     }
 
     // Nodes
-    if(options.text) {
-        node.nodes.push({text: options.text});
+    if(deps.text) {
+        node.nodes.push({text: deps.text});
     }
 
     return node;

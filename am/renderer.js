@@ -9,6 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const stylesheet_1 = require("./stylesheet");
+const event_service_1 = require("./services/event.service");
+const store_1 = require("./store");
 let _renderer;
 /**
  * This value will be used to store the root virtual dom node in the store.
@@ -30,7 +32,7 @@ function addClass(element, className) {
 function boot(nativeNode, fn, deps) {
     return __awaiter(this, void 0, void 0, function* () {
         _renderer = {
-            renderAttribue: renderAttribute,
+            renderAttribute: renderAttribute,
             renderClass: renderClass,
             renderEvent: renderEvent,
             renderNode: renderNode
@@ -38,8 +40,15 @@ function boot(nativeNode, fn, deps) {
         // Generate the virtual dom
         const node = yield fn(deps);
         node.nativeNode = nativeNode;
-        // Travese the virtual dom and sync it with the given native dom.
-        _renderer.renderNode(node, true);
+        // Generate native dom.
+        yield _renderer.renderNode(node, false);
+        // When store changes, rerender the UI.
+        event_service_1.subscribe(store_1.STORE_CHANGED_EVENT, function rerender() {
+            return __awaiter(this, void 0, void 0, function* () {
+                // Update virtual dom and native dom, when deps changed.
+                yield _renderer.renderNode(node, true);
+            });
+        });
         return node;
     });
 }
@@ -56,93 +65,107 @@ function hasClass(element, className) {
         return (-1 < element.className.indexOf(className));
     }
 }
-function renderAttribute(attr, isNew) {
-    let refreshedAttr = attr;
-    // If attr.value is a IStoreField, set refresh method.
-    // Check if deps changed
-    // Check if refresh exists
-    if (!isNew) {
-        attr = attr.refresh(attr.deps);
+function renderAttribute(attr, checkHaschanged) {
+    const attrName = attr.name;
+    const nativeNode = attr.parent.nativeNode;
+    // Update virtual dom, when needed.
+    if (checkHaschanged && attr.deps && store_1.hasChanged(attr.deps)) {
+        if (Boolean(attr.render)) {
+            attr = attr.render(attr.deps);
+        }
     }
-    const attrName = refreshedAttr.name;
-    const nativeNode = refreshedAttr.parent.nativeNode;
-    const value = refreshedAttr.value;
-    const nativeValue = nativeNode[attrName];
-    if (nativeValue != value) {
-        nativeNode[attrName] = value;
-    }
-}
-function renderClass(cssClass, isNew) {
-    let refreshedClass = cssClass;
-    // Check if deps changed
-    // Check if refresh exists
-    if (!isNew) {
-        cssClass = cssClass.refresh(cssClass.deps);
-    }
-    if (refreshedClass.shouldNotRender === false) {
-        removeClass(refreshedClass.parent.nativeNode, refreshedClass.name);
+    const shouldRender = !Boolean(attr.shouldNotRender);
+    if (shouldRender) {
+        // Only set attribute, when it virtual dom value, does not match dom value.
+        const value = attr.value;
+        const nativeValue = nativeNode[attrName];
+        if (nativeValue != value) {
+            nativeNode.setAttribute(attrName, value);
+        }
     }
     else {
-        addClass(refreshedClass.parent.nativeNode, refreshedClass.name);
-    }
-    if (refreshedClass.rendered !== true) {
-        stylesheet_1.addClassToStyleSheet(refreshedClass);
+        // removeAttribute can always be called, because it doesn't fail, when attribute doesn't exist.
+        nativeNode.removeAttribute(attrName);
     }
 }
-function renderEvent(evt, isNew) {
-    let refreshedEvent = evt;
-    // Check if deps changed
-    // Check if refresh exists
-    if (!isNew) {
-        evt = evt.refresh(evt.deps);
+function renderClass(cssClass, checkHaschanged) {
+    // Update virtual dom, when needed.
+    if (checkHaschanged && cssClass.deps && store_1.hasChanged(cssClass.deps)) {
+        if (Boolean(cssClass.render)) {
+            cssClass = cssClass.render(cssClass.deps);
+        }
     }
-    const evtName = refreshedEvent.name;
-    const nativeNode = refreshedEvent.parent.nativeNode;
-    if (refreshedEvent.shouldNotRender === true) {
-        nativeNode.removeEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
+    const shouldRender = !Boolean(cssClass.shouldNotRender);
+    if (shouldRender) {
+        // Will only add css class, when it doesn't exist.
+        addClass(cssClass.parent.nativeNode, cssClass.name);
     }
     else {
-        nativeNode.addEventListener(evtName, refreshedEvent.listener, refreshedEvent.options);
+        // Will only remove css class, when it exists.
+        removeClass(cssClass.parent.nativeNode, cssClass.name);
+    }
+    if (cssClass.rendered !== true) {
+        stylesheet_1.addClassToStyleSheet(cssClass);
     }
 }
-function renderNode(node, isNew) {
+function renderEvent(evt, checkHaschanged) {
+    const evtName = evt.name;
+    const nativeNode = evt.parent.nativeNode;
+    // Update virtual dom, when needed.
+    if (checkHaschanged && evt.deps && store_1.hasChanged(evt.deps)) {
+        if (Boolean(evt.render)) {
+            evt = evt.render(evt.deps);
+        }
+    }
+    const shouldRender = !Boolean(evt.shouldNotRender);
+    if (shouldRender) {
+        nativeNode.addEventListener(evtName, evt.listener, evt.options);
+    }
+    else {
+        nativeNode.removeEventListener(evtName, evt.listener, evt.options);
+    }
+}
+function renderNode(node, checkHaschanged) {
     return __awaiter(this, void 0, void 0, function* () {
-        let refreshedNode = node;
-        if (!isNew) {
-            refreshedNode = yield node.refresh(node.deps);
-        }
-        const nativeNode = refreshedNode.nativeNode;
-        // Attributes
-        const attrs = refreshedNode.attributes;
-        if (attrs && attrs.length && attrs.length > 0) {
-            for (let i = 0, length = attrs.length; i < length; i++) {
-                const attr = attrs[i];
-                attr.parent = refreshedNode;
-                _renderer.renderAttribue(attr, isNew);
+        const nativeNode = node.nativeNode;
+        // Update virtual dom, when needed.
+        if (checkHaschanged && node.deps && store_1.hasChanged(node.deps)) {
+            if (Boolean(node.render)) {
+                node = yield node.render(node.deps);
             }
         }
-        // Classes
-        const classes = refreshedNode.classes;
-        if (classes && classes.length && classes.length > 0) {
-            for (let i = 0, length = classes.length; i < length; i++) {
-                const cssClass = classes[i];
-                cssClass.parent = refreshedNode;
-                _renderer.renderClass(cssClass, isNew);
+        const shouldRender = !Boolean(node.shouldNotRender);
+        if (shouldRender) {
+            // Attributes
+            const attrs = node.attributes;
+            if (attrs && attrs.length && attrs.length > 0) {
+                for (let i = 0, length = attrs.length; i < length; i++) {
+                    const attr = attrs[i];
+                    attr.parent = node;
+                    _renderer.renderAttribute(attr, checkHaschanged);
+                }
             }
-        }
-        // Events
-        const evts = refreshedNode.events;
-        if (evts && evts.length && evts.length > 0) {
-            for (let i = 0, length = evts.length; i < length; i++) {
-                const evt = evts[i];
-                evt.parent = refreshedNode;
-                _renderer.renderEvent(evt, isNew);
+            // Classes
+            const classes = node.classes;
+            if (classes && classes.length && classes.length > 0) {
+                for (let i = 0, length = classes.length; i < length; i++) {
+                    const cssClass = classes[i];
+                    cssClass.parent = node;
+                    _renderer.renderClass(cssClass, checkHaschanged);
+                }
             }
-        }
-        // Nodes
-        if (isNew) {
+            // Events
+            const evts = node.events;
+            if (evts && evts.length && evts.length > 0) {
+                for (let i = 0, length = evts.length; i < length; i++) {
+                    const evt = evts[i];
+                    evt.parent = node;
+                    _renderer.renderEvent(evt, checkHaschanged);
+                }
+            }
+            // Nodes
             const frag = document.createDocumentFragment();
-            const nodes = refreshedNode.nodes;
+            const nodes = node.nodes;
             if (nodes && nodes.length && nodes.length > 0) {
                 for (let i = 0, length = nodes.length; i < length; i++) {
                     const childNode = nodes[i];
@@ -154,9 +177,10 @@ function renderNode(node, isNew) {
                     if (childNode.name) {
                         childNode.nativeNode = document.createElement(childNode.name);
                         frag.appendChild(childNode.nativeNode);
-                        _renderer.renderNode(childNode, isNew);
+                        yield _renderer.renderNode(childNode, checkHaschanged);
                     }
                 }
+                node.nativeNode.innerHTML = "";
                 node.nativeNode.appendChild(frag);
             }
         }
