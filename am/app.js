@@ -46,6 +46,7 @@ function runTests() {
     return __awaiter(this, void 0, void 0, function* () {
         let mod = yield Promise.resolve().then(function () { return require("./common/validation/is.function.test"); });
         mod = yield Promise.resolve().then(function () { return require("./store.test"); });
+        mod = yield Promise.resolve().then(function () { return require("./common/validation/is.object.test"); });
         // Run tests
         test_framework_1.execute();
     });

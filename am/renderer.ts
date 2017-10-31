@@ -37,12 +37,15 @@ export async function boot<T>(nativeNode: HTMLElement, fn: (deps: any) => Promis
     node.nativeNode = nativeNode;
     
     // Generate native dom.
-    await _renderer.renderNode(node, false);
+    let checkIfDependenciesHaveChanged = false;
+    await _renderer.renderNode(node, checkIfDependenciesHaveChanged);
 
     // When store changes, rerender the UI.
     subscribe(STORE_CHANGED_EVENT, async function rerender() {
+        
         // Update virtual dom and native dom, when deps changed.
-        await _renderer.renderNode(node, true);
+        checkIfDependenciesHaveChanged = true;
+        await _renderer.renderNode(node, checkIfDependenciesHaveChanged);
     });
 
     return node;
@@ -74,7 +77,7 @@ function renderAttribute(attr: VirtualDomAttribute, checkHaschanged: boolean): v
     
     const shouldRender = !Boolean(attr.shouldNotRender);
     if(shouldRender) {
-        // Only set attribute, when it virtual dom value, does not match dom value.
+        // Only set attribute, when its virtual dom value, does not match dom value.
         const value = attr.value;
         const nativeValue: any = nativeNode[attrName];
         if(nativeValue != value) {
@@ -137,6 +140,7 @@ async function renderNode(node: VirtualDomNode, checkHaschanged: boolean): Promi
     {
         if(Boolean(node.render)){
             node = await node.render(node.deps);
+            node.nativeNode = nativeNode;
         }
     }
 

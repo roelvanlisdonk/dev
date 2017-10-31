@@ -41,12 +41,14 @@ function boot(nativeNode, fn, deps) {
         const node = yield fn(deps);
         node.nativeNode = nativeNode;
         // Generate native dom.
-        yield _renderer.renderNode(node, false);
+        let checkIfDependenciesHaveChanged = false;
+        yield _renderer.renderNode(node, checkIfDependenciesHaveChanged);
         // When store changes, rerender the UI.
         event_service_1.subscribe(store_1.STORE_CHANGED_EVENT, function rerender() {
             return __awaiter(this, void 0, void 0, function* () {
                 // Update virtual dom and native dom, when deps changed.
-                yield _renderer.renderNode(node, true);
+                checkIfDependenciesHaveChanged = true;
+                yield _renderer.renderNode(node, checkIfDependenciesHaveChanged);
             });
         });
         return node;
@@ -76,7 +78,7 @@ function renderAttribute(attr, checkHaschanged) {
     }
     const shouldRender = !Boolean(attr.shouldNotRender);
     if (shouldRender) {
-        // Only set attribute, when it virtual dom value, does not match dom value.
+        // Only set attribute, when its virtual dom value, does not match dom value.
         const value = attr.value;
         const nativeValue = nativeNode[attrName];
         if (nativeValue != value) {
@@ -132,6 +134,7 @@ function renderNode(node, checkHaschanged) {
         if (checkHaschanged && node.deps && store_1.hasChanged(node.deps)) {
             if (Boolean(node.render)) {
                 node = yield node.render(node.deps);
+                node.nativeNode = nativeNode;
             }
         }
         const shouldRender = !Boolean(node.shouldNotRender);

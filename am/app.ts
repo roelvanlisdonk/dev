@@ -38,6 +38,7 @@ export async function app(appData:AppData): Promise<VirtualDomNode> {
 async function runTests(){
     let mod = await import("./common/validation/is.function.test");
     mod = await import("./store.test");
+    mod = await import("./common/validation/is.object.test");
 
     // Run tests
     execute();

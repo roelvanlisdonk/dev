@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const store_data_1 = require("./store.data");
 const cuid_1 = require("./store/cuid");
 const event_service_1 = require("./services/event.service");
+const is_object_1 = require("./common/validation/is.object");
 // For performance reasons, we generate a cuid only once and use a counter to make storeId's generated in this session unique.
 const rootCuid = cuid_1.cuid();
 let cuidCounter = 0;
@@ -122,15 +123,17 @@ function saveItem(item, skipStoreChangedEvent) {
         for (let attrName in item) {
             if (item.hasOwnProperty(attrName)) {
                 const attrValue = item[attrName];
-                // Save StoreField.
+                // Save attribute value as StoreField.
                 if (isField(attrValue)) {
-                    const result = saveField(attrValue, true);
+                    const skipPublishOfStoreChangedEvent = true;
+                    const result = saveField(attrValue, skipPublishOfStoreChangedEvent);
                     itemChangedInStore = itemChangedInStore || result.storeHasChanged;
                     continue;
                 }
-                // Save StoreItem.
-                if (isItem(attrValue)) {
-                    const result = saveItem(attrValue, true);
+                // Save attribute as StoreItem.
+                if (is_object_1.isObject(attrValue)) {
+                    const skipPublishOfStoreChangedEvent = true;
+                    const result = saveItem(attrValue, skipPublishOfStoreChangedEvent);
                     itemChangedInStore = itemChangedInStore || result.storeHasChanged;
                     continue;
                 }

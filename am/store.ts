@@ -1,6 +1,7 @@
 import { counters, fields, items, StoreField, StoreFieldValue, StoreItem } from "./store.data";
 import { cuid } from "./store/cuid";
 import { publish } from "./services/event.service";
+import { isObject } from "./common/validation/is.object";
 
 // For performance reasons, we generate a cuid only once and use a counter to make storeId's generated in this session unique.
 const rootCuid = cuid();
@@ -148,16 +149,18 @@ export function saveItem<T extends StoreItem>(item: T, skipStoreChangedEvent?: b
             if (item.hasOwnProperty(attrName)) {
                 const attrValue = (<any>item)[attrName];
     
-                // Save StoreField.
+                // Save attribute value as StoreField.
                 if(isField(attrValue)) {
-                    const result = saveField(attrValue, true);
+                    const skipPublishOfStoreChangedEvent = true;
+                    const result = saveField(attrValue, skipPublishOfStoreChangedEvent);
                     itemChangedInStore = itemChangedInStore || result.storeHasChanged;
                     continue;
                 }
     
-                // Save StoreItem.
-                if(isItem(attrValue)) {
-                    const result = saveItem(attrValue, true);
+                // Save attribute as StoreItem.
+                if(isObject(attrValue)) {
+                    const skipPublishOfStoreChangedEvent = true;
+                    const result = saveItem(attrValue, skipPublishOfStoreChangedEvent);
                     itemChangedInStore = itemChangedInStore || result.storeHasChanged;
                     continue;
                 }
