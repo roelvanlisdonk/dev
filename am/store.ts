@@ -59,66 +59,86 @@ export function newCuid(): string {
 }
 
 /**
- * When store changede event is published it will trigger a new rendering of the UI.
- */
-function publishStoreChangedEvent(shouldPublish: boolean): void {
-    if(shouldPublish) {
-        publish(STORE_CHANGED_EVENT);  
-    }
-}
-
-/**
  * Save field to store, publish store changed event when needed.
  */
 export function saveField(field: StoreField<StoreFieldValue>, skipStoreChangedEvent?: boolean): SaveFieldResult {
-    const whenItShouldNotBeSkipped = !skipStoreChangedEvent;
+    const shouldPublishStoreChangedEvent = !skipStoreChangedEvent;
 
-    // New field - publish store changed event.
+    // New field
     if(!field.storeId) {
         field.storeId = newCuid();
+        
+        // Reset previousValue, for correct change tracking.
+        field.previousValue = undefined;
+
+        // Save
         fields[field.storeId] = field;
-        
-        publishStoreChangedEvent(whenItShouldNotBeSkipped);
-        
+
+        // Publish
+        if(shouldPublishStoreChangedEvent) {
+            publish(STORE_CHANGED_EVENT);  
+        }
+                
         return {field: field, storeHasChanged: true};
     } 
     
-    // Existing field in store - publish store changed event only when value has changed.
+    // Existing field in store.
     let fieldInStore = fields[field.storeId]
     if(fieldInStore) {
-        const storeChanged = fieldInStore.value !== field.value;
+        const storeChanged = fieldInStore.previousValue !== field.value;
         if(storeChanged) {
+            // Set previousValue, for correct change tracking.
             fieldInStore.previousValue = fieldInStore.value;
-            fieldInStore.value = field.value;
 
-            publishStoreChangedEvent(whenItShouldNotBeSkipped);
+            // Save
+            fieldInStore.value = field.value;           
+            
+            // Publish
+            if(shouldPublishStoreChangedEvent) {
+                publish(STORE_CHANGED_EVENT);  
+            }
         }
         return {field: field, storeHasChanged: storeChanged};
     }    
 
-    // Existing field but not in store - publish store changed event.
-    fieldInStore = fields[field.storeId] = field;
-    publishStoreChangedEvent(whenItShouldNotBeSkipped);
+    // Existing field, but not in store.
+
+    // Reset previousValue, for correct change tracking.
+    field.previousValue = undefined;
+
+    // Save
+    fieldInStore = fields[field.storeId] = field;   
+
+    // Publish
+    if(shouldPublishStoreChangedEvent) {
+        publish(STORE_CHANGED_EVENT);  
+    }
         
     return {field: field, storeHasChanged: true};
 }
 
 export function saveItem<T extends StoreItem>(item: T, skipStoreChangedEvent?: boolean): SaveItemResult<T> {
+    let shouldPublishStoreChangedEvent = !skipStoreChangedEvent;
 
-    // New item - save to store and publish store changed event.
+    // New item
     if(!item.storeId) {
         item.storeId = newCuid();
-        items[item.storeId] = item;
-        skipStoreChangedEvent = true;
-        saveItem(item, skipStoreChangedEvent);
 
-        const whenNeeded = !skipStoreChangedEvent;
-        publishStoreChangedEvent(whenNeeded);
+        // Save
+        items[item.storeId] = item;
+
+        // Save StoreItems and StoreFields in properties, but do not publish store changed event.
+        saveItem(item, true);
+
+        // Publish
+        if(shouldPublishStoreChangedEvent) {
+            publish(STORE_CHANGED_EVENT);  
+        }
         
         return {item: item, storeHasChanged: true};
     } 
 
-    // Existing item in store - save to store and publish storechangedevent only, when item has changed in the store.
+    // Existing item in store.
     let itemInStore = items[item.storeId]
     if(itemInStore) {
         let itemChangedInStore = false;
@@ -128,14 +148,14 @@ export function saveItem<T extends StoreItem>(item: T, skipStoreChangedEvent?: b
             if (item.hasOwnProperty(attrName)) {
                 const attrValue = (<any>item)[attrName];
     
-                // If property is a storeitem, save it.
+                // Save StoreField.
                 if(isField(attrValue)) {
                     const result = saveField(attrValue, true);
                     itemChangedInStore = itemChangedInStore || result.storeHasChanged;
                     continue;
                 }
     
-                // If property is a storeitem, save it.
+                // Save StoreItem.
                 if(isItem(attrValue)) {
                     const result = saveItem(attrValue, true);
                     itemChangedInStore = itemChangedInStore || result.storeHasChanged;
@@ -144,15 +164,25 @@ export function saveItem<T extends StoreItem>(item: T, skipStoreChangedEvent?: b
             }
         }
 
-        const whenNeeded = itemChangedInStore && !skipStoreChangedEvent;
-        publishStoreChangedEvent(whenNeeded);
+        // Publish storechangedevent only, when item has changed in the store and we don't have to skip publishing.
+        shouldPublishStoreChangedEvent = itemChangedInStore && !skipStoreChangedEvent;
+        if(shouldPublishStoreChangedEvent) {
+            publish(STORE_CHANGED_EVENT);  
+        }
         
         return {item: item, storeHasChanged: itemChangedInStore};
     }
 
-    // Store item not in store - save it to the store and publish storechangedevent.
-    item = items[item.storeId] = item;
+    // Store item not in store, save it.
+    items[item.storeId] = item;
+
+    // Save StoreItems and StoreFields in properties, but do not publish store changed event.
     saveItem(item, true);
+
+    // Publish
+    if(shouldPublishStoreChangedEvent) {
+        publish(STORE_CHANGED_EVENT);  
+    }
 
     return {item: item, storeHasChanged: true};
 }
