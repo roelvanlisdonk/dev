@@ -158,7 +158,7 @@ R = (function (document, undefined) {
             try {
                 id = resolveModuleOrGetExports(module);
             } catch (_err) {
-                err = _err
+                err = _err;
                 throw err;
             }
             if (callback) {

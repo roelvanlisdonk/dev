@@ -13,6 +13,7 @@ window.addEventListener("unhandledrejection", function handlUnhandledrejection (
 
 export async function app(appData:AppData): Promise<VirtualDomNode> {
     const nodes: Array<VirtualDomNode> = [];
+    
     const node: VirtualDomNode = {
         attributes:[{name:"title", value: "This is an AM app."}],
         classes:[block],

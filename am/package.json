@@ -13,13 +13,14 @@
     "watch-ts": "tsc -w"
   },
   "dependencies": {
-    "require1k": "latest"
+    "redis": "2.8.0",
+    "require1k": "1.0.1"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "concurrently": "latest",
-    "es-module-loader": "latest",
-    "livereload": "latest",
-    "typescript": "latest"
+    "@types/node": "8.0.47",
+    "concurrently": "3.5.0",
+    "es-module-loader": "2.2.8",
+    "livereload": "0.6.3",
+    "typescript": "2.6.1"
   }
 }
