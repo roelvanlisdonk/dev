@@ -1,6 +1,7 @@
 {
         "version": "0.2.0",
         "configurations": [
+
             {
                 "type": "node",
                 "request": "launch",
@@ -13,6 +14,13 @@
                 "name": "Debug server",
                 "program": "${workspaceRoot}/server.ts",
                 "outFiles": ["${workspaceRoot}/*.js"]
+            },
+            {
+                "type": "node",
+                "request": "launch",
+                "name": "Redis - Azure function",
+                "program": "${workspaceRoot}/azure-functions/redis.ts",
+                "outFiles": ["${workspaceRoot}/azure-functions/*.js"]
             }
         ]
     }

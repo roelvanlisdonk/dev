@@ -29,12 +29,12 @@ function app(appData) {
             render: app
         };
         if (appData.account.isAuthenticated.value === true) {
-            const mod = yield Promise.resolve().then(function () { return require("./components/feed"); });
+            const mod = yield Promise.resolve().then(() => require("./components/feed"));
             const feedNode = yield mod.feed(appData);
             nodes.push(feedNode);
         }
         else {
-            const mod = yield Promise.resolve().then(function () { return require("./components/login"); });
+            const mod = yield Promise.resolve().then(() => require("./components/login"));
             const loginNode = yield mod.login(appData.account);
             nodes.push(loginNode);
         }
@@ -44,9 +44,9 @@ function app(appData) {
 exports.app = app;
 function runTests() {
     return __awaiter(this, void 0, void 0, function* () {
-        let mod = yield Promise.resolve().then(function () { return require("./common/validation/is.function.test"); });
-        mod = yield Promise.resolve().then(function () { return require("./store.test"); });
-        mod = yield Promise.resolve().then(function () { return require("./common/validation/is.object.test"); });
+        let mod = yield Promise.resolve().then(() => require("./common/validation/is.function.test"));
+        mod = yield Promise.resolve().then(() => require("./store.test"));
+        mod = yield Promise.resolve().then(() => require("./common/validation/is.object.test"));
         // Run tests
         test_framework_1.execute();
     });
