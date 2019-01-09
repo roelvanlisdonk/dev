@@ -1,4 +1,4 @@
 
 -- The following statement, immediately logs the message to the output.
-RAISERROR('Message goes here',0,1) WITH NOWAIT;
+raiserror('Message goes here',0,1) with nowait;
 go
