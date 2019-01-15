@@ -41,3 +41,19 @@ or just open Settings.json and enter:
 "dotnet-test-explorer.testProjectPath": "**/*.test.csproj"
 
 Now the .NET Core Test Explorer should find the "C:\Dev\GitHub\roelvanlisdonk\dev\C#\core\test\core.test.csproj"
+
+## To run test, when ever a C# changes
+First add the following xml to the core.test.csproj:
+
+<ItemGroup>
+    <TestProjects Include="**\*test.csproj" />
+    <Watch Include="**\*.cs" />
+</ItemGroup>
+<Target Name="Test">
+    <MSBuild Targets="VSTest" Projects="@(TestProjects)" />
+</Target>
+<Import Project="$(MSBuildExtensionsPath)\Microsoft.Common.targets" />
+
+Then run:
+
+dotnet watch msbuild /t:Test

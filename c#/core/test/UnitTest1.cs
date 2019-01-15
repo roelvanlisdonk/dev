@@ -1,15 +1,18 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+using SqlScript;
 namespace core
 {
     [TestClass]
     public class UnitTest1
     {
         [TestMethod]
-        public void TestMethod1()
+        public async Task TestMethod1()
         {
-            System.Debug.WriteLine("Hello world - D ");
-            System.Console.WriteLine("Executed test 1.");
+            var generator = new Generator();
+            bool result = await generator.GenerateViewScripts();
+            Assert.IsTrue(true);
         }
     }
 }
