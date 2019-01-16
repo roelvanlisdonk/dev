@@ -11,7 +11,7 @@ namespace core
         public async Task TestMethod1()
         {
             var generator = new Generator();
-            bool result = await generator.GenerateViewScripts();
+            bool result = await generator.GenerateViewScriptsBasedOnViewDefinition();
             Assert.IsTrue(true);
         }
     }
